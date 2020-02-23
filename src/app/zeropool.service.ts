@@ -11,9 +11,11 @@ import { combineLatest, Observable } from 'rxjs';
 })
 export class ZeropoolService {
 
-  activeZpNetwork$: Observable<ZeroPoolNetwork>;
+  activeZpNetwork$: Observable<any>;
 
   constructor(private circomeSvc: CircomeLoaderService, private accountService: AccountService) {
+
+    // const x: ZeroPoolNetwork = {} as any as ZeroPoolNetwork;
 
     // In order to get ethereum balance use:
     // activeZpNetwork.ZeroPool.web3Ethereum.getBalance('');

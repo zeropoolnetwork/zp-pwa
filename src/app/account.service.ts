@@ -34,7 +34,9 @@ export class AccountService {
       zeropoolMnemonic,
       zeropoolAddress
     };
+    //
 
     this.account$ = of(account);
+    // this.account$ = of({ethereumPrivateKey: '', ethereumAddress: '', zeropoolMnemonic: '', zeropoolAddress: ''});
   }
 }
