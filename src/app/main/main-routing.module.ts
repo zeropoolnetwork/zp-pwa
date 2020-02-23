@@ -5,6 +5,7 @@ import { MainComponent } from './main.component';
 import { DepositComponent } from './deposit/deposit.component';
 import { TransferComponent } from './transfer/transfer.component';
 import { WithdrawComponent } from './withdraw/withdraw.component';
+import { NgxLoadersCssModule } from 'ngx-loaders-css';
 
 const routes: Routes = [
   {path: '', component: MainComponent},
@@ -14,7 +15,10 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)],
+  imports: [
+    NgxLoadersCssModule,
+    RouterModule.forChild(routes)
+  ],
   exports: [RouterModule]
 })
 export class MainRoutingModule {
