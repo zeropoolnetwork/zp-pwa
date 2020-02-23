@@ -1,4 +1,4 @@
-<h1>hi One</h1>
+<h1>Main Component:</h1>
 <ng-container *ngIf="account$ | async as account">
   <h1>Your ZP address</h1>
   <h1>{{account.ethereumAddress}}</h1>
@@ -6,9 +6,9 @@
 
   <h1>{{balance}} zpETH</h1>
 
-  <button (click)="deposit()">Deposit</button>
-  <button (click)="transfer()">Transfer</button>
-  <button (click)="withdraw()">Withdraw</button>
+  <button routerLink="./deposit">Deposit</button>
+  <button routerLink="./transfer">Transfer</button>
+  <button routerLink="./withdraw">Withdraw</button>
 
   <h2>History:</h2>
   <ul>
@@ -18,5 +18,3 @@
     </li>
   </ul>
 </ng-container>
-
-<h1>hi two</h1>

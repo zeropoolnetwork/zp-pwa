@@ -25,6 +25,8 @@ export class AppComponent {
     {type: 'withdraw', amount: 10},
   ];
 
+
+
   constructor(private circomeSvc: CircomeLoaderService, private accountSvc: AccountService, private zeropoolSvc: ZeropoolService) {
     this.hasError$ = this.circomeSvc.hasError$;
     this.circomeResourcesLoaded$ = this.circomeSvc.isReady$;
