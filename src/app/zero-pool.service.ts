@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CircomeLoaderService } from './circome-loader.service';
-import { HistoryItem, HistoryState, normalizeUtxoState, ZeroPoolNetwork } from 'zeropool-lib';
-import { filter, map } from 'rxjs/operators';
+import { HistoryItem, HistoryState, MyUtxoState, normalizeUtxoState, ZeroPoolNetwork } from 'zeropool-lib';
+import { filter, map, switchMap, tap } from 'rxjs/operators';
 import { AccountService } from './account.service';
 import { environment } from '../environments/environment';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
@@ -17,11 +17,8 @@ export class ZeroPoolService {
 
   activeZpNetwork$: Observable<ZeroPoolNetwork>;
 
-  private zpBalance: BehaviorSubject<ZpBalance> = new BehaviorSubject<ZpBalance>(({'0x0': 0}));
-  zpBalance$: Observable<ZpBalance> = this.zpBalance.asObservable();
-
-  private zpHistory: BehaviorSubject<HistoryItem[]> = new BehaviorSubject<HistoryItem[]>([]);
-  zpHistory$: Observable<HistoryItem[]> = this.zpHistory.asObservable();
+  zpBalance$: Observable<ZpBalance>;
+  zpHistory$: Observable<HistoryItem[]>;
 
   constructor(
     private circomeSvc: CircomeLoaderService,
@@ -45,6 +42,7 @@ export class ZeroPoolService {
 
     this.activeZpNetwork$ = combineLatest([circomLoaded$, web3Loaded$, this.accountService.account$]).pipe(
       map(([ok1, ok2, account]) => {
+
         const zp = new ZeroPoolNetwork(
           environment.contractAddress,
           this.web3ProviderService.web3Provider,
@@ -54,26 +52,31 @@ export class ZeroPoolService {
           this.stateStorageService.utxoState,
           this.stateStorageService.historyState
         );
-
-        zp.zpHistoryState$.subscribe(async historyState => {
-          this.stateStorageService.historyState = historyState;
-          const history = await zp.utxoHistory();
-          this.zpHistory.next(history.items);
-        });
-
-        zp.state$.subscribe(async utxoState => {
-          this.stateStorageService.utxoState = normalizeUtxoState(utxoState);
-          const balance = await zp.getBalance();
-          this.zpBalance.next(balance);
-        });
-
-        zp.utxoHistory();
-        zp.getBalance();
-        // this.accountService.ethereumAddress = zp.ZeroPool.web3Ethereum.ethAddress;
-
         return zp;
-
       }),
     );
+
+    this.zpHistory$ = this.activeZpNetwork$.pipe(
+      switchMap( (zpn: ZeroPoolNetwork) => {
+        return zpn.zpHistoryState$;
+      }),
+      tap( (historyState: HistoryState) => {
+        // Side effect - save to storage
+        this.stateStorageService.historyState = historyState;
+      }),
+      map( (historyState: HistoryState) => {
+        return historyState.items;
+      })
+    );
+
+    this.activeZpNetwork$.pipe(
+      switchMap( (zpn: ZeroPoolNetwork) => {
+        return zpn.state$; // MerkleTree etc...
+      }),
+      tap((utxoState: MyUtxoState<bigint>) => {
+        this.stateStorageService.utxoState = normalizeUtxoState(utxoState);
+      })
+    ).subscribe(); // Infinite subscribe
+
   }
 }
