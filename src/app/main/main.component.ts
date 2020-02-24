@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountService, IAccount } from '../account.service';
 import { ZeroPoolService } from '../zero-pool.service';
-import { combineLatest, Observable } from 'rxjs';
-import { map, mergeMap, tap } from 'rxjs/operators';
-import { fw, HistoryItem, HistoryState } from 'zeropool-lib';
+import { Observable } from 'rxjs';
+import { fw, HistoryItem } from 'zeropool-lib';
 
 @Component({
   selector: 'app-main',
@@ -16,21 +15,23 @@ export class MainComponent implements OnInit {
   balance = 1;
   history: HistoryItem[];
 
-  constructor(private accountSvc: AccountService, private zeropoolSvc: ZeroPoolService) {
+  constructor(private accountSvc: AccountService, private zeroPoolSvc: ZeroPoolService) {
     this.account$ = this.accountSvc.account$;
-    zeropoolSvc.activeZpNetwork$.pipe(
-      mergeMap(
-        zp => {
-          return combineLatest([zp.getBalance(), zp.utxoHistory()]);
-        }
-      ),
-      tap(
-        ([balances, history]) => {
-          this.balance = fw(balances['0x0']) || 0;
-          this.history = history.items;
-        }
-      )
-    ).subscribe();
+
+    this.zeroPoolSvc.activeZpNetwork$.subscribe();
+
+    this.zeroPoolSvc.zpBalance$.subscribe(
+      balances => {
+        this.balance = fw(balances['0x0']) || 0;
+      }
+    );
+
+    this.zeroPoolSvc.zpHistory$.subscribe(
+      history => {
+        this.history = history;
+      }
+    );
+
   }
 
   ngOnInit(): void {

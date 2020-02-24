@@ -17,18 +17,11 @@ export class StateStorageService {
     this.setItem('history-state', val);
   }
 
-  get utxoState(): MyUtxoState | undefined {
-    return this.getItem<MyUtxoState>('utxo-state');
+  get utxoState(): MyUtxoState<string> | undefined {
+    return this.getItem<MyUtxoState<string>>('utxo-state');
   }
 
-  set utxoState(val: MyUtxoState) {
-    const stringUtxoState = {
-      nullifiers: undefined,
-      lastBlockNumber: undefined
-    };
-    stringUtxoState.nullifiers = val.nullifiers.map(String);
-    stringUtxoState.lastBlockNumber = val.lastBlockNumber;
-    // val.utxoList.map(x => x.)
+  set utxoState(val: MyUtxoState<string>) {
     this.setItem('utxo-state', val);
   }
 
