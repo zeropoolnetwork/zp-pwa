@@ -2,13 +2,20 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { getEthereumAddress, getKeyPair } from 'zeropool-lib';
 
+
+export function toAddressPreview(address: string): string {
+  return address.substring(0, 8) + '...' + address.substring(address.length - 8, address.length);
+}
+
 export interface IAccount {
   // Hex encoded start private key '0x' prefix is optional
   readonly ethereumPrivateKey: string;
   readonly ethereumAddress: string;
+  readonly ethereumAddressPreview: string;
   //
   readonly zeropoolMnemonic: string;
   readonly zeropoolAddress: string;
+  readonly zeropoolAddressPreview: string;
 }
 
 @Injectable({
@@ -30,9 +37,11 @@ export class AccountService {
       //
       ethereumPrivateKey,
       ethereumAddress,
+      ethereumAddressPreview: toAddressPreview(ethereumAddress),
       //
       zeropoolMnemonic,
-      zeropoolAddress
+      zeropoolAddress,
+      zeropoolAddressPreview: toAddressPreview(zeropoolAddress),
     };
     //
 

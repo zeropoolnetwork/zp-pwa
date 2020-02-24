@@ -1,5 +1,57 @@
-button {
-  padding: 0.5em;
-  margin: 0.2em;
-  font-size: 1em;
+.content {
+  text-align: center;
+}
+
+.address-box {
+  margin-bottom: 0.5em;
+  margin-top: 0.5em;
+  display: grid;
+  grid-row: 1;
+  grid-template-columns: 40px 1fr 40px;
+  p {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-direction: row;
+
+  button {
+    width: 100px;
+    padding: 0.3em 1em;
+    margin: 0.2em;
+    font-size: 1em;
+    border: 1px solid !important;
+  }
+}
+
+
+.fixed-horizontal-center
+{
+  position: fixed;
+  top: 100px; /* or whatever top you need */
+  left: 50%;
+  width: auto;
+  -webkit-transform: translateX(-50%);
+  -moz-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  -o-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+
+
+.fixed-center
+{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: auto;
+  height: auto;
+  -webkit-transform: translate(-50%,-50%);
+  -moz-transform: translate(-50%,-50%);
+  -ms-transform: translate(-50%,-50%);
+  -o-transform: translate(-50%,-50%);
+  transform: translate(-50%,-50%);
 }
