@@ -6,7 +6,7 @@
 
   <ng-container *ngIf="!isDone">
 
-    <ng-container *ngIf="!depositInProgress">
+    <ng-container *ngIf="!depositInProgress" [formGroup]="depositForm">
 
       <h2>Deposit</h2>
       <p>ETH from your account will be deposited to your ZeroPool address via relayer</p>
@@ -16,17 +16,17 @@
         <div class="title" style="font-size: 0.7em">Available {{availableEthAmount}} ETH</div>
       </ng-container>
 
-      <mat-form-field appearance="outline" style="width: 300px">
-        <mat-label>Enter amount of ETH</mat-label>
-        <input matInput placeholder="0.05 ETH">
+      <ng-container>
+        <app-amount-input formControlName="amount"></app-amount-input>
+        <br>
         <mat-hint>Maximum amount of deposit is: 0.001 ETH</mat-hint>
-      </mat-form-field>
+      </ng-container>
 
       <br>
       <br>
       <div class="actions">
-        <button mat-stroked-button routerLink="./transfer" routerLink="/main">Back</button>
-        <button mat-flat-button color="accent" (click)="onDepositClick()" [disabled]="true">Deposit</button>
+        <button mat-stroked-button routerLink="/main">Back</button>
+        <button mat-flat-button color="accent" (click)="onDepositClick()" [disabled]="!depositForm.valid">Deposit</button>
       </div>
     </ng-container>
 

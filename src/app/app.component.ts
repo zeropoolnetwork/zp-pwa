@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CircomeLoaderService } from './circome-loader.service';
 import { Observable } from 'rxjs';
 import { AccountService, IAccount } from './account.service';
-import { ZeropoolService } from './zeropool.service';
+import { ZeroPoolService } from './zero-pool.service';
 import { switchMap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
 
@@ -25,7 +25,7 @@ export class AppComponent {
     {type: 'withdraw', amount: 10},
   ];
 
-  constructor(private circomeSvc: CircomeLoaderService, private accountSvc: AccountService, private zeropoolSvc: ZeropoolService) {
+  constructor(private circomeSvc: CircomeLoaderService, private accountSvc: AccountService, private zeropoolSvc: ZeroPoolService) {
     this.hasError$ = this.circomeSvc.hasError$;
     this.circomeResourcesLoaded$ = this.circomeSvc.isReady$;
 

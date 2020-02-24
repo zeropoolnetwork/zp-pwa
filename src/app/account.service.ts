@@ -8,10 +8,8 @@ export function toAddressPreview(address: string): string {
 }
 
 export interface IAccount {
-  // Hex encoded start private key '0x' prefix is optional
-  readonly ethereumPrivateKey: string;
-  readonly ethereumAddress: string;
-  readonly ethereumAddressPreview: string;
+  // readonly ethereumAddress: string;
+  // readonly ethereumAddressPreview: string;
   //
   readonly zeropoolMnemonic: string;
   readonly zeropoolAddress: string;
@@ -24,20 +22,18 @@ export interface IAccount {
 export class AccountService {
   account$: Observable<IAccount>;
 
+  // public ethereumAddress: string;
+
   constructor() {
 
-    const ethereumPrivateKey = '0x896bdb64b1ca1458a61323416f5d4ba1a96278c894f83059b02642d094a21c63';
-    const ethereumAddress = getEthereumAddress(ethereumPrivateKey);
-
     const zeropoolMnemonic = 'salute grocery glass box cloth pull wedding measure bright tilt shield over';
-    const {publicKey} = getKeyPair(zeropoolMnemonic);
+    const { publicKey } = getKeyPair(zeropoolMnemonic);
     const zeropoolAddress = `0x` + publicKey.toString(16);
 
     const account: IAccount = {
       //
-      ethereumPrivateKey,
-      ethereumAddress,
-      ethereumAddressPreview: toAddressPreview(ethereumAddress),
+      // ethereumAddress: this.ethereumAddress,
+      // ethereumAddressPreview: toAddressPreview(this.ethereumAddress),
       //
       zeropoolMnemonic,
       zeropoolAddress,

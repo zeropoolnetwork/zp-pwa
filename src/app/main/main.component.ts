@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountService, IAccount } from '../account.service';
-import { ZeropoolService } from '../zeropool.service';
-import { Observable } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
-import { fromPromise } from 'rxjs/internal-compatibility'
+import { ZeroPoolService } from '../zero-pool.service';
+import { combineLatest, Observable } from 'rxjs';
+import { map, mergeMap, tap } from 'rxjs/operators';
+import { fw, HistoryItem, HistoryState } from 'zeropool-lib';
 
 @Component({
   selector: 'app-main',
@@ -14,24 +14,23 @@ export class MainComponent implements OnInit {
 
   account$: Observable<IAccount>;
   balance = 1;
-  history = [
-    {type: 'Transfer', amount: 10},
-    {type: 'Deposit', amount: 10},
-    {type: 'Withdraw', amount: 10},
-    {type: 'withdraw', amount: 10},
-    {type: 'withdraw', amount: 10},
-    {type: 'withdraw', amount: 10},
-    {type: 'withdraw', amount: 10},
-    {type: 'withdraw', amount: 10},
-    {type: 'withdraw', amount: 10},
-    {type: 'withdraw', amount: 10},
-    {type: 'withdraw', amount: 10},
-    {type: 'withdraw', amount: 10},
-    {type: 'withdraw', amount: 10},
-  ];
+  history: HistoryItem[];
 
-  constructor(private accountSvc: AccountService, private zeropoolSvc: ZeropoolService) {
+  constructor(private accountSvc: AccountService, private zeropoolSvc: ZeroPoolService) {
     this.account$ = this.accountSvc.account$;
+    zeropoolSvc.activeZpNetwork$.pipe(
+      mergeMap(
+        zp => {
+          return combineLatest([zp.getBalance(), zp.utxoHistory()]);
+        }
+      ),
+      tap(
+        ([balances, history]) => {
+          this.balance = fw(balances['0x0']) || 0;
+          this.history = history.items;
+        }
+      )
+    ).subscribe();
   }
 
   ngOnInit(): void {
@@ -39,13 +38,7 @@ export class MainComponent implements OnInit {
   }
 
   deposit() {
-    this.zeropoolSvc.activeZpNetwork$.pipe(
-      switchMap((zpn) => {
-        return fromPromise(zpn.deposit('0x0000000000000000000000000000000000000000', 100000));
-      })
-    ).subscribe((result) => {
-      debugger
-    });
+
   }
 
   transfer() {
