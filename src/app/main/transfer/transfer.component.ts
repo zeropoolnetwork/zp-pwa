@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-transfer',
@@ -8,15 +7,25 @@ import { Location } from '@angular/common';
 })
 export class TransferComponent implements OnInit {
 
-  constructor(private location: Location) {
+  //
+  myZpBalance: number;
+
+  //
+  toAmount: number;
+  toAddress: string;
+
+  isDone = false;
+  transferIsInProgress = false;
+
+
+  constructor() {
+    //
   }
 
   ngOnInit(): void {
   }
 
-  navigateBack() {
-    this.location.back();
+  onSendClick() {
+    //
   }
-
-
 }

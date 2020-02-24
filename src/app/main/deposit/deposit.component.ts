@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
-import { LoadersCSS } from 'ngx-loaders-css';
 
 @Component({
   selector: 'app-deposit',
@@ -12,11 +11,12 @@ export class DepositComponent implements OnInit {
   @Input()
   availableEthAmount: number;
 
+  // TODO: from and validation
   depositAmount: number;
   transactionHash: string;
 
   isDone = false;
-  depositInProgress = false;
+  depositInProgress = true;
   color = 'rgba(100, 100, 100, 0.5)';
 
   constructor(private location: Location) {
@@ -24,10 +24,6 @@ export class DepositComponent implements OnInit {
   }
 
   ngOnInit(): void {
-  }
-
-  navigateBack() {
-    this.location.back();
   }
 
   onDepositClick(): void {

@@ -8,15 +8,26 @@ import { Location } from '@angular/common';
 })
 export class WithdrawComponent implements OnInit {
 
-  constructor(private location: Location) {
+  //
+  myZpBalance: number;
+
+  //
+  toAmount: number;
+  toAddress: string;
+
+  isDone = false;
+  withdrawIsInProgress = false;
+
+
+  constructor() {
+    //
   }
 
   ngOnInit(): void {
   }
 
-  navigateBack() {
-    this.location.back();
+  onSendClick() {
+    //
   }
-
 
 }

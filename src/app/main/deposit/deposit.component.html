@@ -18,14 +18,14 @@
 
       <mat-form-field appearance="outline" style="width: 300px">
         <mat-label>Enter amount of ETH</mat-label>
-        <input matInput placeholder="0.0001 ETH">
+        <input matInput placeholder="0.05 ETH">
         <mat-hint>Maximum amount of deposit is: 0.001 ETH</mat-hint>
       </mat-form-field>
 
       <br>
       <br>
       <div class="actions">
-        <button mat-stroked-button routerLink="./transfer" (click)="navigateBack()">Back</button>
+        <button mat-stroked-button routerLink="./transfer" routerLink="/main">Back</button>
         <button mat-flat-button color="accent" (click)="onDepositClick()" [disabled]="true">Deposit</button>
       </div>
     </ng-container>
@@ -46,9 +46,9 @@
     <div>
       <img src="/assets/images/guy-fawkes-zip.png" width="260px">
     </div>
-    <h3 class="title" style="padding: 10px">From this moment no one wouldn't now what you with you funds</h3>
+    <h3 class="title" style="padding: 10px">From this moment no one wouldn't know what you do with you funds</h3>
     <div style="margin-top: 20px">
-      <button mat-stroked-button color="primary" (click)="navigateBack()">Let's make transaction</button>
+      <button mat-stroked-button color="primary" routerLink="/main">Let's make transaction</button>
     </div>
   </ng-container>
 
