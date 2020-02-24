@@ -26,7 +26,7 @@ export class AccountService {
 
   constructor() {
 
-    const zeropoolMnemonic = 'salute grocery glass box cloth pull wedding measure bright tilt shield over';
+    const zeropoolMnemonic = 'session oppose search lunch cave enact quote wire debate knee noble drama exit way scene';
     const { publicKey } = getKeyPair(zeropoolMnemonic);
     const zeropoolAddress = `0x` + publicKey.toString(16);
 

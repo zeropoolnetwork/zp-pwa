@@ -50,10 +50,8 @@ export class DepositComponent implements OnInit {
 
   onDepositClick(): void {
     this.depositInProgress = true;
-    this.zpService.activeZpNetwork$
-      .pipe(
-        mergeMap(
-          zp => {
+    fromPromise(this.zpService.zp$).pipe(
+        mergeMap((zp) => {
             const amount = tw(this.depositAmount).toNumber();
 
             // generate tx and send eth to contract

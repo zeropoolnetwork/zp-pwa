@@ -37,12 +37,7 @@ export class AppComponent {
   }
 
   deposit() {
-    this.zeropoolSvc.activeZpNetwork$.pipe(
-      switchMap((zpn) => {
-        return fromPromise(zpn.deposit('0x0000000000000000000000000000000000000000', 100000));
-      })
-    ).subscribe((result) => {
-    });
+
   }
 
   transfer() {

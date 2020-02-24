@@ -30,7 +30,7 @@
     "rxjs": "~6.5.4",
     "tslib": "^1.10.0",
     "web3": "^1.2.6",
-    "zeropool-lib": "^0.1.6",
+    "zeropool-lib": "^0.1.9",
     "zone.js": "~0.10.2"
   },
   "devDependencies": {
