@@ -15,16 +15,12 @@ export class DepositComponent implements OnInit {
   depositAmount: number;
   transactionHash: string;
 
-  // @Output()
-  // backClick = new EventEmitter<boolean>();
-
   isDone = false;
-  showSpinner = false;
-  bgColor = 'black';
+  depositInProgress = false;
   color = 'rgba(100, 100, 100, 0.5)';
-  loader: LoadersCSS = 'pacman';
 
   constructor(private location: Location) {
+    this.availableEthAmount = 0.0000;
   }
 
   ngOnInit(): void {

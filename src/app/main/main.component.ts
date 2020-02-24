@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AccountService, IAccount } from '../account.service';
 import { ZeropoolService } from '../zeropool.service';
 import { Observable } from 'rxjs';
-import { switchMap, tap } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility'
 
 @Component({
@@ -15,9 +15,9 @@ export class MainComponent implements OnInit {
   account$: Observable<IAccount>;
   balance = 1;
   history = [
-    {type: 'Transfer to 0xA4...0d', amount: 10},
-    {type: 'Deposit from', amount: 10},
-    {type: 'Withdraw to 0xA4...0d', amount: 10},
+    {type: 'Transfer', amount: 10},
+    {type: 'Deposit', amount: 10},
+    {type: 'Withdraw', amount: 10},
     {type: 'withdraw', amount: 10},
     {type: 'withdraw', amount: 10},
     {type: 'withdraw', amount: 10},

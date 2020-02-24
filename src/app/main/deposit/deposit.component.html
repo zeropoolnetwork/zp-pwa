@@ -1,41 +1,59 @@
-<div class="container">
+<div class="fixed-center content">
+
+  <button mat-icon-button aria-label=Back routerLink="/main">
+    <mat-icon>keyboard_backspace</mat-icon>
+  </button>
 
   <ng-container *ngIf="!isDone">
-    <div class="title" style="padding: 10px">Enter amount in ETH</div>
 
-    <input [(ngModel)]="depositAmount" type="text" class="input-block-level" placeholder="0.0 ETH"
-           style="width:290px;border-radius:5px;border:none"/>
+    <ng-container *ngIf="!depositInProgress">
 
-    <ng-container *ngIf="availableEthAmount">
-      <div class="title" style="padding: 10px; font-size: 0.7em">Available {{availableEthAmount}} ETH</div>
-    </ng-container>
-    <ng-container *ngIf="!availableEthAmount">
+      <h2>Deposit</h2>
+      <p>ETH from your account will be deposited to your ZeroPool address via relayer</p>
       <br>
-    </ng-container>
 
-    <ng-container *ngIf="!showSpinner">
-      <div class="buttons_container">
-        <button (click)="navigateBack()" class="back">Back</button>
-        <button (click)="onDepositClick()">Deposit</button>
+      <ng-container *ngIf="availableEthAmount">
+        <div class="title" style="font-size: 0.7em">Available {{availableEthAmount}} ETH</div>
+      </ng-container>
+
+      <mat-form-field appearance="outline" style="width: 300px">
+        <mat-label>Enter amount of ETH</mat-label>
+        <input matInput placeholder="0.0001 ETH">
+        <mat-hint>Maximum amount of deposit is: 0.001 ETH</mat-hint>
+      </mat-form-field>
+
+      <br>
+      <br>
+      <div class="actions">
+        <button mat-stroked-button routerLink="./transfer" (click)="navigateBack()">Back</button>
+        <button mat-flat-button color="accent" (click)="onDepositClick()" [disabled]="true">Deposit</button>
       </div>
     </ng-container>
 
-    <ng-container *ngIf="showSpinner">
-      <loaders-css [loader]="loader" [bgColor]="bgColor" [color]="color" [scale]="1"></loaders-css>
-      <div class="buttons_container" style="margin-top: 20px">
-        <button (click)="navigateBack()" class="back">Back</button>
+    <ng-container *ngIf="depositInProgress">
+      <h1>Deposit in progress</h1>
+      <div>
+        <img src="/assets/images/guy-fawkes-cross-fingers.png" width="260px">
       </div>
+      <loaders-css loader="ball-beat" [color]="color" [scale]="1"></loaders-css>
+      <h1>Let's cross a fingers and wait for a couple of blocks</h1>
     </ng-container>
+
   </ng-container>
 
   <ng-container *ngIf="isDone">
-    <div class="title" style="padding: 10px">Deposit Successful</div>
-    <div class="buttons_container" style="margin-top: 20px">
-      <button (click)="navigateBack()" class="back">BACK!</button>
+    <h2 class="title" style="padding: 10px">Deposit Successful</h2>
+    <div>
+      <img src="/assets/images/guy-fawkes-zip.png" width="260px">
+    </div>
+    <h3 class="title" style="padding: 10px">From this moment no one wouldn't now what you with you funds</h3>
+    <div style="margin-top: 20px">
+      <button mat-stroked-button color="primary" (click)="navigateBack()">Let's make transaction</button>
     </div>
   </ng-container>
 
 
-  <p (click)="navigateBack()">back</p>
 </div>
+
+
 

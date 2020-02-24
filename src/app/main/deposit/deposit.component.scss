@@ -1,62 +1,58 @@
-.container {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
+.content {
+  text-align: center;
+}
 
-  font-family: "Roboto";
-  background: #000000;
-  //background: url(../../assets/background.jpg) no-repeat center fixed;
-
-  -webkit-background-size: cover; /* pour anciens Chrome et Safari */
-  background-size: cover; /* version standardisée */
-
-  div, p {
-    color: white;
+.address-box {
+  margin-bottom: 0.5em;
+  margin-top: 0.5em;
+  display: grid;
+  grid-row: 1;
+  grid-template-columns: 40px 1fr 40px;
+  p {
     margin: 0;
-  }
-
-  .balance {
-    font-size: 4em;
+    padding: 0;
   }
 }
 
-.input-block-level {
-  border: none;
-  font-size: 1.2em;
-  padding: 10px;
-  background-color : #d1d1d1;
-
-  //
-  width:290px;
-  border-radius:5px;
-}
-
-.buttons_container {
+.actions {
   display: flex;
   flex-direction: row;
+  justify-content: center;
 
   button {
-    text-transform: uppercase;
-    font-size: 1em;
-    margin: 5px;
-    height:40px;
     width: 100px;
-    border-radius:5px;
-    border:none;
-    outline: none;
+    padding: 0.3em 1em;
+    margin: 0.2em;
+    font-size: 1em;
+    border: 1px solid !important;
   }
+}
 
-  button.back {
-    border:1px solid white;
-    color: white;
-    background: black;
-  }
 
-  .title {
-    color: white;
-    margin: 0;
-    padding: 50px 20px;
-  }
+.fixed-horizontal-center
+{
+  position: fixed;
+  top: 100px; /* or whatever top you need */
+  left: 50%;
+  width: auto;
+  -webkit-transform: translateX(-50%);
+  -moz-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  -o-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+
+
+.fixed-center
+{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: auto;
+  height: auto;
+  -webkit-transform: translate(-50%,-50%);
+  -moz-transform: translate(-50%,-50%);
+  -ms-transform: translate(-50%,-50%);
+  -o-transform: translate(-50%,-50%);
+  transform: translate(-50%,-50%);
 }
