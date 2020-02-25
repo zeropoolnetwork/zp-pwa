@@ -26,11 +26,14 @@ p {
 
 $toolbar-height: 60px;
 
+.container {
+  position: relative;
+  padding-top: $toolbar-height + 50px;
+}
+
 .toolbar {
-  position: absolute;
+  position: fixed;
   top: 0;
-  left: 0;
-  right: 0;
   height: $toolbar-height;
   display: flex;
   align-items: center;
@@ -39,6 +42,7 @@ $toolbar-height: 60px;
   padding-left: 1.5em;
   padding-right: 1.5em;
   font-weight: 600;
+  width: 100%;
 }
 
 .content {
