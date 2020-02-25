@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { CircomeLoaderService } from './circome-loader.service';
-import { HistoryState, MyUtxoState, normalizeUtxoState, ZeroPoolNetwork } from 'zeropool-lib';
+import { fw, HistoryItem, HistoryState, MyUtxoState, normalizeUtxoState, ZeroPoolNetwork } from 'zeropool-lib';
 import { filter, map, switchMap, tap } from 'rxjs/operators';
 import { AccountService } from './account.service';
 import { environment } from '../environments/environment';
-import { combineLatest, Observable } from 'rxjs';
+import { combineLatest, interval, Observable } from 'rxjs';
 import { Web3ProviderService } from './web3.provider.service';
 import { StateStorageService } from './state.storage.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
@@ -18,9 +18,29 @@ export interface ZpBalance {
 })
 export class ZeroPoolService {
 
-  // todo: rewrite it!!!!!!!!!
   public zp$: Promise<ZeroPoolNetwork>;
-  private zp: ZeroPoolNetwork;
+  public zpBalance: ZpBalance;
+  public zpHistory: HistoryItem[];
+
+  public zpUpdates$: Observable<boolean> = interval(5000).pipe(
+    switchMap(() => {
+      return fromPromise(this.zp$);
+    }),
+    switchMap((zp) => {
+      return combineLatest(
+        [
+          fromPromise(zp.getBalance()),
+          fromPromise(zp.utxoHistory())
+        ]
+      );
+    }),
+    tap(([balances, history]) => {
+      this.zpBalance = balances;
+      this.zpHistory = history.items.slice(0, 3);
+    }),
+    map(() => {
+      return true;
+    }));
 
   constructor(
     private circomeSvc: CircomeLoaderService,
@@ -75,6 +95,9 @@ export class ZeroPoolService {
       })
     ).subscribe(); // Infinite subscribe
 
+    this.zpUpdates$.subscribe();
+
   }
 
 }
+

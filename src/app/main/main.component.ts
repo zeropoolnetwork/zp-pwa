@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountService, IAccount } from '../account.service';
 import { ZeroPoolService } from '../zero-pool.service';
-import { combineLatest, Observable } from 'rxjs';
-import { fw, HistoryItem, HistoryState } from 'zeropool-lib';
-import { switchMap, tap } from 'rxjs/operators';
-import { fromPromise } from 'rxjs/internal-compatibility';
+import { Observable } from 'rxjs';
+import { fw, HistoryItem } from 'zeropool-lib';
+import { copyToClipboard } from '../copy-to-clipboard';
+import { MatSnackBar, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-main',
@@ -14,25 +14,24 @@ import { fromPromise } from 'rxjs/internal-compatibility';
 export class MainComponent implements OnInit {
 
   account$: Observable<IAccount>;
-  balance = 1;
+  balance;
   history: HistoryItem[];
 
-  constructor(private accountSvc: AccountService, private zpService: ZeroPoolService) {
+  horizontalPosition: MatSnackBarHorizontalPosition = 'center';
+  verticalPosition: MatSnackBarVerticalPosition = 'top';
+
+  constructor(private accountSvc: AccountService, private zpService: ZeroPoolService, private snackBar: MatSnackBar) {
     this.account$ = this.accountSvc.account$;
 
-    fromPromise(this.zpService.zp$).pipe(
-      switchMap((zp) => {
-        return combineLatest([
-          fromPromise(zp.getBalance()),
-          fromPromise(zp.utxoHistory())
-        ]);
-      }),
-      tap((x) => {
-        const [balances, history]: [{ [key: string]: number }, HistoryState] = x;
-        this.history = history.items;
-        this.balance = fw(balances['0x0']) || 0;
-      })
-    ).subscribe();
+    if (this.zpService.zpBalance) {
+      this.balance =  fw(this.zpService.zpBalance['0x0']) || 0;
+      this.history = this.zpService.zpHistory;
+    }
+
+    this.zpService.zpUpdates$.subscribe(() => {
+      this.balance = fw(this.zpService.zpBalance['0x0']) || 0;
+      this.history = this.zpService.zpHistory;
+    });
 
   }
 
@@ -40,15 +39,18 @@ export class MainComponent implements OnInit {
 
   }
 
-  deposit() {
-
+  copyAddress(address: string): void {
+    copyToClipboard(address);
+    this.openSnackBar('✅ Address was copied successfully', '');
   }
 
-  transfer() {
+  private openSnackBar(message: string, action: string) {
+    const config = {
+      duration: 800,
+      verticalPosition: this.verticalPosition,
+      horizontalPosition: this.horizontalPosition,
+    };
 
-  }
-
-  withdraw() {
-
+    this.snackBar.open(message, action, config);
   }
 }

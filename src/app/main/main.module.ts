@@ -11,14 +11,13 @@ import { NgxLoadersCssModule } from 'ngx-loaders-css';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { TextFieldModule } from '@angular/cdk/text-field';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
-import { Web3ProviderService } from '../web3.provider.service';
 import { RelayerApiService } from '../relayer.api.service';
-import { ZeroPoolService } from '../zero-pool.service';
 import { HttpClientModule } from '@angular/common/http';
 import { InputAmountModule } from '../common/input-amount/input-amount.module';
+import { InputZpAddressModule } from '../common/input-zp-address/input-zp-address.module';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 
 @NgModule({
@@ -38,11 +37,13 @@ import { InputAmountModule } from '../common/input-amount/input-amount.module';
     MatInputModule,
     MatButtonModule,
     MatDividerModule,
+    MatSnackBarModule,
     MatIconModule,
     ReactiveFormsModule,
 
     HttpClientModule,
-    InputAmountModule
+    InputAmountModule,
+    InputZpAddressModule
   ],
   providers: [
     RelayerApiService

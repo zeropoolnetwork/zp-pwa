@@ -7,8 +7,7 @@ import { mergeMap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { RelayerApiService } from '../../relayer.api.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
-
-const ethToken = '0x0000000000000000000000000000000000000000';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-deposit',
@@ -51,18 +50,17 @@ export class DepositComponent implements OnInit {
   onDepositClick(): void {
     this.depositInProgress = true;
     fromPromise(this.zpService.zp$).pipe(
-        mergeMap((zp) => {
-            const amount = tw(this.depositAmount).toNumber();
+      mergeMap((zp) => {
+        const amount = tw(this.depositAmount).toNumber();
 
-            // generate tx and send eth to contract
-            return fromPromise(zp.deposit(ethToken, amount));
-          }),
-        mergeMap(
-          ([blockItem, txHash]: [BlockItem<string>, string]) => {
-            return this.relayerApi.sendTx$(blockItem);
-          }
-        )
-      ).subscribe(
+        // generate tx and send eth to contract
+        return fromPromise(zp.deposit(environment.ethToken, amount));
+      }),
+      mergeMap((blockItem: BlockItem<string>) => {
+          return this.relayerApi.sendTx$(blockItem);
+        }
+      )
+    ).subscribe(
       (tx: Transaction) => {
         this.isDone = true;
         this.transactionHash = tx.transactionHash;

@@ -2,22 +2,22 @@ import { Component, forwardRef, Input } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, Validator, } from '@angular/forms';
 
 @Component({
-  selector: 'app-amount-input',
-  templateUrl: './input-amount.component.html',
-  styleUrls: ['./input-amount.component.scss'],
+  selector: 'app-zp-address-input',
+  templateUrl: './input-zp-address.component.html',
+  styleUrls: ['./input-zp-address.component.scss'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => InputAmountComponent),
+      useExisting: forwardRef(() => InputZpAddressComponent),
       multi: true,
     },
     {
       provide: NG_VALIDATORS,
-      useExisting: forwardRef(() => InputAmountComponent),
+      useExisting: forwardRef(() => InputZpAddressComponent),
       multi: true,
     }]
 })
-export class InputAmountComponent implements ControlValueAccessor, Validator {
+export class InputZpAddressComponent implements ControlValueAccessor, Validator {
 
   @Input()
   placeholder: string;
@@ -25,7 +25,7 @@ export class InputAmountComponent implements ControlValueAccessor, Validator {
   @Input()
   label: string;
 
-  private amount: string;
+  private address = '';
 
   constructor() {
   }
@@ -39,14 +39,18 @@ export class InputAmountComponent implements ControlValueAccessor, Validator {
   }
 
   writeValue(val: string): void {
-    val.replace(',', '.');
-    this.amount = val;
+    if (val.length === 64) {
+      this.address = '0x' + val;
+      return;
+    }
+
+    this.address = val;
   }
 
   validate(control: AbstractControl): { [key: string]: any } | null {
-    if (this.amount === '0' || this.amount === '') {
-      return { zeroAmount: { value: control.value } };
-    } else if (!/^[0-9]*[.,]?[0-9]+$/.test(this.amount)) {
+    if (this.address.length !== 66) {
+      return { badLength: { value: control.value } };
+    } else if (!/0[xX][0-9a-fA-F]+/.test(this.address)) {
       return { NAN: { value: control.value } };
     }
     return null;
