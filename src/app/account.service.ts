@@ -26,6 +26,7 @@ export class AccountService {
 
   constructor() {
 
+    // TODO: remove hardcode
     const zeropoolMnemonic = 'session oppose search lunch cave enact quote wire debate knee noble drama exit way scene';
     const { publicKey } = getKeyPair(zeropoolMnemonic);
     const zeropoolAddress = `0x` + publicKey.toString(16);
