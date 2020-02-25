@@ -43,9 +43,10 @@ export class TransferComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    //
   }
 
-  onSendClick() {
+  onSendClick(): void {
     this.transferIsInProgress = true;
 
     const amount = tw(this.toAmount).toNumber();
