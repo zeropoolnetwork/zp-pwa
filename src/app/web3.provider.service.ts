@@ -48,10 +48,6 @@ export class Web3ProviderService {
 
     if (typeof ethereum !== 'undefined') {
       this.enableWeb3(ethereum);
-      this.web3Provider = ethereum;
-      ethereum.on('accountsChanged', () => {
-        window.location.reload();
-      });
 
       ethereum.on('networkChanged', () => {
         window.location.reload();
@@ -78,15 +74,19 @@ export class Web3ProviderService {
         console.log(e);
         return of('');
       }),
-      // switchMap(() => {
-      //   return interval(100);
-      // }),
+      switchMap(() => {
+        return interval(100);
+      }),
       map(() => {
         return getEthAddressSafe();
       }),
       filter(address => !!address),
       take(1),
       tap(() => {
+        this.web3Provider = eth;
+        eth.on('accountsChanged', () => {
+          window.location.reload();
+        });
         this.addressSubject$.next(getEthAddressSafe());
       })
     ).subscribe();
