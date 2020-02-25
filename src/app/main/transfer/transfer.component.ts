@@ -47,13 +47,11 @@ export class TransferComponent implements OnInit {
 
   onSendClick() {
     this.transferIsInProgress = true;
-    fromPromise(this.zpService.zp$).pipe(
-      mergeMap((zp) => {
-        const amount = tw(this.toAmount).toNumber();
 
-        // generate tx and send eth to contract
-        return fromPromise(zp.transfer(environment.ethToken, this.toAddress, amount));
-      }),
+    const amount = tw(this.toAmount).toNumber();
+
+    // generate tx and send eth to contract
+    fromPromise(this.zpService.zp.transfer(environment.ethToken, this.toAddress, amount)).pipe(
       mergeMap((blockItem: BlockItem<string>) => {
           return this.relayerApi.sendTx$(blockItem);
         }

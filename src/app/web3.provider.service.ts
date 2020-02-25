@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpProvider } from 'web3-providers-http';
-import { BehaviorSubject, Observable, of, interval } from 'rxjs';
+import { BehaviorSubject, Observable, of, interval, Subject } from 'rxjs';
 import { catchError, filter, map, switchMap, take, tap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
 
@@ -21,7 +21,7 @@ export class Web3ProviderService {
 
   public web3Provider: HttpProvider;
 
-  private addressSubject$ = new BehaviorSubject('');
+  private addressSubject$ = new Subject<string>();
   public address$ = this.addressSubject$.asObservable();
   public isReady$: Observable<boolean>;
 
@@ -47,8 +47,8 @@ export class Web3ProviderService {
   connectWeb3(): boolean {
 
     if (typeof ethereum !== 'undefined') {
-      this.web3Provider = ethereum;
       this.enableWeb3(ethereum);
+      this.web3Provider = ethereum;
       return true;
     }
 
@@ -71,9 +71,9 @@ export class Web3ProviderService {
         console.log(e);
         return of('');
       }),
-      switchMap(() => {
-        return interval(100);
-      }),
+      // switchMap(() => {
+      //   return interval(100);
+      // }),
       map(() => {
         return getEthAddressSafe();
       }),
