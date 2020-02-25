@@ -1,19 +1,33 @@
 <div class="fixed-horizontal-center">
-  <div fxLayout="column" fxLayoutAlign="space-evenly none" >
-    <h1>Enter mnemonic</h1>
-    <h3>To make your transaction private we need a KeyPair on <a href="https://z.cash/technology/jubjub/">BabyJubJub</a>
-      elliptic curve, please provide some mnemonic for us</h3>
+  <div fxLayout="column" fxLayoutAlign="space-around stretch">
+    <form [formGroup]="mnemonicForm">
+      <h1>Enter mnemonic</h1>
+      <h3>To make your transaction private we need a KeyPair on <a
+        href="https://z.cash/technology/jubjub/">BabyJubJub</a>
+        elliptic curve, please provide some mnemonic for us</h3>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Place mnemonic here</mat-label>
-      <textarea matInput placeholder="12, 15, 18, 21 or 24 words..." cdkTextareaAutosize
-                cdkAutosizeMinRows="8"></textarea>
-    </mat-form-field>
+      <mat-form-field appearance="outline" style="width: 100%">
+        <mat-label>Place mnemonic here</mat-label>
+        <textarea formControlName="mnemonic"
+                  matInput placeholder="12, 15, 18, 21 or 24 words..." cdkTextareaAutosize
+                  cdkAutosizeMinRows="8"></textarea>
 
-    <div>
-      <button mat-flat-button color="primary" routerLink="/account-setup">Generate new</button>
-      <button mat-flat-button color="primary" routerLink="/account-setup"
-              [disabled]="true" (click)="next()">Next</button>
-    </div>
+        <mat-error *ngIf="mnemonic.hasError('invalidMnemonic') ">
+          We need valid mnemonic to proceed
+        </mat-error>
+
+      </mat-form-field>
+
+
+      <div class="button-box">
+        <button mat-flat-button color="primary" (click)="generateNew()">
+          Generate new mnemonic
+        </button>
+
+        <button mat-flat-button color="accent" routerLink="/account-setup" class="next-btn"
+                [disabled]="mnemonicForm.invalid" (click)="next()">Next
+        </button>
+      </div>
+    </form>
   </div>
 </div>

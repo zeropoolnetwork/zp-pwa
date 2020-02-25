@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { TextFieldModule } from '@angular/cdk/text-field';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [AccountSetupComponent],
@@ -17,6 +18,7 @@ import { MatInputModule } from '@angular/material/input';
     MatButtonModule,
     TextFieldModule,
     AccountSetupRoutingModule,
+    ReactiveFormsModule,
   ]
 })
 export class AccountSetupModule {
