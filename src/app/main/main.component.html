@@ -1,9 +1,8 @@
+<!-- Not account yet: show something -->
 <ng-container *ngIf="account$ | async as account">
 
-  <div class="fixed-center content">
+  <div class="fixed-center content widget-box">
 
-
-    <mat-divider></mat-divider>
     <div class="address-box">
       <p></p>
       <div (click)="copyAddress(account.zeropoolAddress)" style="cursor: pointer">

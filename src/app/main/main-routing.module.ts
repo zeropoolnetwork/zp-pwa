@@ -19,7 +19,10 @@ const routes: Routes = [
     NgxLoadersCssModule,
     RouterModule.forChild(routes)
   ],
-  exports: [RouterModule]
+  exports: [
+    RouterModule
+  ]
 })
 export class MainRoutingModule {
+  //
 }
