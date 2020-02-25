@@ -49,6 +49,13 @@ export class Web3ProviderService {
     if (typeof ethereum !== 'undefined') {
       this.enableWeb3(ethereum);
       this.web3Provider = ethereum;
+      ethereum.on('accountsChanged', () => {
+        window.location.reload();
+      });
+
+      ethereum.on('networkChanged', () => {
+        window.location.reload();
+      });
       return true;
     }
 
