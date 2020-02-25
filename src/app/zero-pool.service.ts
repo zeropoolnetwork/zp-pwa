@@ -50,7 +50,6 @@ export class ZeroPoolService {
   ) {
 
     // const x: ZeroPoolNetwork = {} as any as ZeroPoolNetwork;
-
     // In order to get ethereum balance use:
     // activeZpNetwork.ZeroPool.web3Ethereum.getBalance('');
 

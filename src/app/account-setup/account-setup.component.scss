@@ -1,27 +1,50 @@
-.fixed-horizontal-center
-{
-  position: fixed;
-  top: 100px; /* or whatever top you need */
-  left: 50%;
-  width: auto;
-  -webkit-transform: translateX(-50%);
-  -moz-transform: translateX(-50%);
-  -ms-transform: translateX(-50%);
-  -o-transform: translateX(-50%);
-  transform: translateX(-50%);
+
+.fixed-horizontal-center {
+
+  @media (min-width: 600px) {
+    left: 50%;
+    width: auto;
+    -webkit-transform: translateX(-50%);
+    -moz-transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
+    -o-transform: translateX(-50%);
+    transform: translateX(-50%);
+    position: fixed;
+  }
+  @media (max-width: 600px) {
+    h1, h3 {
+      text-align: center;
+    }
+  }
+}
+
+.button-box {
+  margin-top: 5px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  @media (min-width: 600px) {
+    flex-direction: row;
+  }
+  @media (max-width: 600px) {
+    flex-direction: column;
+    .next-btn {
+      margin-top: 4em;
+    }
+  }
+
 }
 
 
-.fixed-center
-{
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: auto;
-  height: auto;
-  -webkit-transform: translate(-50%,-50%);
-  -moz-transform: translate(-50%,-50%);
-  -ms-transform: translate(-50%,-50%);
-  -o-transform: translate(-50%,-50%);
-  transform: translate(-50%,-50%);
-}
+//.fixed-center {
+//  position: fixed;
+//  top: 50%;
+//  left: 50%;
+//  width: auto;
+//  height: auto;
+//  -webkit-transform: translate(-50%, -50%);
+//  -moz-transform: translate(-50%, -50%);
+//  -ms-transform: translate(-50%, -50%);
+//  -o-transform: translate(-50%, -50%);
+//  transform: translate(-50%, -50%);
+//}
