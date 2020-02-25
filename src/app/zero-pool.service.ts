@@ -36,7 +36,7 @@ export class ZeroPoolService {
     }),
     tap(([balances, history]) => {
       this.zpBalance = balances;
-      this.zpHistory = history.items.slice(0, 3);
+      this.zpHistory = history.items;
     }),
     map(() => {
       return true;
