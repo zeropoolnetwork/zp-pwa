@@ -1,62 +1,64 @@
 <div class="fixed-center content">
 
-  <button mat-icon-button aria-label="Back"routerLink="/main">
+  <button mat-icon-button aria-label="Back" routerLink="/main">
     <mat-icon>keyboard_backspace</mat-icon>
   </button>
   <br/>
   <br/>
 
-  <ng-container *ngIf="!isDone">
+  <div class="widget-box">
+    <ng-container *ngIf="!isDone">
 
-    <ng-container *ngIf="myZpBalance">
-      <div style="padding: 10px; font-size: 0.7em">Available {{myZpBalance}} zpETH</div>
+      <ng-container *ngIf="myZpBalance">
+        <div style="padding: 10px; font-size: 0.7em">Available {{myZpBalance}} zpETH</div>
+      </ng-container>
+
+      <!--    <div style="padding: 10px">Enter Zeropool Address of receiver</div>-->
+      <mat-form-field appearance="outline" style="width: 300px">
+        <mat-label>Enter receivers Ethereum address</mat-label>
+        <input matInput placeholder="0.05 ETH">
+        <mat-hint>Available ZeroPool balance is 31 zpETH</mat-hint>
+      </mat-form-field>
+
+      <br>
+      <br>
+
+      <!--    <div style="padding: 10px">Enter ZeroPool Address of receiver</div>-->
+      <mat-form-field appearance="outline" style="width: 300px">
+        <mat-label>Amount of zpETH</mat-label>
+        <input matInput placeholder="0.05 zpETH">
+      </mat-form-field>
+
+
+      <ng-container *ngIf="!withdrawIsInProgress">
+        <div class="actions">
+          <button mat-stroked-button routerLink="./transfer" routerLink="/main">Back</button>
+          <button mat-flat-button color="accent" (click)="onSendClick()">SEND</button>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="withdrawIsInProgress">
+        <h1>Transfer is in progress</h1>
+        <div>
+          <img src="/assets/images/guy-fawkes-cross-fingers.png" width="260px">
+        </div>
+
+        <loaders-css loader="ball-beat" [scale]="1"></loaders-css>
+        <h1>Let's cross a fingers and wait for a couple of blocks</h1>
+        <div class="buttons_container" style="margin-top: 20px">
+          <button mat-stroked-button routerLink="./transfer" routerLink="/main">Back</button>
+        </div>
+      </ng-container>
+
     </ng-container>
 
-    <!--    <div style="padding: 10px">Enter Zeropool Address of receiver</div>-->
-    <mat-form-field appearance="outline" style="width: 300px">
-      <mat-label>Enter receivers Ethereum address</mat-label>
-      <input matInput placeholder="0.05 ETH">
-      <mat-hint>Available ZeroPool balance is 31 zpETH </mat-hint>
-    </mat-form-field>
 
-    <br>
-    <br>
-
-    <!--    <div style="padding: 10px">Enter ZeroPool Address of receiver</div>-->
-    <mat-form-field appearance="outline" style="width: 300px">
-      <mat-label>Amount of zpETH</mat-label>
-      <input matInput placeholder="0.05 zpETH">
-    </mat-form-field>
-
-
-    <ng-container *ngIf="!withdrawIsInProgress">
-      <div class="actions">
-        <button mat-stroked-button routerLink="./transfer" routerLink="/main">Back</button>
-        <button mat-flat-button color="accent" (click)="onSendClick()">SEND</button>
-      </div>
-    </ng-container>
-
-    <ng-container *ngIf="withdrawIsInProgress">
-      <h1>Transfer is in progress</h1>
-      <div>
-        <img src="/assets/images/guy-fawkes-cross-fingers.png" width="260px">
-      </div>
-
-      <loaders-css loader="ball-beat" [scale]="1"></loaders-css>
-      <h1>Let's cross a fingers and wait for a couple of blocks</h1>
+    <ng-container *ngIf="isDone">
+      <div class="title" style="padding: 10px">Send Successful</div>
       <div class="buttons_container" style="margin-top: 20px">
         <button mat-stroked-button routerLink="./transfer" routerLink="/main">Back</button>
       </div>
     </ng-container>
-
-  </ng-container>
-
-
-  <ng-container *ngIf="isDone">
-    <div class="title" style="padding: 10px">Send Successful</div>
-    <div class="buttons_container" style="margin-top: 20px">
-      <button mat-stroked-button routerLink="./transfer" routerLink="/main">Back</button>
-    </div>
-  </ng-container>
+  </div>
 
 </div>

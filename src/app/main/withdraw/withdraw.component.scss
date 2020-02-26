@@ -1,3 +1,14 @@
+.widget-box {
+  height: 515px;
+  @media (min-width: 600px) {
+    padding: 1em;
+    border-radius: 1em;
+    -webkit-box-shadow: 0px 15px 68px -18px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 15px 68px -18px rgba(0,0,0,0.75);
+    box-shadow: 0px 15px 68px -18px rgba(0,0,0,0.75);
+  }
+}
+
 .content {
   text-align: center;
 }

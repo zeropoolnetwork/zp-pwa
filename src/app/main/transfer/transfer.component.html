@@ -1,55 +1,59 @@
-<div class="fixed-center content">
+<div class="fixed-center content widget-box">
 
-  <button mat-icon-button aria-label="Back"routerLink="/main">
+  <button mat-icon-button aria-label="Back" routerLink="/main">
     <mat-icon>keyboard_backspace</mat-icon>
   </button>
   <br/>
   <br/>
 
-  <ng-container *ngIf="!isDone" [formGroup]="transferForm">
+  <div>
 
-    <ng-container *ngIf="myZpBalance">
-      <div style="padding: 10px; font-size: 0.7em">Available {{myZpBalance}} zpETH</div>
-    </ng-container>
+    <ng-container *ngIf="!isDone" [formGroup]="transferForm">
 
-    <div style="padding: 10px">Enter Zeropool Address of receiver</div>
-    <app-zp-address-input label="Enter receivers ZeroPool address" formControlName="toAddress"></app-zp-address-input>
+      <ng-container *ngIf="myZpBalance">
+        <div style="padding: 10px; font-size: 0.7em">Available {{myZpBalance}} zpETH</div>
+      </ng-container>
 
-    <br>
-    <br>
+      <div style="padding: 10px">Enter Zeropool Address of receiver</div>
+      <app-zp-address-input label="Enter receivers ZeroPool address" formControlName="toAddress"></app-zp-address-input>
 
-    <app-amount-input label="Enter amount of ETH" formControlName="toAmount"></app-amount-input>
+      <br>
+      <br>
+
+      <app-amount-input label="Enter amount of ETH" formControlName="toAmount"></app-amount-input>
 
 
-    <ng-container *ngIf="!transferIsInProgress">
+      <ng-container *ngIf="!transferIsInProgress">
         <div class="actions">
           <button mat-stroked-button routerLink="/main">Back</button>
           <button mat-flat-button color="accent" [disabled]="!transferForm.valid" (click)="onSendClick()">SEND</button>
         </div>
+      </ng-container>
+
+      <ng-container *ngIf="transferIsInProgress">
+        <h1>Transfer is in progress</h1>
+        <div>
+          <img src="/assets/images/guy-fawkes-cross-fingers.png" width="260px">
+        </div>
+
+        <loaders-css loader="ball-beat" [scale]="1"></loaders-css>
+        <h1>Waiting for trasnaction confirmation <br>
+          It will take several minutes</h1>
+        <div class="buttons_container" style="margin-top: 20px">
+          <button mat-stroked-button routerLink="./transfer" routerLink="/main">Back</button>
+        </div>
+      </ng-container>
+
     </ng-container>
 
-    <ng-container *ngIf="transferIsInProgress">
-      <h1>Transfer is in progress</h1>
-      <div>
-        <img src="/assets/images/guy-fawkes-cross-fingers.png" width="260px">
-      </div>
 
-      <loaders-css loader="ball-beat" [scale]="1"></loaders-css>
-      <h1>Waiting for trasnaction confirmation <br>
-        It will take several minutes</h1>
+    <ng-container *ngIf="isDone">
+      <div class="title" style="padding: 10px">Send Successful</div>
       <div class="buttons_container" style="margin-top: 20px">
         <button mat-stroked-button routerLink="./transfer" routerLink="/main">Back</button>
       </div>
     </ng-container>
 
-  </ng-container>
-
-
-  <ng-container *ngIf="isDone">
-    <div class="title" style="padding: 10px">Send Successful</div>
-    <div class="buttons_container" style="margin-top: 20px">
-      <button mat-stroked-button routerLink="./transfer" routerLink="/main">Back</button>
-    </div>
-  </ng-container>
+  </div>
 
 </div>
