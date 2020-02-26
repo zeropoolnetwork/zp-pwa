@@ -27,24 +27,31 @@ p {
 $toolbar-height: 60px;
 
 .container {
+  padding: $toolbar-height + 30px 20px 0 20px;
   position: relative;
-  padding-top: $toolbar-height + 50px;
+  text-align: center;
 }
 
 .toolbar {
-  position: fixed;
-  top: 0;
-  height: $toolbar-height;
-  display: flex;
   align-items: center;
   background-color: #24292e;
   color: white;
+  display: flex;
+  font-weight: 600;
+  height: $toolbar-height;
+  left: 0;
   padding-left: 1.5em;
   padding-right: 1.5em;
-  font-weight: 600;
+  position: fixed;
+  right: 0;
+  top: 0;
   width: 100%;
 }
 
-.content {
-  margin-top: $toolbar-height + 50px;
+.logo {
+  font-weight: 400;
+
+  &-bold {
+    font-weight: 600;
+  }
 }
