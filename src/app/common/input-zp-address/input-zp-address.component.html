@@ -1,0 +1,23 @@
+<mat-form-field appearance="outline" style="width: 300px">
+  <mat-label>{{ label }}</mat-label>
+  <input
+    (change)="onChange($event)"
+    (keyup)="onChange($event)"
+    matInput
+    [placeholder]="placeholder || ''">
+</mat-form-field>
+
+<!--
+<div *ngIf="mnemonic.invalid && (mnemonic.dirty || mnemonic.touched)"
+     class="alert alert-danger">
+  <div *ngIf="mnemonic.errors.required">
+    Name is required.
+  </div>
+  <div *ngIf="mnemonic.errors.badMnemonic">
+    Mnemonic is invalid
+  </div>
+</div>
+-->
+
+
+

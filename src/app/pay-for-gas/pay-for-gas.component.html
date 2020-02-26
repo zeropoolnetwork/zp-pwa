@@ -8,8 +8,8 @@
 
     <ng-container *ngIf="!depositInProgress" [formGroup]="depositForm">
 
-      <h2>Deposit</h2>
-      <p>ETH from your account will be deposited to your ZeroPool address via relayer</p>
+      <h2>Gas deposit</h2>
+      <p>ETH that you send will be used by relayer<br>for anonymous execution of your transfers and withdrawals</p>
       <br>
 
       <ng-container *ngIf="availableEthAmount">
@@ -26,12 +26,12 @@
       <br>
       <div class="actions">
         <button mat-stroked-button routerLink="/main">Back</button>
-        <button mat-flat-button color="accent" (click)="onDepositClick()" [disabled]="!depositForm.valid">Deposit</button>
+        <button mat-flat-button color="accent" (click)="onDepositClick()" [disabled]="!depositForm.valid">Proceed</button>
       </div>
     </ng-container>
 
     <ng-container *ngIf="depositInProgress">
-      <h1>Deposit in progress</h1>
+      <h1>Gas deposit in progress</h1>
       <div>
         <img src="/assets/images/guy-fawkes-cross-fingers.png" width="260px">
       </div>

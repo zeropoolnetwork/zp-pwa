@@ -1,20 +1,20 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Location } from '@angular/common';
-import { ZeroPoolService } from '../../zero-pool.service';
-import { BlockItem, tw } from 'zeropool-lib';
-import { Transaction } from 'web3-core';
-import { mergeMap } from 'rxjs/operators';
-import { fromPromise } from 'rxjs/internal-compatibility';
-import { RelayerApiService } from '../../relayer.api.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { environment } from '../../../environments/environment';
+import { Location } from '@angular/common';
+import { ZeroPoolService } from '../zero-pool.service';
+import { RelayerApiService } from '../relayer.api.service';
+import { BlockItem, tw } from 'zeropool-lib';
+import { fromPromise } from 'rxjs/internal-compatibility';
+import { environment } from '../../environments/environment';
+import { mergeMap } from 'rxjs/operators';
+import { Transaction } from 'web3-core';
 
 @Component({
-  selector: 'app-deposit',
-  templateUrl: './deposit.component.html',
-  styleUrls: ['./deposit.component.scss']
+  selector: 'app-pay-for-gas',
+  templateUrl: './pay-for-gas.component.html',
+  styleUrls: ['./pay-for-gas.component.scss']
 })
-export class DepositComponent implements OnInit {
+export class PayForGasComponent implements OnInit {
 
   @Input()
   availableEthAmount: number;

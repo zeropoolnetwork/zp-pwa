@@ -2,9 +2,9 @@ import { Component } from '@angular/core';
 import { CircomeLoaderService } from './circome-loader.service';
 import { Observable } from 'rxjs';
 import { AccountService, IAccount } from './account.service';
-import { ZeropoolService } from './zeropool.service';
-import { switchMap } from 'rxjs/operators';
-import { fromPromise } from 'rxjs/internal-compatibility';
+import { ZeroPoolService } from './zero-pool.service';
+import { shareReplay, tap } from 'rxjs/operators';
+import { Web3ProviderService } from './web3.provider.service';
 
 @Component({
   selector: 'app-root',
@@ -17,7 +17,6 @@ export class AppComponent {
   hasError$: Observable<boolean>;
   circomeResourcesLoaded$: Observable<boolean>;
 
-  account$: Observable<IAccount>;
   balance = 1;
   history = [
     {type: 'transfer', amount: 10},
@@ -25,31 +24,21 @@ export class AppComponent {
     {type: 'withdraw', amount: 10},
   ];
 
-  constructor(private circomeSvc: CircomeLoaderService, private accountSvc: AccountService, private zeropoolSvc: ZeropoolService) {
+  ethAddress$: Observable<string>;
+
+  constructor(
+    private circomeSvc: CircomeLoaderService,
+    private accountSvc: AccountService,
+    private zeropoolSvc: ZeroPoolService,
+    private web3Service: Web3ProviderService
+  ) {
     this.hasError$ = this.circomeSvc.hasError$;
     this.circomeResourcesLoaded$ = this.circomeSvc.isReady$;
 
-    this.account$ = this.accountSvc.account$;
+    this.ethAddress$ = this.web3Service.address$;
   }
 
   connectWallet() {
-    // TODO: use connect widget
-  }
-
-  deposit() {
-    this.zeropoolSvc.activeZpNetwork$.pipe(
-      switchMap((zpn) => {
-        return fromPromise(zpn.deposit('0x0000000000000000000000000000000000000000', 100000));
-      })
-    ).subscribe((result) => {
-    });
-  }
-
-  transfer() {
-
-  }
-
-  withdraw() {
-
+    this.web3Service.connectWeb3();
   }
 }

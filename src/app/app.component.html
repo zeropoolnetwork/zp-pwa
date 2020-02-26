@@ -1,17 +1,27 @@
-<div class="toolbar" role="banner">
-  <h2>
-    <span style="font-weight: 600">ZERO</span>
-    <span style="font-weight: 400">POOL</span>
-  </h2>
-  <div class="spacer"></div>
-  <button mat-stroked-button>Connect Wallet</button>
+<div class="container">
+  <div class="toolbar" role="banner">
+    <h2>
+      <span style="font-weight: 600">ZERO</span>
+      <span style="font-weight: 400">POOL</span>
+    </h2>
+    <div class="spacer"></div>
+
+    <ng-container *ngIf="!(ethAddress$ | async)">
+      <button mat-stroked-button (click)="connectWallet()">Connect Wallet</button>
+    </ng-container>
+
+    <ng-container *ngIf="ethAddress$ | async as ethAddress">
+      <p>{{ethAddress}}</p>
+    </ng-container>
+
+  </div>
+
+
+  <div class="dicsonnectTemplate">
+    <router-outlet></router-outlet>
+  </div>
+
 </div>
-
-
-<div class="content">
-  <router-outlet></router-outlet>
-</div>
-
 <!--<h2 *ngIf="!(circomeResourcesLoaded$ |async)">Loading circome...</h2>-->
 <!--<h2 *ngIf="hasError$ |async" style="color: red">Circome Loading Error</h2>-->
 

@@ -22,7 +22,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
     MatButtonModule,
     FlexLayoutModule,
     ServiceWorkerModule.register('ngsw-worker.js', {enabled: environment.production}),
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
