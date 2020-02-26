@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { CircomeLoaderService } from './circome-loader.service';
-import { HistoryItem, HistoryState, MyUtxoState, normalizeUtxoState, ZeroPoolNetwork } from 'zeropool-lib';
+import { GetBalanceProgressNotification, HistoryItem, HistoryState, MyUtxoState, normalizeUtxoState, ZeroPoolNetwork } from 'zeropool-lib';
 import { concatMap, filter, map, tap } from 'rxjs/operators';
-import { AccountService } from './account.service';
+import { AccountService, IAccount } from './account.service';
 import { environment } from '../environments/environment';
 import { combineLatest, interval, Observable, Subject } from 'rxjs';
 import { Web3ProviderService } from './web3.provider.service';
@@ -23,6 +23,10 @@ export class ZeroPoolService {
   public zpBalance: ZpBalance;
   public zpHistory: HistoryItem[];
 
+  private balanceProgressNotificator: Subject<GetBalanceProgressNotification> = new Subject();
+  public balanceProgressNotificator$: Observable<GetBalanceProgressNotification> =
+    this.balanceProgressNotificator.asObservable();
+
   private zpUpdates = new Subject<boolean>();
   public zpUpdates$: Observable<boolean> = this.zpUpdates.asObservable();
 
@@ -38,17 +42,24 @@ export class ZeroPoolService {
     );
 
     const web3Loaded$ = this.web3ProviderService.isReady$.pipe(
-      filter((isReady) => isReady),
+      filter((isReady: boolean) => isReady),
     );
 
-    const updateStates$ = (zp: ZeroPoolNetwork): Observable<boolean> => {
+    const updateStates$ = (
+      zp: ZeroPoolNetwork,
+      balanceProgress?: Subject<GetBalanceProgressNotification>,
+    ): Observable<boolean> => {
+
       return combineLatest(
         [
-          fromPromise(zp.getBalance()),
+          fromPromise(zp.getBalance((update) => {
+            balanceProgress && balanceProgress.next(update);
+          })),
           fromPromise(zp.utxoHistory())
         ]
       ).pipe(
-        tap(([balances, history]) => {
+        tap((x) => {
+          const [balances, history]: [ZpBalance, HistoryState] = x;
           this.zpBalance = balances;
           this.zpHistory = history.items;
         }),
@@ -87,7 +98,9 @@ export class ZeroPoolService {
     };
 
     combineLatest([circomLoaded$, web3Loaded$, this.accountService.account$]).pipe(
-      map(([ok1, ok2, account]) => {
+      map((x) => {
+        const [ok1, ok2, account]: [boolean, boolean, IAccount] = x;
+
         const zp = new ZeroPoolNetwork(
           environment.contractAddress,
           this.web3ProviderService.web3Provider,
@@ -101,7 +114,10 @@ export class ZeroPoolService {
         listenHistoryStateUpdates$(zp).subscribe();
         listenUtxoStateUpdates$(zp).subscribe();
 
-        pushUpdates$(zp).subscribe();
+        updateStates$(zp, this.balanceProgressNotificator)
+          .subscribe(() => {
+            pushUpdates$(zp).subscribe();
+          });
 
         this.zp = zp;
       })

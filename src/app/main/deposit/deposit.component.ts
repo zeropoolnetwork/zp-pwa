@@ -1,13 +1,15 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { ZeroPoolService } from '../../zero-pool.service';
-import { BlockItem, tw } from 'zeropool-lib';
+import { BlockItem, DepositProgressNotification, tw } from 'zeropool-lib';
 import { Transaction } from 'web3-core';
 import { mergeMap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { RelayerApiService } from '../../relayer.api.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { environment } from '../../../environments/environment';
+import { Observable, Subject } from 'rxjs';
+
 
 @Component({
   selector: 'app-deposit',
@@ -15,6 +17,10 @@ import { environment } from '../../../environments/environment';
   styleUrls: ['./deposit.component.scss']
 })
 export class DepositComponent implements OnInit {
+
+  private depositProgressNotificator: Subject<DepositProgressNotification> = new Subject();
+  private depositProgressNotificator$: Observable<DepositProgressNotification> =
+    this.depositProgressNotificator.asObservable();
 
   @Input()
   availableEthAmount: number;
@@ -41,6 +47,12 @@ export class DepositComponent implements OnInit {
     private fb: FormBuilder
   ) {
 
+    this.depositProgressNotificator$.subscribe(
+      (update) => {
+        console.log(update);
+      }
+    );
+
     this.availableEthAmount = 0.0000;
   }
 
@@ -53,7 +65,9 @@ export class DepositComponent implements OnInit {
     const amount = tw(this.depositAmount).toNumber();
 
     // generate tx and send eth to contract
-    fromPromise(this.zpService.zp.deposit(environment.ethToken, amount)).pipe(
+    fromPromise(this.zpService.zp.deposit(environment.ethToken, amount, (update) => {
+      this.depositProgressNotificator.next(update);
+    })).pipe(
       mergeMap((blockItem: BlockItem<string>) => {
           return this.relayerApi.sendTx$(blockItem);
         }

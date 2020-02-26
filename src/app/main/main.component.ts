@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountService, IAccount } from '../account.service';
 import { ZeroPoolService } from '../zero-pool.service';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { fw, HistoryItem } from 'zeropool-lib';
 import { copyToClipboard } from '../copy-to-clipboard';
 import { MatSnackBar, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from '@angular/material/snack-bar';
@@ -22,6 +22,10 @@ export class MainComponent implements OnInit {
 
   constructor(private accountSvc: AccountService, private zpService: ZeroPoolService, private snackBar: MatSnackBar) {
     this.account$ = this.accountSvc.account$;
+
+    this.zpService.balanceProgressNotificator$.subscribe((update) => {
+      console.log(update)
+    });
 
     if (this.zpService.zpBalance) {
       this.balance =  fw(this.zpService.zpBalance['0x0']) || 0;
