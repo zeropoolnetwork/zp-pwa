@@ -1,15 +1,18 @@
-<div class="fixed-horizontal-center pl20 pr20">
+<div class="fixed-horizontal-center">
   <div fxLayout="column" fxLayoutAlign="space-around stretch">
     <form [formGroup]="mnemonicForm">
       <h1>Enter mnemonic</h1>
-      <h3>To make your transaction private we need a KeyPair on <a
-        href="https://z.cash/technology/jubjub/">BabyJubJub</a>
-        elliptic curve, please provide some mnemonic for us</h3>
+      <h3>
+        To make your transaction private we need a KeyPair on
+        <a href="https://z.cash/technology/jubjub/">BabyJubJub</a>
+        elliptic curve, please provide some mnemonic for us
+      </h3>
 
-      <mat-form-field appearance="outline" style="width: 100%">
+      <mat-form-field appearance="outline" class="field">
         <mat-label>Place mnemonic here</mat-label>
         <textarea formControlName="mnemonic"
-                  matInput placeholder="12, 15, 18, 21 or 24 words..." cdkTextareaAutosize
+                  matInput placeholder="12, 15, 18, 21 or 24 words..."
+                  cdkTextareaAutosize
                   cdkAutosizeMinRows="8"></textarea>
 
         <mat-error *ngIf="mnemonic.hasError('invalidMnemonic') ">
@@ -17,7 +20,6 @@
         </mat-error>
 
       </mat-form-field>
-
 
       <div class="button-box">
         <button mat-flat-button color="primary" (click)="generateNew()">

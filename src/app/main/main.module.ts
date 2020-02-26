@@ -19,7 +19,7 @@ import { InputAmountModule } from '../common/input-amount/input-amount.module';
 import { InputZpAddressModule } from '../common/input-zp-address/input-zp-address.module';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { PayForGasComponent } from '../pay-for-gas/pay-for-gas.component';
-
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
@@ -42,6 +42,7 @@ import { PayForGasComponent } from '../pay-for-gas/pay-for-gas.component';
     MatSnackBarModule,
     MatIconModule,
     ReactiveFormsModule,
+    MatTooltipModule,
 
     HttpClientModule,
     InputAmountModule,
