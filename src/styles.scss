@@ -40,3 +40,52 @@ $zp-pwa-theme: mat-light-theme($zp-pwa-primary, $zp-pwa-accent, $zp-pwa-warn);
 html, body { height: 100%; margin: 0;}
 //body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
+.fixed-center {
+  //height: 515px;
+  left: 50%;
+  position: fixed;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  -o-transform: translate(-50%, -50%);
+  width: auto;
+
+  @media (max-width: 600px) {
+    left: 0;
+    position: relative;
+    transform: none;
+    top: 0;
+  }
+}
+
+.widget-box {
+  height: 515px;
+
+  @media (min-width: 600px) {
+    border-radius: 1em;
+    box-shadow: 0 15px 68px -18px rgba(0,0,0,0.75);
+    -webkit-box-shadow: 0 15px 68px -18px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0 15px 68px -18px rgba(0,0,0,0.75);
+    padding: 1em;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+
+  button {
+    border: 1px solid !important;
+    font-size: 1em;
+    margin: 0.2em;
+    padding: 0.3em 1em;
+    width: 100px;
+  }
+}
+
+.field {
+  width: 100%;
+}

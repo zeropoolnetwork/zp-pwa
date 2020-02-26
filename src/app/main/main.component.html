@@ -2,17 +2,25 @@
 <ng-container *ngIf="account$ | async as account">
 
   <div class="fixed-center content widget-box">
+    <div class="tooltip-box">
+      <span class="tooltip"
+            #tooltip="matTooltip"
+            matTooltip="Copied!"></span>
 
-    <div class="address-box">
-      <p></p>
-      <div (click)="copyAddress(account.zeropoolAddress)" style="cursor: pointer">
-        <p style="font-weight:700">Your ZP address:</p>
-        <p style="font-weight: 400">{{account.zeropoolAddressPreview}}</p>
+      <div class="address-box"
+           #tooltipAddres="matTooltip"
+           matTooltip="Copy">
+        <p></p>
+        <div (click)="tooltipAddres.hide(); tooltip.show();" style="cursor: pointer">
+  <!--      <div (click)="copyAddress(account.zeropoolAddress)" style="cursor: pointer">-->
+          <p style="font-weight:700">Your ZP address:</p>
+          <p style="font-weight: 400">{{account.zeropoolAddressPreview}}</p>
+        </div>
+
+  <!--      <button mat-icon-button aria-label="Swap address preview">-->
+  <!--        <mat-icon>swap_horiz</mat-icon>-->
+  <!--      </button>-->
       </div>
-
-<!--      <button mat-icon-button aria-label="Swap address preview">-->
-<!--        <mat-icon>swap_horiz</mat-icon>-->
-<!--      </button>-->
     </div>
     <mat-divider></mat-divider>
 
