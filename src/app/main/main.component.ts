@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountService, IAccount } from '../account.service';
 import { ZeroPoolService } from '../zero-pool.service';
-import { Observable, Subject } from 'rxjs';
+import { Observable } from 'rxjs';
 import { fw, HistoryItem } from 'zeropool-lib';
 import { copyToClipboard } from '../copy-to-clipboard';
 import { MatSnackBar, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from '@angular/material/snack-bar';
@@ -24,11 +24,11 @@ export class MainComponent implements OnInit {
     this.account$ = this.accountSvc.account$;
 
     this.zpService.balanceProgressNotificator$.subscribe((update) => {
-      console.log(update)
+      console.log(update);
     });
 
     if (this.zpService.zpBalance) {
-      this.balance =  fw(this.zpService.zpBalance['0x0']) || 0;
+      this.balance = fw(this.zpService.zpBalance['0x0']) || 0;
       this.history = this.zpService.zpHistory;
     }
 
@@ -45,7 +45,6 @@ export class MainComponent implements OnInit {
 
   copyAddress(address: string): void {
     copyToClipboard(address);
-    this.openSnackBar('✅ Address was copied successfully', '');
   }
 
   private openSnackBar(message: string, action: string) {

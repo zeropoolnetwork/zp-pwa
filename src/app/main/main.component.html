@@ -11,8 +11,7 @@
            #tooltipAddres="matTooltip"
            matTooltip="Copy">
         <p></p>
-        <div (click)="tooltipAddres.hide(); tooltip.show();" style="cursor: pointer">
-  <!--      <div (click)="copyAddress(account.zeropoolAddress)" style="cursor: pointer">-->
+        <div (click)="tooltipAddres.hide(); tooltip.show(); copyAddress(account.zeropoolAddress)" style="cursor: pointer">
           <p style="font-weight:700">Your ZP address:</p>
           <p style="font-weight: 400">{{account.zeropoolAddressPreview}}</p>
         </div>
