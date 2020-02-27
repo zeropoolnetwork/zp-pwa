@@ -4,17 +4,15 @@
     <div class="widget-box-main-contant">
       <div class="widget-box-header">
         <div class="tooltip-box">
-      <span class="tooltip"
-						#tooltip="matTooltip"
-            matTooltip="Copied!"></span>
 
           <div class="address-box">
             <mat-icon class="icon-settings">settings</mat-icon>
-            <div #tooltipAddres="matTooltip"
-                 matTooltip="Copy"
+
+            <div #addressTooltip="matTooltip" (click)="onAddressClick(addressTooltip, account)"
+                 [matTooltip]="tooltipMessage"
                  class="address">
               <p class="title">Your ZP address:</p>
-              <p (click)="tooltipAddres.hide(); tooltip.show(); copyAddress(account.zeropoolAddress)">{{account.zeropoolAddressPreview}}</p>
+              <p>{{account.zeropoolAddressPreview}}</p>
             </div>
 
             <!--      <button mat-icon-button aria-label="Swap address preview">-->
@@ -23,6 +21,22 @@
           </div>
         </div>
         <mat-divider></mat-divider>
+        <!--
+        <button mat-button
+                (click)="tooltip.toggle()"
+                aria-label="Show/Hide tooltip on the button at the end of this section"
+                class="example-action-button">
+          toggle show/hide
+        </button>
+
+        <button mat-raised-button #tooltip="matTooltip"
+                matTooltip="Info about the action"
+                matTooltipPosition="right"
+                aria-tooltip="Button that displays and hides a tooltip triggered by other buttons">
+          Action
+        </button>
+        -->
+
       </div>
 
       <!--
