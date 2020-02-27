@@ -3,12 +3,20 @@
   grid-row: 1;
   grid-template-columns: 40px 1fr 40px;
   margin-bottom: 0.5em;
-  margin-top: 0.5em;
 
   p {
     margin: 0;
     padding: 0;
   }
+}
+
+.address {
+  cursor: pointer;
+  font-weight:400;
+}
+
+.title {
+  font-weight:700;
 }
 
 .tooltip-box {
@@ -18,4 +26,19 @@
 .tooltip {
   position: absolute;
   top: 40px;
+}
+
+.balance {
+  margin: 1em 0 1.5em 0;
+}
+
+.icon-settings {
+  display: block;
+  height: 100%;
+  margin: 0 auto;
+  padding: 7px 0;
+
+  &:hover {
+    cursor: pointer;
+  }
 }
