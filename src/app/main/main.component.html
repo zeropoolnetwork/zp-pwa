@@ -48,7 +48,7 @@
       </div>
 
       <h4 class="title">Transaction History:</h4>
-      <p *ngIf="!history">No transaction history yet</p>
+      <p *ngIf="!history || history?.length == 0">No transaction history yet</p>
       <div style="overflow-y: auto;  min-height: 50px">
         <div *ngFor="let tx of history">
           <mat-divider></mat-divider>
