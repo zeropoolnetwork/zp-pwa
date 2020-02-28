@@ -18,9 +18,6 @@ export class MainComponent implements OnInit {
   account$: Observable<IAccount>;
   balance;
   history: HistoryItem[];
-
-  // horizontalPosition: MatSnackBarHorizontalPosition = 'center';
-  // verticalPosition: MatSnackBarVerticalPosition = 'top';
   tooltipMessage = 'Copy to clipboard';
 
   constructor(private accountSvc: AccountService, private zpService: ZeroPoolService, private snackBar: MatSnackBar) {
@@ -30,13 +27,15 @@ export class MainComponent implements OnInit {
       console.log(update);
     });
 
+    const ethAssetId = '0x0';
+
     if (this.zpService.zpBalance) {
-      this.balance = fw(this.zpService.zpBalance['0x0']) || 0;
+      this.balance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
       this.history = this.zpService.zpHistory;
     }
 
     this.zpService.zpUpdates$.subscribe(() => {
-      this.balance = fw(this.zpService.zpBalance['0x0']) || 0;
+      this.balance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
       this.history = this.zpService.zpHistory;
     });
 
@@ -50,6 +49,9 @@ export class MainComponent implements OnInit {
     copyToClipboard(address);
   }
 
+
+  // horizontalPosition: MatSnackBarHorizontalPosition = 'center';
+  // verticalPosition: MatSnackBarVerticalPosition = 'top';
   // private openSnackBar(message: string, action: string) {
   //   const config = {
   //     duration: 800,
