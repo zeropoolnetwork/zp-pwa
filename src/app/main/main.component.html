@@ -6,7 +6,9 @@
         <div class="tooltip-box">
 
           <div class="address-box">
-            <mat-icon class="icon-settings">settings</mat-icon>
+            <button mat-button>
+              <img class="icon-settings" src="../../assets/icons/settings.png">
+            </button>
 
             <div #addressTooltip="matTooltip" (click)="onAddressClick(addressTooltip, account)"
                  [matTooltip]="tooltipMessage"

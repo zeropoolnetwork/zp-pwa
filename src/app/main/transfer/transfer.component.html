@@ -1,20 +1,17 @@
 <div class="fixed-center widget-box">
-  <button mat-icon-button aria-label="Back" routerLink="/main" class="arrow-back">
-    <mat-icon>keyboard_backspace</mat-icon>
-  </button>
-
   <ng-container *ngIf="!isDone" [formGroup]="transferForm">
 
     <ng-container *ngIf="myZpBalance">
       <div style="padding: 10px; font-size: 0.7em">Available {{myZpBalance}} zpETH</div>
     </ng-container>
 
-    <div style="padding: 10px">Enter Zeropool Address of receiver</div>
-    <app-zp-address-input label="Enter receivers ZeroPool address" formControlName="toAddress"></app-zp-address-input>
-    <app-amount-input label="Enter amount of ETH" formControlName="toAmount"></app-amount-input>
-
-
     <ng-container *ngIf="!transferIsInProgress">
+      <h2>Transfer</h2>
+
+      <p class="ng-star-inserted">Enter Zeropool Address of receiver</p>
+      <app-zp-address-input label="Enter receivers ZeroPool address" formControlName="toAddress"></app-zp-address-input>
+      <app-amount-input label="Enter amount of ETH" formControlName="toAmount"></app-amount-input>
+
       <div class="actions">
         <button mat-stroked-button routerLink="/main">Back</button>
         <button mat-flat-button color="accent" [disabled]="!transferForm.valid" (click)="onSendClick()">Send</button>
@@ -22,16 +19,17 @@
     </ng-container>
 
     <ng-container *ngIf="transferIsInProgress">
-      <h1>Transfer is in progress</h1>
+      <h2>Transfer is in progress</h2>
       <div>
-        <img src="/assets/images/guy-fawkes-cross-fingers.png" width="260px">
+        <img src="/assets/images/guy-fawkes-cross-fingers.png" width="240px">
       </div>
 
       <loaders-css loader="ball-beat" [scale]="1"></loaders-css>
-      <h1>Waiting for trasnaction confirmation <br>
-        It will take several minutes</h1>
-      <div class="buttons_container" style="margin-top: 20px">
-        <button mat-stroked-button routerLink="./transfer" routerLink="/main">Back</button>
+      <h3>Waiting for trasnaction confirmation <br>
+        It will take several minutes</h3>
+      <div class="actions">
+<!--        <button mat-stroked-button routerLink="./transfer" routerLink="/main">Back</button>-->
+        <button mat-stroked-button routerLink="/main">Back</button>
       </div>
     </ng-container>
 
@@ -39,9 +37,10 @@
 
 
   <ng-container *ngIf="isDone">
-    <div class="title" style="padding: 10px">Send Successful</div>
-    <div class="buttons_container" style="margin-top: 20px">
-      <button mat-stroked-button routerLink="./transfer" routerLink="/main">Back</button>
+    <h3>Send Successful</h3>
+    <div class="actions">
+<!--  <button mat-stroked-button routerLink="./transfer" routerLink="/main">Back</button>-->
+      <button mat-stroked-button routerLink="/main">Back</button>
     </div>
   </ng-container>
 </div>

@@ -1,10 +1,7 @@
 <div class="fixed-center widget-box">
-  <button mat-icon-button aria-label=Back routerLink="/main" class="arrow-back">
-    <mat-icon>keyboard_backspace</mat-icon>
-  </button>
 
   <ng-container *ngIf="!isDone">
-    <ng-container *ngIf="!depositInProgress" [formGroup]="depositForm">
+    <ng-container [formGroup]="depositForm" *ngIf="!depositInProgress">
 
       <h2>Deposit</h2>
       <p>ETH from your account will be deposited to your ZeroPool address via relayer</p>
@@ -25,23 +22,25 @@
     </ng-container>
 
     <ng-container *ngIf="depositInProgress">
-      <h1>Deposit in progress</h1>
+      <h2>Deposit in progress</h2>
       <div>
-        <img src="/assets/images/guy-fawkes-cross-fingers.png" width="260px">
+        <img src="/assets/images/guy-fawkes-cross-fingers.png" width="240px">
       </div>
       <loaders-css loader="ball-beat" [color]="color" [scale]="1"></loaders-css>
-      <h1>Let's cross a fingers and wait for a couple of blocks</h1>
+      <h3>Let's cross a fingers and wait for a couple of blocks</h3>
+      <div class="actions">
+        <button mat-stroked-button routerLink="/main">Back</button>
+      </div>
     </ng-container>
-
   </ng-container>
 
   <ng-container *ngIf="isDone">
     <h2 class="title" style="padding: 10px">Deposit Successful</h2>
     <div>
-      <img src="/assets/images/guy-fawkes-zip.png" width="260px">
+      <img src="/assets/images/guy-fawkes-zip.png" width="240px">
     </div>
     <h3 class="title" style="padding: 10px">From this moment no one wouldn't know what you do with you funds</h3>
-    <div style="margin-top: 20px">
+    <div class="actions">
       <button mat-stroked-button color="primary" routerLink="/main">Let's make transaction</button>
     </div>
   </ng-container>
