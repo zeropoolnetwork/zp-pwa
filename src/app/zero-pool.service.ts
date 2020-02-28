@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CircomeLoaderService } from './circome-loader.service';
-import { GetBalanceProgressNotification, HistoryItem, HistoryState, MyUtxoState, normalizeUtxoState, ZeroPoolNetwork } from 'zeropool-lib';
+import { GetBalanceProgressNotification, HistoryItem, HistoryState, MyUtxoState, stringifyUtxoState, ZeroPoolNetwork } from 'zeropool-lib';
 import { concatMap, filter, map, tap } from 'rxjs/operators';
 import { AccountService, IAccount } from './account.service';
 import { environment } from '../environments/environment';
@@ -92,7 +92,7 @@ export class ZeroPoolService {
     const listenUtxoStateUpdates$ = (zp: ZeroPoolNetwork): Observable<any> => {
       return zp.utxoState$.pipe(
         tap((utxoState: MyUtxoState<bigint>) => {
-          this.stateStorageService.utxoState = normalizeUtxoState(utxoState);
+          this.stateStorageService.utxoState = stringifyUtxoState(utxoState);
         })
       );
     };
