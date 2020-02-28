@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Location } from '@angular/common';
-import { ZeroPoolService } from '../zero-pool.service';
-import { RelayerApiService } from '../relayer.api.service';
+import { ZeroPoolService } from '../services/zero-pool.service';
+import { RelayerApiService } from '../services/relayer.api.service';
 import { BlockItem, tw } from 'zeropool-lib';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { environment } from '../../environments/environment';

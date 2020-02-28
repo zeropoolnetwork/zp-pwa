@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AccountService, IAccount } from '../account.service';
-import { ZeroPoolService } from '../zero-pool.service';
+import { AccountService, IAccount } from '../services/account.service';
+import { ZeroPoolService } from '../services/zero-pool.service';
 import { Observable, timer } from 'rxjs';
 import { fw, HistoryItem } from 'zeropool-lib';
 import { copyToClipboard } from '../copy-to-clipboard';

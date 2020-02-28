@@ -3,7 +3,7 @@ import { CircomeLoaderService } from './circome-loader.service';
 import { GetBalanceProgressNotification, HistoryItem, HistoryState, MyUtxoState, normalizeUtxoState, ZeroPoolNetwork } from 'zeropool-lib';
 import { concatMap, filter, map, tap } from 'rxjs/operators';
 import { AccountService, IAccount } from './account.service';
-import { environment } from '../environments/environment';
+import { environment } from '../../environments/environment';
 import { combineLatest, interval, Observable, Subject } from 'rxjs';
 import { Web3ProviderService } from './web3.provider.service';
 import { StateStorageService } from './state.storage.service';

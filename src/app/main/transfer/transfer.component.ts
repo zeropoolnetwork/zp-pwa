@@ -4,9 +4,9 @@ import { fromPromise } from 'rxjs/internal-compatibility';
 import { Transaction } from 'web3-core';
 import { mergeMap } from 'rxjs/operators';
 import { BlockItem, tw } from 'zeropool-lib';
-import { ZeroPoolService } from '../../zero-pool.service';
+import { ZeroPoolService } from '../../services/zero-pool.service';
 import { environment } from '../../../environments/environment';
-import { RelayerApiService } from '../../relayer.api.service';
+import { RelayerApiService } from '../../services/relayer.api.service';
 
 @Component({
   selector: 'app-transfer',

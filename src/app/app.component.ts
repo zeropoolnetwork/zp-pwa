@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { CircomeLoaderService } from './circome-loader.service';
+import { CircomeLoaderService } from './services/circome-loader.service';
 import { Observable } from 'rxjs';
-import { AccountService, toAddressPreview } from './account.service';
-import { ZeroPoolService } from './zero-pool.service';
-import { Web3ProviderService } from './web3.provider.service';
+import { AccountService, toAddressPreview } from './services/account.service';
+import { ZeroPoolService } from './services/zero-pool.service';
+import { Web3ProviderService } from './services/web3.provider.service';
 import { map } from 'rxjs/operators';
 
 @Component({
