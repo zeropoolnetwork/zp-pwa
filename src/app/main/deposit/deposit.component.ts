@@ -1,11 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
-import { ZeroPoolService } from '../../zero-pool.service';
+import { ZeroPoolService } from '../../services/zero-pool.service';
 import { BlockItem, DepositProgressNotification, tw } from 'zeropool-lib';
 import { Transaction } from 'web3-core';
 import { mergeMap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
-import { RelayerApiService } from '../../relayer.api.service';
+import { RelayerApiService } from '../../services/relayer.api.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { environment } from '../../../environments/environment';
 import { Observable, Subject } from 'rxjs';

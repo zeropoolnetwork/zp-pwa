@@ -62,13 +62,42 @@ html, body { height: 100%; margin: 0;}
 
 .widget-box {
   height: 515px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 
   @media (min-width: 600px) {
+    width: 350px;
     border-radius: 1em;
     box-shadow: 0 15px 68px -18px rgba(0,0,0,0.75);
     -webkit-box-shadow: 0 15px 68px -18px rgba(0,0,0,0.75);
     -moz-box-shadow: 0 15px 68px -18px rgba(0,0,0,0.75);
-    padding: 1em;
+    padding: 1em 1em 2.5em 1em;
+  }
+
+  &-main-contant {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+    padding-top: 5em;
+    position: relative;
+  }
+
+  &-header {
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+
+    @media (min-width: 600px) {
+      position: fixed;
+      top: 1.5em;
+      left: 1em;
+      right: 1em;
+      width: auto;
+    }
   }
 }
 
@@ -88,4 +117,17 @@ html, body { height: 100%; margin: 0;}
 
 .field {
   width: 100%;
+}
+
+button.arrow-back {
+  display: block;
+  margin: 0 auto;
+}
+
+.pb-40 {
+  padding-bottom: 40px;
+}
+
+.mt-20 {
+  margin-top: 20px;
 }

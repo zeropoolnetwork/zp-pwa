@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpProvider } from 'web3-providers-http';
-import { BehaviorSubject, Observable, of, interval, Subject } from 'rxjs';
+import { Observable, of, interval, Subject } from 'rxjs';
 import { catchError, filter, map, switchMap, take, tap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
-
 
 // TODO: move declarations into polyfills
 declare let ethereum: any;

@@ -4,7 +4,7 @@ import { getEthereumAddress, getKeyPair } from 'zeropool-lib';
 
 
 export function toAddressPreview(address: string): string {
-  return address.substring(0, 8) + '...' + address.substring(address.length - 8, address.length);
+  return address.substring(0, 6) + '...' + address.substring(address.length - 4, address.length);
 }
 
 export interface IAccount {

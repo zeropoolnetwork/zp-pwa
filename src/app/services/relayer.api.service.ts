@@ -4,7 +4,7 @@ import { Observable, of, throwError } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { BlockItem } from 'zeropool-lib';
 import { Transaction } from 'web3-core';
-import { environment } from '../environments/environment';
+import { environment } from '../../environments/environment';
 
 const DEFAULT_MAX_RETRIES = 1;
 

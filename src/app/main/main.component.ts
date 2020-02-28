@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { AccountService, IAccount } from '../account.service';
-import { ZeroPoolService } from '../zero-pool.service';
-import { Observable } from 'rxjs';
+import { AccountService, IAccount } from '../services/account.service';
+import { ZeroPoolService } from '../services/zero-pool.service';
+import { Observable, timer } from 'rxjs';
 import { fw, HistoryItem } from 'zeropool-lib';
 import { copyToClipboard } from '../copy-to-clipboard';
-import { MatSnackBar, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatTooltip } from '@angular/material/tooltip';
+import { delay, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-main',
@@ -16,9 +18,7 @@ export class MainComponent implements OnInit {
   account$: Observable<IAccount>;
   balance;
   history: HistoryItem[];
-
-  horizontalPosition: MatSnackBarHorizontalPosition = 'center';
-  verticalPosition: MatSnackBarVerticalPosition = 'top';
+  tooltipMessage = 'Copy to clipboard';
 
   constructor(private accountSvc: AccountService, private zpService: ZeroPoolService, private snackBar: MatSnackBar) {
     this.account$ = this.accountSvc.account$;
@@ -27,13 +27,15 @@ export class MainComponent implements OnInit {
       console.log(update);
     });
 
+    const ethAssetId = '0x0';
+
     if (this.zpService.zpBalance) {
-      this.balance = fw(this.zpService.zpBalance['0x0']) || 0;
+      this.balance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
       this.history = this.zpService.zpHistory;
     }
 
     this.zpService.zpUpdates$.subscribe(() => {
-      this.balance = fw(this.zpService.zpBalance['0x0']) || 0;
+      this.balance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
       this.history = this.zpService.zpHistory;
     });
 
@@ -47,13 +49,39 @@ export class MainComponent implements OnInit {
     copyToClipboard(address);
   }
 
-  private openSnackBar(message: string, action: string) {
-    const config = {
-      duration: 800,
-      verticalPosition: this.verticalPosition,
-      horizontalPosition: this.horizontalPosition,
-    };
 
-    this.snackBar.open(message, action, config);
+  // horizontalPosition: MatSnackBarHorizontalPosition = 'center';
+  // verticalPosition: MatSnackBarVerticalPosition = 'top';
+  // private openSnackBar(message: string, action: string) {
+  //   const config = {
+  //     duration: 800,
+  //     verticalPosition: this.verticalPosition,
+  //     horizontalPosition: this.horizontalPosition,
+  //   };
+  //
+  //   this.snackBar.open(message, action, config);
+  // }
+
+  onAddressClick(tooltip: MatTooltip, account: IAccount) {
+
+    tooltip.hide();
+    this.copyAddress(account.zeropoolAddress);
+
+    timer(250).pipe(
+      tap(() => {
+        this.tooltipMessage = 'Copied!';
+        tooltip.show();
+      }),
+      delay(1000),
+      tap(() => {
+        tooltip.hide();
+      }),
+      delay(50),
+      tap(() => {
+        this.tooltipMessage = 'Copy to clipboard';
+      }),
+    ).subscribe(() => {
+      console.log('!');
+    });
   }
 }

@@ -13,7 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
-import { RelayerApiService } from '../relayer.api.service';
+import { RelayerApiService } from '../services/relayer.api.service';
 import { HttpClientModule } from '@angular/common/http';
 import { InputAmountModule } from '../common/input-amount/input-amount.module';
 import { InputZpAddressModule } from '../common/input-zp-address/input-zp-address.module';

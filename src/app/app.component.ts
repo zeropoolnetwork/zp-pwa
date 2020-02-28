@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { CircomeLoaderService } from './circome-loader.service';
+import { CircomeLoaderService } from './services/circome-loader.service';
 import { Observable } from 'rxjs';
-import { AccountService, IAccount } from './account.service';
-import { ZeroPoolService } from './zero-pool.service';
-import { shareReplay, tap } from 'rxjs/operators';
-import { Web3ProviderService } from './web3.provider.service';
+import { AccountService, toAddressPreview } from './services/account.service';
+import { ZeroPoolService } from './services/zero-pool.service';
+import { Web3ProviderService } from './services/web3.provider.service';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -24,7 +24,7 @@ export class AppComponent {
     {type: 'withdraw', amount: 10},
   ];
 
-  ethAddress$: Observable<string>;
+  ethAddress$: Observable<{ full: string, short: string }>;
 
   constructor(
     private circomeSvc: CircomeLoaderService,
@@ -35,7 +35,13 @@ export class AppComponent {
     this.hasError$ = this.circomeSvc.hasError$;
     this.circomeResourcesLoaded$ = this.circomeSvc.isReady$;
 
-    this.ethAddress$ = this.web3Service.address$;
+    this.ethAddress$ = this.web3Service.address$.pipe(
+      map((ethAddress: string) => {
+        return {
+          full: ethAddress, short: toAddressPreview(ethAddress)
+        };
+      })
+    );
   }
 
   connectWallet() {
