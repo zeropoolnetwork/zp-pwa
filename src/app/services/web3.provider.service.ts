@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpProvider } from 'web3-providers-http';
 import { Observable, of, interval, Subject, merge } from 'rxjs';
-import { catchError, distinctUntilChanged, filter, map, switchMap, take, tap } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, filter, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
 
 // TODO: move declarations into polyfills
@@ -30,13 +30,8 @@ export class Web3ProviderService {
   constructor() {
 
     this.address$ = merge(this.alreadyConnected$, this.manuallyConnected$).pipe(
-      tap((eth: HttpProvider) => {
-        this.web3Provider = eth;
-
-        // TODO: Double check that
-        (eth as any).on('accountsChanged', () => {
-          window.location.reload();
-        });
+      tap((provider: HttpProvider) => {
+        this.web3Provider = provider;
       }),
       map(() => getEthAddressSafe()),
       distinctUntilChanged()
@@ -45,6 +40,15 @@ export class Web3ProviderService {
     this.isReady$ = this.address$.pipe(
       map(address => !!address),
     );
+
+    interval(500).pipe(
+      tap(
+        () => {
+          this.refreshWeb3ConnectionState();
+        }
+      ),
+      takeUntil(this.isReady$)
+    ).subscribe();
 
   }
 
@@ -57,10 +61,9 @@ export class Web3ProviderService {
   connectWeb3(): boolean {
     if (typeof ethereum !== 'undefined') {
       this.enableWeb3(ethereum);
-
-      ethereum.on('networkChanged', () => {
-        window.location.reload();
-      });
+      // ethereum.on('networkChanged', () => {
+      //   window.location.reload();
+      // });
       return true;
     }
 
@@ -90,6 +93,9 @@ export class Web3ProviderService {
       map(() => getEthAddressSafe()),
       filter(address => !!address),
       take(1),
+      tap(() => {
+        this.manuallyConnected$.next(eth);
+      })
     ).subscribe();
   }
 
