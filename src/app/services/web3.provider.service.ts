@@ -9,7 +9,7 @@ declare let ethereum: any;
 declare let window: any;
 declare let web3: any;
 
-function getEthAddressSafe() {
+export function getEthAddressSafe() {
   return window.ethereum && window.ethereum.selectedAddress;
   // return window.ethereum && ethereum.isMetaMask && window.ethereum.selectedAddress;
 }
