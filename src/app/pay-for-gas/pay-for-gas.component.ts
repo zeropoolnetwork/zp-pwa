@@ -59,7 +59,8 @@ export class PayForGasComponent implements OnInit {
         }
       )
     ).subscribe(
-      (tx: Transaction) => {
+      (tx: any) => {
+      // (tx: Transaction) => {
         this.isDone = true;
         this.transactionHash = tx.transactionHash;
       }

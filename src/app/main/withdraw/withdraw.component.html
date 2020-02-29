@@ -1,27 +1,25 @@
 <div class="fixed-center widget-box">
   <ng-container *ngIf="!isDone">
 
-    <button mat-icon-button aria-label="Back" routerLink="/main" class="arrow-back">
-      <mat-icon>keyboard_backspace</mat-icon>
-    </button>
-
     <ng-container *ngIf="myZpBalance">
       <div style="padding: 10px; font-size: 0.7em">Available {{myZpBalance}} zpETH</div>
     </ng-container>
 
-    <!--    <div style="padding: 10px">Enter Zeropool Address of receiver</div>-->
-    <mat-form-field appearance="outline" class="field">
-      <mat-label>Enter receivers Ethereum address</mat-label>
-      <input matInput placeholder="0.05 ETH">
-      <mat-hint>Available ZeroPool balance is 31 zpETH</mat-hint>
-    </mat-form-field>
-    <!--    <div style="padding: 10px">Enter ZeroPool Address of receiver</div>-->
-    <mat-form-field appearance="outline" class="field">
-      <mat-label>Amount of zpETH</mat-label>
-      <input matInput placeholder="0.05 zpETH">
-    </mat-form-field>
-
     <ng-container *ngIf="!withdrawIsInProgress">
+      <h2>Withdraw</h2>
+
+      <!--    <div style="padding: 10px">Enter Zeropool Address of receiver</div>-->
+      <mat-form-field appearance="outline" class="field">
+        <mat-label>Enter receivers Ethereum address</mat-label>
+        <input matInput placeholder="0.05 ETH" autocomplete="off">
+        <mat-hint>Available ZeroPool balance is 31 zpETH</mat-hint>
+      </mat-form-field>
+      <!--    <div style="padding: 10px">Enter ZeroPool Address of receiver</div>-->
+      <mat-form-field appearance="outline" class="field" autocomplete="off">
+        <mat-label>Amount of zpETH</mat-label>
+        <input matInput placeholder="0.05 zpETH">
+      </mat-form-field>
+
       <div class="actions">
         <button mat-stroked-button routerLink="./transfer" routerLink="/main">Back</button>
         <button mat-flat-button color="accent" (click)="onSendClick()">Send</button>
@@ -29,14 +27,14 @@
     </ng-container>
 
     <ng-container *ngIf="withdrawIsInProgress">
-      <h1>Transfer is in progress</h1>
+      <h2>Transfer is in progress</h2>
       <div>
-        <img src="/assets/images/guy-fawkes-cross-fingers.png" width="260px">
+        <img src="/assets/images/guy-fawkes-cross-fingers.png" width="240px">
       </div>
 
       <loaders-css loader="ball-beat" [scale]="1"></loaders-css>
-      <h1>Let's cross a fingers and wait for a couple of blocks</h1>
-      <div class="buttons_container" style="margin-top: 20px">
+      <h3>Let's cross a fingers and wait for a couple of blocks</h3>
+      <div class="actions">
         <button mat-stroked-button routerLink="./transfer" routerLink="/main">Back</button>
       </div>
     </ng-container>
@@ -44,8 +42,8 @@
   </ng-container>
 
   <ng-container *ngIf="isDone">
-    <div class="title" style="padding: 10px">Send Successful</div>
-    <div class="buttons_container" style="margin-top: 20px">
+    <h3>Send Successful</h3>
+    <div class="actions">
       <button mat-stroked-button routerLink="./transfer" routerLink="/main">Back</button>
     </div>
   </ng-container>
