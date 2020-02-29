@@ -38,7 +38,6 @@
         </div>
 
       </div>
-
     </div>
 
     <div class="fixed-center widget-box" *ngIf="history && balance">
@@ -73,9 +72,11 @@
         <div class="actions mb-20">
           <button mat-stroked-button routerLink="./deposit">Deposit</button>
           <button mat-stroked-button routerLink="./transfer">Transfer</button>
-
-          <button mat-stroked-button routerLink="./withdraw">Withdraw</button>
-
+          <button mat-stroked-button routerLink="./withdraw"
+                  matBadgePosition="top after"
+                  [matBadge]="totalWithdrawals"
+                  [matBadgeColor]="hasVerifiedWithdrawals ? 'accent' : 'primary'"
+                  [matBadgeHidden]="!hasWithdrawals">Withdraw</button>
         </div>
 
         <h4 class="title">Transaction History</h4>

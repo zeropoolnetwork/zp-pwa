@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountService, IAccount } from '../services/account.service';
 import { ZeroPoolService } from '../services/zero-pool.service';
-import { Observable, timer } from 'rxjs';
+import { Observable, of, timer } from 'rxjs';
 import { fw, tbn, HistoryItem } from 'zeropool-lib';
 import { MatTooltip } from '@angular/material/tooltip';
 import { delay, filter, tap } from 'rxjs/operators';
@@ -19,9 +19,20 @@ export class MainComponent implements OnInit {
 
   isConnectedEthereum: boolean;
 
-  balance;
-  history: HistoryItem[];
+  balance = 1;
+  history: HistoryItem[] = [];
   tooltipMessage = 'Copy to clipboard';
+
+  // amountOfPendingWithdrawals = 1;
+  // amountOfVerifiedWithdrawals = 3;
+  totalWithdrawals = 3;
+  hasWithdrawals = true;
+  hasVerifiedWithdrawals = true;
+
+  withdrawals$ = of({
+    pending: 1,
+    verified: 2
+  });
 
   constructor(
     private accountSvc: AccountService,
@@ -30,8 +41,8 @@ export class MainComponent implements OnInit {
     private clipboard: Clipboard
   ) {
 
-    this.isConnectedEthereum = !!(zpService.zp
-      && zpService.zp.ZeroPool.web3Ethereum.ethAddress);
+    // TODO: fix problem and use ?. operator
+    this.isConnectedEthereum = !!(zpService.zp && zpService.zp.ZeroPool.web3Ethereum.ethAddress);
 
     web3Service.isReady$.pipe(
       filter(x => !!x)
@@ -50,15 +61,15 @@ export class MainComponent implements OnInit {
 
     const ethAssetId = '0x0';
 
-    if (this.zpService.zpBalance) {
-      this.balance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
-      this.history = this.zpService.zpHistory;
-    }
-
-    this.zpService.zpUpdates$.subscribe(() => {
-      this.balance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
-      this.history = this.zpService.zpHistory;
-    });
+    // if (this.zpService.zpBalance) {
+    //   this.balance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
+    //   this.history = this.zpService.zpHistory;
+    // }
+    //
+    // this.zpService.zpUpdates$.subscribe(() => {
+    //   this.balance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
+    //   this.history = this.zpService.zpHistory;
+    // });
 
   }
 

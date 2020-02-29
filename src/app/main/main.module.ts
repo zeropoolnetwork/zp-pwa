@@ -24,6 +24,7 @@ import { PayForGasComponent } from './pay-for-gas/pay-for-gas.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ClipboardModule } from '@angular/cdk/clipboard';
+import { MatBadgeModule } from '@angular/material/badge';
 
 @NgModule({
   declarations: [
@@ -54,7 +55,8 @@ import { ClipboardModule } from '@angular/cdk/clipboard';
 
     HttpClientModule,
     InputAmountModule,
-    InputZpAddressModule
+    InputZpAddressModule,
+    MatBadgeModule
   ],
   providers: [
     RelayerApiService
