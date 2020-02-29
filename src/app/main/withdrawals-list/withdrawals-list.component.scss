@@ -1,0 +1,29 @@
+.withdrawals-list {
+  max-height: 75%;
+  overflow-y: auto;
+}
+
+.withdrawals-row {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  padding: .5em;
+
+  &:last-child {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  }
+
+  p, h3 {
+    margin: 0;
+    text-align: left;
+  }
+
+  p {
+    font-weight: 700;
+  }
+
+  button {
+    //border: 1px solid !important;
+  }
+}
