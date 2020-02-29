@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { fromPromise } from 'rxjs/internal-compatibility';
-import { Transaction } from 'web3-core';
 import { mergeMap } from 'rxjs/operators';
 import { BlockItem, tw } from 'zeropool-lib';
 import { ZeroPoolService } from '../../services/zero-pool.service';
