@@ -2,7 +2,7 @@
   display: grid;
   grid-row: 1;
   grid-template-columns: 40px 1fr 40px;
-  margin-bottom: 0.5em;
+  margin-bottom: .9em;
 
   p {
     margin: 0;
@@ -32,13 +32,19 @@
   margin: 1em 0 1.5em 0;
 }
 
+.circle-buttun {
+  @media (min-width: 600px) {
+    &:hover {
+      background-color: rgba(51, 51, 51, .1);
+    }
+  }
+}
+
 .icon-settings {
   display: block;
+  margin: 0 auto;
   width: 28px;
 
-  &:hover {
-    cursor: pointer;
-  }
 }
 
 ::ng-deep .mat-progress-bar-fill::after {
