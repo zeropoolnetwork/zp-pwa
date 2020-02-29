@@ -71,7 +71,7 @@ export class MainComponent implements OnInit {
   }
 
   copyAddress(address: string): void {
-    this.clipboard.copy(address);
+    copyToClipboard(address);
   }
 
   onAddressClick(tooltip: MatTooltip, account: IAccount) {
