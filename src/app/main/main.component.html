@@ -3,7 +3,7 @@
 
   <div *ngIf="isConnectedEthereum">
 
-    <div class="fixed-center widget-box pt-50"  *ngIf="!history || !balance">
+    <div class="fixed-center widget-box"  *ngIf="!history || !balance">
       <div class="widget-box-main-contant">
         <div class="widget-box-header">
           <div class="tooltip-box">
@@ -46,7 +46,7 @@
           <div class="tooltip-box">
 
             <div class="address-box">
-              <button mat-button>
+              <button class="circle-buttun" mat-icon-button routerLink="./settings">
                 <img class="icon-settings" src="../../assets/icons/settings.png">
               </button>
 

@@ -29,7 +29,7 @@
 }
 
 .balance {
-  margin: 1em 0;
+  margin: 3.5em 0 0.5em 0;
 }
 
 .circle-buttun {
@@ -87,12 +87,15 @@
 .a {
   grid-column: 1 / 6;
   grid-row: 1;
-  //margin-top: .2em;
 }
 .b {
   grid-column: 2 / 6 ;
   grid-row: 1;
-  margin-top: 1em;
+  margin: .5em 0;
+
+  p {
+    margin: 0;
+  }
 }
 
 .e {

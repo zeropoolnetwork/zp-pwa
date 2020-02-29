@@ -73,7 +73,7 @@ html, body { height: 100%; margin: 0;}
 }
 
 .widget-box {
-  height: 515px;
+  height: calc(100vh - 75px);
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -81,11 +81,12 @@ html, body { height: 100%; margin: 0;}
 
   @media (min-width: 600px) {
     width: 350px;
+    height: 515px;
     border-radius: 1em;
     box-shadow: 0 15px 68px -18px rgba(0,0,0,0.75);
     -webkit-box-shadow: 0 15px 68px -18px rgba(0,0,0,0.75);
     -moz-box-shadow: 0 15px 68px -18px rgba(0,0,0,0.75);
-    padding: 1em 1em 2.5em 1em;
+    padding: 1em;
   }
 
   &.pt-50 {
@@ -103,12 +104,12 @@ html, body { height: 100%; margin: 0;}
   &-header {
     left: 0;
     position: absolute;
-    top: 0;
+    top: 1em;
     width: 100%;
 
     @media (min-width: 600px) {
       position: fixed;
-      top: 1.2em;
+      top: 1.5em;
       left: 1em;
       right: 1em;
       width: auto;
