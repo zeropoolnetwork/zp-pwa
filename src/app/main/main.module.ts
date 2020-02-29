@@ -6,6 +6,7 @@ import { MainComponent } from './main.component';
 import { DepositComponent } from './deposit/deposit.component';
 import { TransferComponent } from './transfer/transfer.component';
 import { WithdrawComponent } from './withdraw/withdraw.component';
+import { SettingsComponent } from './settings/settings.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxLoadersCssModule } from 'ngx-loaders-css';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -13,6 +14,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { RelayerApiService } from '../services/relayer.api.service';
 import { HttpClientModule } from '@angular/common/http';
 import { InputAmountModule } from '../common/input-amount/input-amount.module';
@@ -28,7 +30,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     DepositComponent,
     TransferComponent,
     WithdrawComponent,
-    PayForGasComponent
+    PayForGasComponent,
+    SettingsComponent
   ],
   imports: [
     CommonModule,
@@ -45,6 +48,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     ReactiveFormsModule,
     MatTooltipModule,
     MatProgressBarModule,
+    MatCheckboxModule,
 
     HttpClientModule,
     InputAmountModule,
