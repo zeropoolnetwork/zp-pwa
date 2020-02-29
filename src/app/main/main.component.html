@@ -1,64 +1,107 @@
 <!-- Not account yet: show something -->
 <ng-container *ngIf="account$ | async as account">
-  <div class="fixed-center widget-box">
-    <div class="widget-box-main-contant">
-      <div class="widget-box-header">
-        <div class="tooltip-box">
 
-          <div class="address-box">
-            <mat-icon class="icon-settings">settings</mat-icon>
+  <div *ngIf="isConnectedEthereum">
 
-            <div #addressTooltip="matTooltip" (click)="onAddressClick(addressTooltip, account)"
-                 [matTooltip]="tooltipMessage"
-                 class="address">
-              <p class="title">Your ZP address:</p>
-              <p>{{account.zeropoolAddressPreview}}</p>
+    <div class="fixed-center widget-box" *ngIf="!history || !balance">
+      <div class="widget-box-main-contant">
+        <div class="widget-box-header">
+          <div class="tooltip-box">
+
+            <div class="address-box">
+              <mat-icon class="icon-settings">settings</mat-icon>
+
+              <div #addressTooltip="matTooltip" (click)="onAddressClick(addressTooltip, account)"
+                   [matTooltip]="tooltipMessage"
+                   class="address">
+                <p class="title">Your ZP address:</p>
+                <p>{{account.zeropoolAddressPreview}}</p>
+              </div>
+
             </div>
-            <!--      <button mat-icon-button aria-label="Swap address preview">-->
-            <!--        <mat-icon>swap_horiz</mat-icon>-->
-            <!--      </button>-->
+
           </div>
-        </div>
-        <mat-divider></mat-divider>
-
-
-      </div>
-
-      <!--
-      <button mat-stroked-button style="padding: 5px; width: 200px">
-        <p>Your ZP address:</p>
-        <p>{{account.ethereumAddressPreview}}</p>
-      </button>
-      -->
-
-      <!--    <h4>Your ETH address:</h4>-->
-      <!--    <h4>{{account.zeropoolAddressPreview}}</h4>-->
-
-      <h1 class="balance">
-        {{balance || '...'}}
-        <p *ngIf="balance">zpETH</p>
-      </h1>
-
-
-      <div class="actions pb-40">
-        <button mat-stroked-button routerLink="./deposit">Deposit</button>
-        <button mat-stroked-button routerLink="./transfer">Transfer</button>
-        <button mat-stroked-button routerLink="./withdraw">Withdraw</button>
-      </div>
-
-      <h4 class="title">Transaction History:</h4>
-      <p *ngIf="!history || history?.length == 0">No transaction history yet</p>
-      <div style="overflow-y: auto;  min-height: 50px">
-        <div *ngFor="let tx of history">
           <mat-divider></mat-divider>
-          <div style="margin: 0.5em">
-            <!-- <p>#81 - 2/10/2020 at 12:35</p> -->
-            <p *ngIf="tx.type === 'in'" style="color: green">{{ tx.amount }} zpETH {{ tx.action }}</p>
-            <p *ngIf="tx.type === 'out'" style="color: red">{{ tx.amount }} zpETH {{ tx.action }}</p>
+
+        </div>
+
+        <div>
+          <div class="prl mt">
+            <h1 style="text-align: center">
+              Loading
+            </h1>
+            <p style="margin-top: -1em; font-style: italic">It could take some time</p>
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
           </div>
         </div>
+
+      </div>
+
+    </div>
+
+    <div class="fixed-center widget-box" *ngIf="history && balance">
+      <div class="widget-box-main-contant">
+        <div class="widget-box-header">
+          <div class="tooltip-box">
+
+            <div class="address-box">
+              <mat-icon class="icon-settings">settings</mat-icon>
+
+              <div #addressTooltip="matTooltip" (click)="onAddressClick(addressTooltip, account)"
+                   [matTooltip]="tooltipMessage"
+                   class="address">
+                <p class="title">Your ZP address:</p>
+                <p>{{account.zeropoolAddressPreview}}</p>
+              </div>
+            </div>
+          </div>
+          <mat-divider></mat-divider>
+
+        </div>
+
+        <h1 class="balance">
+          {{balance}}
+          <p *ngIf="balance">zpETH</p>
+        </h1>
+
+        <div class="actions pb-40">
+          <button mat-stroked-button routerLink="./deposit">Deposit</button>
+          <button mat-stroked-button routerLink="./transfer">Transfer</button>
+          <button mat-stroked-button routerLink="./withdraw">Withdraw</button>
+        </div>
+
+        <h4 class="title">Transaction History</h4>
+        <p *ngIf="history?.length == 0">No transaction history yet</p>
+        <div style="overflow-y: auto;  min-height: 50px">
+          <div *ngFor="let tx of history">
+            <mat-divider></mat-divider>
+            <div style="margin: 0.5em">
+              <!-- <p>#81 - 2/10/2020 at 12:35</p> -->
+              <p *ngIf="tx.type === 'in'" style="color: green">{{ tx.amount }} zpETH {{ tx.action }}</p>
+              <p *ngIf="tx.type === 'out'" style="color: red">{{ tx.amount }} zpETH {{ tx.action }}</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div *ngIf="!isConnectedEthereum">
+    <div class="fixed-center widget-box">
+      <img style="margin-top: 1em; margin-left: auto; margin-right: auto" src="/assets/images/zeropool-logo.jpeg" width="100px">
+      <h1>Connect Wallet</h1>
+      <h5 style="margin-top: -1.5em">To start using ZeroPool</h5>
+      <div class="widget-box-main-contant" style="margin-top: -10em">
+        <button mat-stroked-button (click)="connectWallet()">
+          <img style="padding-bottom: 1em; padding-top: 1em;" src="/assets/images/metamask.png" width="100px">
+        </button>
       </div>
     </div>
   </div>
+
+
 </ng-container>
 

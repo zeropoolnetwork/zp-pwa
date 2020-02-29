@@ -4,9 +4,9 @@ import { ZeroPoolService } from '../services/zero-pool.service';
 import { Observable, timer } from 'rxjs';
 import { fw, HistoryItem } from 'zeropool-lib';
 import { copyToClipboard } from '../copy-to-clipboard';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltip } from '@angular/material/tooltip';
-import { delay, tap } from 'rxjs/operators';
+import { delay, filter, tap } from 'rxjs/operators';
+import { Web3ProviderService } from '../services/web3.provider.service';
 
 @Component({
   selector: 'app-main',
@@ -16,11 +16,31 @@ import { delay, tap } from 'rxjs/operators';
 export class MainComponent implements OnInit {
 
   account$: Observable<IAccount>;
+
+  isConnectedEthereum: boolean;
+
   balance;
   history: HistoryItem[];
   tooltipMessage = 'Copy to clipboard';
 
-  constructor(private accountSvc: AccountService, private zpService: ZeroPoolService, private snackBar: MatSnackBar) {
+  constructor(
+    private accountSvc: AccountService,
+    private zpService: ZeroPoolService,
+    private web3Service: Web3ProviderService
+  ) {
+
+    this.isConnectedEthereum = !!(zpService.zp
+      && zpService.zp.ZeroPool.web3Ethereum.ethAddress);
+
+    web3Service.isReady$.pipe(
+      filter(x => !!x)
+    )
+      .subscribe(
+        () => {
+          this.isConnectedEthereum = true;
+        }
+      );
+
     this.account$ = this.accountSvc.account$;
 
     this.zpService.balanceProgressNotificator$.subscribe((update) => {
@@ -41,6 +61,10 @@ export class MainComponent implements OnInit {
 
   }
 
+  connectWallet() {
+    this.web3Service.connectWeb3();
+  }
+
   ngOnInit(): void {
 
   }
@@ -48,19 +72,6 @@ export class MainComponent implements OnInit {
   copyAddress(address: string): void {
     copyToClipboard(address);
   }
-
-
-  // horizontalPosition: MatSnackBarHorizontalPosition = 'center';
-  // verticalPosition: MatSnackBarVerticalPosition = 'top';
-  // private openSnackBar(message: string, action: string) {
-  //   const config = {
-  //     duration: 800,
-  //     verticalPosition: this.verticalPosition,
-  //     horizontalPosition: this.horizontalPosition,
-  //   };
-  //
-  //   this.snackBar.open(message, action, config);
-  // }
 
   onAddressClick(tooltip: MatTooltip, account: IAccount) {
 
