@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpProvider } from 'web3-providers-http';
-import { Observable, of, interval, Subject } from 'rxjs';
-import { catchError, filter, map, switchMap, take, tap } from 'rxjs/operators';
+import { Observable, of, interval, Subject, merge } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, map, switchMap, take, tap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
 
 // TODO: move declarations into polyfills
@@ -11,6 +11,7 @@ declare let web3: any;
 
 function getEthAddressSafe() {
   return window.ethereum && window.ethereum.selectedAddress;
+  // return window.ethereum && ethereum.isMetaMask && window.ethereum.selectedAddress;
 }
 
 @Injectable({
@@ -20,31 +21,40 @@ export class Web3ProviderService {
 
   public web3Provider: HttpProvider;
 
-  private addressSubject$ = new Subject<string>();
-  public address$ = this.addressSubject$.asObservable();
+  public address$: Observable<string>;
   public isReady$: Observable<boolean>;
 
-
-  // TODO: redesign to eth address
+  private alreadyConnected$ = new Subject<HttpProvider>();
+  private manuallyConnected$ = new Subject<HttpProvider>();
 
   constructor() {
 
-    this.isReady$ = this.addressSubject$.asObservable().pipe(
+    this.address$ = merge(this.alreadyConnected$, this.manuallyConnected$).pipe(
+      tap((eth: HttpProvider) => {
+        this.web3Provider = eth;
+
+        // TODO: Double check that
+        (eth as any).on('accountsChanged', () => {
+          window.location.reload();
+        });
+      }),
+      map(() => getEthAddressSafe()),
+      distinctUntilChanged()
+    );
+
+    this.isReady$ = this.address$.pipe(
       map(address => !!address),
     );
 
+  }
+
+  refreshWeb3ConnectionState(): void {
     if (getEthAddressSafe()) {
-      this.addressSubject$.next(getEthAddressSafe());
+      this.alreadyConnected$.next(window.ethereum);
     }
   }
 
-  /**
-   * Checks fo different version of injected web3 and activate it if needed
-   * note: the fact that provider is found doesn't mean it's ready
-   * @returns true if any provider was found
-   */
   connectWeb3(): boolean {
-
     if (typeof ethereum !== 'undefined') {
       this.enableWeb3(ethereum);
 
@@ -67,6 +77,7 @@ export class Web3ProviderService {
     return false;
   }
 
+  // TODO: move to static utils
   private enableWeb3(eth: any): void {
     fromPromise(eth.enable()).pipe(
       catchError((e) => {
@@ -76,18 +87,9 @@ export class Web3ProviderService {
       switchMap(() => {
         return interval(100);
       }),
-      map(() => {
-        return getEthAddressSafe();
-      }),
+      map(() => getEthAddressSafe()),
       filter(address => !!address),
       take(1),
-      tap(() => {
-        this.web3Provider = eth;
-        eth.on('accountsChanged', () => {
-          window.location.reload();
-        });
-        this.addressSubject$.next(getEthAddressSafe());
-      })
     ).subscribe();
   }
 

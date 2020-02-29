@@ -1,17 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CircomeLoaderService } from './services/circome-loader.service';
-import { Observable } from 'rxjs';
+import { interval, Observable } from 'rxjs';
 import { AccountService, toAddressPreview } from './services/account.service';
 import { ZeroPoolService } from './services/zero-pool.service';
 import { Web3ProviderService } from './services/web3.provider.service';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'zp-ui';
 
   hasError$: Observable<boolean>;
@@ -46,5 +46,15 @@ export class AppComponent {
 
   connectWallet() {
     this.web3Service.connectWeb3();
+  }
+
+  ngOnInit(): void {
+    interval(1000).pipe(
+      tap(() => {
+        //this.web3Service.refreshWeb3ConnectionState();
+      })
+    ).subscribe();
+    // Do refresh after component initialisation
+
   }
 }
