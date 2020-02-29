@@ -19,8 +19,8 @@ export class MainComponent implements OnInit {
 
   isConnectedEthereum: boolean;
 
-  balance = 1;
-  history: HistoryItem[] = [];
+  balance;
+  history: HistoryItem[];
   tooltipMessage = 'Copy to clipboard';
 
   // amountOfPendingWithdrawals = 1;
@@ -55,21 +55,22 @@ export class MainComponent implements OnInit {
 
     this.account$ = this.accountSvc.account$;
 
-    this.zpService.balanceProgressNotificator$.subscribe((update) => {
-      console.log(update);
-    });
+    this.zpService.balanceProgressNotificator$
+      .subscribe((update) => {
+        console.log(update);
+      });
 
     const ethAssetId = '0x0';
 
-    // if (this.zpService.zpBalance) {
-    //   this.balance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
-    //   this.history = this.zpService.zpHistory;
-    // }
-    //
-    // this.zpService.zpUpdates$.subscribe(() => {
-    //   this.balance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
-    //   this.history = this.zpService.zpHistory;
-    // });
+    if (this.zpService.zpBalance) {
+      this.balance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
+      this.history = this.zpService.zpHistory;
+    }
+
+    this.zpService.zpUpdates$.subscribe(() => {
+      this.balance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
+      this.history = this.zpService.zpHistory;
+    });
 
   }
 
