@@ -51,7 +51,9 @@
                 <img class="icon-settings" src="../../assets/icons/settings.png">
               </button>
 
-              <div #addressTooltip="matTooltip" (click)="onAddressClick(addressTooltip, account)"
+
+              <div #addressTooltip="matTooltip"
+                   (click)="onAddressClick(addressTooltip, account)"
                    [matTooltip]="tooltipMessage"
                    class="address">
                 <p class="title">Your ZP address:</p>

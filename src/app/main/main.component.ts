@@ -3,10 +3,10 @@ import { AccountService, IAccount } from '../services/account.service';
 import { ZeroPoolService } from '../services/zero-pool.service';
 import { Observable, timer } from 'rxjs';
 import { fw, tbn, HistoryItem } from 'zeropool-lib';
-import { copyToClipboard } from '../copy-to-clipboard';
 import { MatTooltip } from '@angular/material/tooltip';
 import { delay, filter, tap } from 'rxjs/operators';
 import { Web3ProviderService } from '../services/web3.provider.service';
+import { Clipboard } from '@angular/cdk/clipboard';
 
 @Component({
   selector: 'app-main',
@@ -27,6 +27,7 @@ export class MainComponent implements OnInit {
     private accountSvc: AccountService,
     private zpService: ZeroPoolService,
     private web3Service: Web3ProviderService,
+    private clipboard: Clipboard
   ) {
 
     this.isConnectedEthereum = !!(zpService.zp
@@ -69,14 +70,10 @@ export class MainComponent implements OnInit {
 
   }
 
-  copyAddress(address: string): void {
-    copyToClipboard(address);
-  }
-
   onAddressClick(tooltip: MatTooltip, account: IAccount) {
 
     tooltip.hide();
-    this.copyAddress(account.zeropoolAddress);
+    this.clipboard.copy(account.zeropoolAddress);
 
     timer(250).pipe(
       tap(() => {
