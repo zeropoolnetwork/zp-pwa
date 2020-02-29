@@ -27,7 +27,6 @@ export class MainComponent implements OnInit {
     private accountSvc: AccountService,
     private zpService: ZeroPoolService,
     private web3Service: Web3ProviderService,
-    private clipboard: Clipboard
   ) {
 
     this.isConnectedEthereum = !!(zpService.zp
