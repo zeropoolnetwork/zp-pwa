@@ -26,7 +26,8 @@ export class MainComponent implements OnInit {
   constructor(
     private accountSvc: AccountService,
     private zpService: ZeroPoolService,
-    private web3Service: Web3ProviderService
+    private web3Service: Web3ProviderService,
+    private clipboard: Clipboard
   ) {
 
     this.isConnectedEthereum = !!(zpService.zp
@@ -70,7 +71,7 @@ export class MainComponent implements OnInit {
   }
 
   copyAddress(address: string): void {
-    copyToClipboard(address);
+    this.clipboard.copy(address);
   }
 
   onAddressClick(tooltip: MatTooltip, account: IAccount) {

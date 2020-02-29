@@ -23,6 +23,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { PayForGasComponent } from './pay-for-gas/pay-for-gas.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { ClipboardModule } from '@angular/cdk/clipboard'
 
 @NgModule({
   declarations: [
@@ -49,6 +50,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     MatTooltipModule,
     MatProgressBarModule,
     MatCheckboxModule,
+    ClipboardModule,
 
     HttpClientModule,
     InputAmountModule,
