@@ -22,11 +22,11 @@
       </mat-form-field>
 
       <div class="actions button-box">
-        <button mat-stroked-button (click)="generateNew()">
+        <button mat-flat-button color="primary" (click)="generateNew()">
           Generate new mnemonic
         </button>
 
-        <button mat-flat-button color="warn" routerLink="/account-setup" class="next-btn"
+        <button mat-flat-button color="accent" routerLink="/account-setup" class="next-btn"
                 [disabled]="mnemonicForm.invalid" (click)="next()">Next
         </button>
       </div>
