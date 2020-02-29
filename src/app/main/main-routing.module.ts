@@ -7,7 +7,7 @@ import { TransferComponent } from './transfer/transfer.component';
 import { WithdrawComponent } from './withdraw/withdraw.component';
 import { SettingsComponent } from './settings/settings.component';
 import { NgxLoadersCssModule } from 'ngx-loaders-css';
-import { PayForGasComponent } from '../pay-for-gas/pay-for-gas.component';
+import { PayForGasComponent } from './pay-for-gas/pay-for-gas.component';
 
 const routes: Routes = [
   {path: '', component: MainComponent},

@@ -9,11 +9,13 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatButtonModule } from '@angular/material/button';
 import { WelcomeComponent } from './welcome/welcome.component';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { ConnectWalletComponent } from './connect-wallet/connect-wallet.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     WelcomeComponent,
+    ConnectWalletComponent,
   ],
   imports: [
     BrowserModule,
