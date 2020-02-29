@@ -72,7 +72,7 @@
         <div class="actions mb-20">
           <button mat-stroked-button routerLink="./deposit">Deposit</button>
           <button mat-stroked-button routerLink="./transfer">Transfer</button>
-          <button mat-stroked-button routerLink="./withdraw"
+          <button mat-stroked-button [routerLink]="hasWithdrawals ? 'withdrawals-list' :'./withdraw'"
                   matBadgePosition="top after"
                   [matBadge]="totalWithdrawals"
                   [matBadgeColor]="hasVerifiedWithdrawals ? 'accent' : 'primary'"

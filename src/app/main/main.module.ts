@@ -25,6 +25,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ClipboardModule } from '@angular/cdk/clipboard';
 import { MatBadgeModule } from '@angular/material/badge';
+import { WithdrawalsListComponent } from './withdrawals-list/withdrawals-list.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { MatBadgeModule } from '@angular/material/badge';
     TransferComponent,
     WithdrawComponent,
     PayForGasComponent,
-    SettingsComponent
+    SettingsComponent,
+    WithdrawalsListComponent
   ],
   imports: [
     CommonModule,

@@ -8,6 +8,7 @@ import { WithdrawComponent } from './withdraw/withdraw.component';
 import { SettingsComponent } from './settings/settings.component';
 import { NgxLoadersCssModule } from 'ngx-loaders-css';
 import { PayForGasComponent } from './pay-for-gas/pay-for-gas.component';
+import { WithdrawalsListComponent } from './withdrawals-list/withdrawals-list.component';
 
 const routes: Routes = [
   {path: '', component: MainComponent},
@@ -15,6 +16,7 @@ const routes: Routes = [
   {path: 'deposit', component: DepositComponent},
   {path: 'transfer', component: TransferComponent},
   {path: 'withdraw', component: WithdrawComponent},
+  {path: 'withdrawals-list', component: WithdrawalsListComponent},
   {path: 'settings', component: SettingsComponent}
 ];
 
