@@ -73,7 +73,8 @@ export class DepositComponent implements OnInit {
         }
       )
     ).subscribe(
-      (tx: Transaction) => {
+      // (tx: Transaction) => {
+      (tx: any) => {
         this.isDone = true;
         this.transactionHash = tx.transactionHash;
       }

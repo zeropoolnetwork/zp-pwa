@@ -58,7 +58,8 @@ export class TransferComponent implements OnInit {
         }
       )
     ).subscribe(
-      (tx: Transaction) => {
+      (tx: any) => {
+        // (tx: Transaction) => {
         this.isDone = true;
         this.transactionHash = tx.transactionHash;
       }
