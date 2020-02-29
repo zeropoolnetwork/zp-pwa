@@ -76,14 +76,26 @@
 
         <h4 class="title">Transaction History</h4>
         <p *ngIf="history?.length == 0">No transaction history yet</p>
-        <div style="overflow-y: auto;  min-height: 50px">
+        <div style="overflow-y: auto;  min-height: 1px">
           <div *ngFor="let tx of history">
             <mat-divider></mat-divider>
-            <div style="margin: 0.5em">
+            <!--<div style="margin: 0.5em">-->
               <!-- <p>#81 - 2/10/2020 at 12:35</p> -->
-              <p *ngIf="tx.type === 'in'" style="color: green">{{ tx.amount }} zpETH {{ tx.action }}</p>
-              <p *ngIf="tx.type === 'out'" style="color: red">{{ tx.amount }} zpETH {{ tx.action }}</p>
-            </div>
+              <div class="wrapper" style="text-align: left">
+
+                <div class="box a">
+                  <img style="margin-top: 1em; margin-left: auto; margin-right: auto" src="/assets/images/zeropool-logo.jpeg" width="40px">
+                </div>
+                <div class="box b">
+                  <p style="font-weight: bold;">{{ tx.action.toUpperCase() }}</p>
+                  <p style="margin-top: -1em">{{ fromDecimals(tx.amount) }} zpETH</p>
+                </div>
+                <div class="box e"></div>
+
+              </div>
+              <!--<p *ngIf="tx.type === 'in'" style="color: green">  </p>-->
+              <!--<p *ngIf="tx.type === 'out'" style="color: red">{{ tx.amount }} zpETH {{ tx.action }}</p>-->
+            <!--</div>-->
           </div>
         </div>
 

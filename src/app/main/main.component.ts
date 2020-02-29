@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AccountService, IAccount } from '../services/account.service';
 import { ZeroPoolService } from '../services/zero-pool.service';
 import { Observable, timer } from 'rxjs';
-import { fw, HistoryItem } from 'zeropool-lib';
+import { fw, tbn, HistoryItem } from 'zeropool-lib';
 import { copyToClipboard } from '../copy-to-clipboard';
 import { MatTooltip } from '@angular/material/tooltip';
 import { delay, filter, tap } from 'rxjs/operators';
@@ -94,5 +94,9 @@ export class MainComponent implements OnInit {
     ).subscribe(() => {
       console.log('!');
     });
+  }
+
+  fromDecimals(val: number): string {
+    return tbn(val).div(1e18).toFixed(8).toString();
   }
 }
