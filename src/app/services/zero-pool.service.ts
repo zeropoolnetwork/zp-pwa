@@ -51,6 +51,9 @@ export class ZeroPoolService {
     private stateStorageService: StateStorageService
   ) {
 
+    // todo: challengeExpiresBlocks - this.zp.ZeroPool.getChallengeExpiresBlocks();
+    // see: withdraw / withdraw-list components
+
     const circomLoaded$ = this.circomeSvc.isReady$.pipe(
       filter((isReady) => isReady),
     );
