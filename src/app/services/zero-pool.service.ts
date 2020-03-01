@@ -8,7 +8,6 @@ import { combineLatest, interval, Observable, of, Subject } from 'rxjs';
 import { Web3ProviderService } from './web3.provider.service';
 import { StateStorageService } from './state.storage.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
-import { RelayerApiService } from './relayer.api.service';
 
 export interface ZpBalance {
   [key: string]: number;
@@ -102,8 +101,8 @@ export class ZeroPoolService {
 
     const zp$ = combineLatest([circomLoaded$, web3Loaded$, this.accountService.account$]).pipe(
       map((x) => {
-        const [ok1, ok2, account]: [boolean, boolean, IAccount] = x;
 
+        const [ok1, ok2, account]: [boolean, boolean, IAccount] = x;
         const zp = new ZeroPoolNetwork(
           environment.contractAddress,
           this.web3ProviderService.web3Provider,

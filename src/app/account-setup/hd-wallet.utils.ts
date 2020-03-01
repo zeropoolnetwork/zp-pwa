@@ -18,13 +18,12 @@ export function uint8ArrayToHex(a: Uint8Array): string {
   return s;
 }
 
-export function generateMnemonic(): string {
+export function generateMnemonic(numWords: number = 24): string {
   if (!hasStrongRandom()) {
     alert('This browser does not support strong randomness');
     return;
   }
 
-  const numWords = 24;
   const strength = numWords / 3 * 32;
 
   // get the amount of entropy (bits) to use
@@ -42,5 +41,5 @@ export function generateMnemonic(): string {
 
 
 export function isValidMnemonic( phrase: string ): boolean {
-  return validateMnemonic(phrase);
+  return validateMnemonic(phrase, EnDict);
 }
