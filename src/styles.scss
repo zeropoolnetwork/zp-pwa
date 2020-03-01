@@ -40,6 +40,28 @@ $zp-pwa-theme: mat-light-theme($zp-pwa-primary, $zp-pwa-accent, $zp-pwa-warn);
 html, body { height: 100%; margin: 0;}
 //body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
+.notice-block-hidden {
+  display: none !important;
+}
+
+.notice-title {
+  text-align: center;
+  font-weight: 200 !important;
+}
+
+.notice-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  padding: 20px;
+
+  @media (min-width: 600px) {
+    display: block;
+    margin: 100px auto 0;
+  }
+}
+
 .start-container {
   height: calc(100vh - 60px);
   display: flex;
