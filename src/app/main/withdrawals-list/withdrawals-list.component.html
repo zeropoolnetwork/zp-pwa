@@ -1,27 +1,17 @@
 <div class="fixed-center widget-box">
   <h2>Your withdrawals</h2>
   <div class="withdrawals-list">
-    <div class="withdrawals-row">
-      <div>
-        <p>Verified 5000 / 5000</p>
-        <h3>0.2 ETH</h3>
+
+    <div *ngFor="let w of withdrawals">
+      <div class="withdrawals-row">
+        <div>
+          <p>Verified {{ getRemainingBlockNumber(w.blockNumber) }} / {{ expiresBlockNumber }}</p>
+          <h3>{{ getAmount(w.utxo.amount) }} {{ getAssetName(w.utxo.token) }}</h3>
+        </div>
+        <button *ngIf="isReady(w.blockNumber)" mat-stroked-button>Finalize</button>
       </div>
-      <button mat-stroked-button>Finalize</button>
     </div>
-    <div class="withdrawals-row">
-      <div>
-        <p>Pending 1500 / 5000</p>
-        <h3>0.2 ETH</h3>
-      </div>
-      <button mat-stroked-button>Finalize</button>
-    </div>
-    <div class="withdrawals-row">
-      <div>
-        <p>Pending 1500 / 5000</p>
-        <h3>0.2 ETH</h3>
-      </div>
-      <button mat-stroked-button>Finalize</button>
-    </div>
+
   </div>
   <div class="actions mt-20">
     <button mat-stroked-button routerLink="/main">Back</button>

@@ -1,14 +1,21 @@
 import { Injectable } from '@angular/core';
 import { CircomeLoaderService } from './circome-loader.service';
-import { GetBalanceProgressNotification, HistoryItem, HistoryState, MyUtxoState, stringifyUtxoState, ZeroPoolNetwork } from 'zeropool-lib';
-import { concatMap, filter, map, shareReplay, switchMap, tap } from 'rxjs/operators';
+import {
+  GetBalanceProgressNotification,
+  HistoryItem,
+  HistoryState,
+  MyUtxoState,
+  PayNote,
+  stringifyUtxoState,
+  ZeroPoolNetwork
+} from 'zeropool-lib';
+import { concatMap, filter, map, mergeMap, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { AccountService, IAccount } from './account.service';
 import { environment } from '../../environments/environment';
 import { combineLatest, interval, Observable, of, Subject } from 'rxjs';
 import { Web3ProviderService } from './web3.provider.service';
 import { StateStorageService } from './state.storage.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
-import { RelayerApiService } from './relayer.api.service';
 
 export interface ZpBalance {
   [key: string]: number;
@@ -25,6 +32,10 @@ export class ZeroPoolService {
 
   public zpBalance: ZpBalance;
   public zpHistory: HistoryItem[];
+  public activeWithdrawals: PayNote[];
+  public currentBlockNumber: number;
+
+  public challengeExpiresBlocks = 5760;
 
   private balanceProgressNotificator: Subject<GetBalanceProgressNotification> = new Subject();
   public balanceProgressNotificator$: Observable<GetBalanceProgressNotification> =
@@ -32,7 +43,6 @@ export class ZeroPoolService {
 
   private zpUpdatesSubject = new Subject<boolean>();
   public zpUpdates$: Observable<boolean> = this.zpUpdatesSubject.asObservable();
-
 
   constructor(
     private circomeSvc: CircomeLoaderService,
@@ -57,13 +67,23 @@ export class ZeroPoolService {
       return combineLatest(
         [
           fromPromise(zp.getBalance()),
-          fromPromise(zp.utxoHistory())
+          fromPromise(zp.utxoHistory()),
+          fromPromise(zp.getActiveWithdrawals()),
+          fromPromise(zp.ZeroPool.web3Ethereum.getBlockNumber())
         ]
       ).pipe(
         tap((x) => {
-          const [balances, history]: [ZpBalance, HistoryState] = x;
+          const [
+            balances,
+            history,
+            activeWithdrawals,
+            blockNumber
+          ]: [ZpBalance, HistoryState, PayNote[], number] = x;
+
           this.zpBalance = balances;
           this.zpHistory = history.items;
+          this.activeWithdrawals = activeWithdrawals;
+          this.currentBlockNumber = blockNumber;
         }),
         map(() => {
           return true;
@@ -100,6 +120,7 @@ export class ZeroPoolService {
       );
     };
 
+    // @ts-ignore
     const zp$ = combineLatest([circomLoaded$, web3Loaded$, this.accountService.account$]).pipe(
       map((x) => {
         const [ok1, ok2, account]: [boolean, boolean, IAccount] = x;
@@ -122,7 +143,7 @@ export class ZeroPoolService {
         });
 
         this.zp = zp;
-        return zp$;
+        return zp;
       }),
       shareReplay(),
     );

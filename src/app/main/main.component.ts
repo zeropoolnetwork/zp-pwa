@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountService, IAccount } from '../services/account.service';
 import { ZeroPoolService } from '../services/zero-pool.service';
-import { interval, Observable, of, timer } from 'rxjs';
-import { fw, tbn, HistoryItem } from 'zeropool-lib';
+import { Observable, of, timer } from 'rxjs';
+import { fw, HistoryItem, PayNote, tbn } from 'zeropool-lib';
 import { MatTooltip } from '@angular/material/tooltip';
 import { delay, filter, tap } from 'rxjs/operators';
 import { Web3ProviderService } from '../services/web3.provider.service';
@@ -28,7 +28,7 @@ export class MainComponent implements OnInit {
   // amountOfPendingWithdrawals = 1;
   // amountOfVerifiedWithdrawals = 3;
   totalWithdrawals = 3;
-  hasWithdrawals = true;
+  hasWithdrawals = false;
   hasVerifiedWithdrawals = true;
 
   withdrawals$ = of({
@@ -63,21 +63,38 @@ export class MainComponent implements OnInit {
         console.log(update);
       });
 
-    const ethAssetId = '0x0';
-
     if (this.zpService.zpBalance) {
-      this.balance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
-      this.history = this.zpService.zpHistory;
+      this.syncState();
     }
 
+
     this.zpService.zpUpdates$.subscribe(() => {
-      this.balance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
-      this.history = this.zpService.zpHistory;
+      this.syncState();
     });
   }
 
   connectWallet() {
     this.web3Service.connectWeb3();
+  }
+
+  syncState() {
+    const ethAssetId = '0x0';
+
+    this.balance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
+    this.history = this.zpService.zpHistory;
+
+    this.totalWithdrawals = this.zpService.activeWithdrawals.length;
+    if (this.totalWithdrawals !== 0) {
+      this.hasWithdrawals = true;
+      const readyBlock = this.zpService.currentBlockNumber - this.zpService.challengeExpiresBlocks;
+      this.zpService.activeWithdrawals.forEach(
+        (payNote: PayNote) => {
+          if (payNote.blockNumber <= readyBlock) {
+            this.hasVerifiedWithdrawals = true;
+          }
+        }
+      );
+    }
   }
 
   ngOnInit(): void {
