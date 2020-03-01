@@ -62,8 +62,6 @@ export class WithdrawComponent implements OnInit {
 
           let tmp = 0;
           const utxoIn: Utxo<bigint>[] = [];
-
-          debugger
           for (const [i, utxo] of state.utxoList.entries()) {
             if (i === 2) {
               throw new Error('max 2 utxo per withdraw');

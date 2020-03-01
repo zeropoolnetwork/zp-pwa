@@ -7,16 +7,19 @@ import { TransferComponent } from './transfer/transfer.component';
 import { WithdrawComponent } from './withdraw/withdraw.component';
 import { SettingsComponent } from './settings/settings.component';
 import { NgxLoadersCssModule } from 'ngx-loaders-css';
-import { PayForGasComponent } from './pay-for-gas/pay-for-gas.component';
+import { GasIsNeededComponent } from './gas-is-needed/gas-is-needed.component';
 import { WithdrawalsListComponent } from './withdrawals-list/withdrawals-list.component';
+import { GasGuard } from './gas.guard';
+import { GasDepositComponent } from './gas-deposit/gas-deposit.component';
 
 const routes: Routes = [
   {path: '', component: MainComponent},
-  {path: 'pay-for-gas', component: PayForGasComponent},
-  {path: 'deposit', component: DepositComponent},
-  {path: 'transfer', component: TransferComponent},
-  {path: 'withdraw', component: WithdrawComponent},
-  {path: 'withdrawals-list', component: WithdrawalsListComponent},
+  {path: 'gas-is-needed', component: GasIsNeededComponent},
+  {path: 'gas-deposit', component: GasDepositComponent},
+  {path: 'deposit', component: DepositComponent, canActivate: [GasGuard]},
+  {path: 'transfer', component: TransferComponent, canActivate: [GasGuard]},
+  {path: 'withdraw', component: WithdrawComponent, canActivate: [GasGuard]},
+  {path: 'withdrawals-list', component: WithdrawalsListComponent, canActivate: [GasGuard]},
   {path: 'settings', component: SettingsComponent}
 ];
 

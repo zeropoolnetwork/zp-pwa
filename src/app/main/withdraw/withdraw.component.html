@@ -2,20 +2,17 @@
   <ng-container *ngIf="!isDone" [formGroup]="transferForm">
 
     <ng-container *ngIf="myZpBalance">
-      <div style="padding: 10px; font-size: 0.7em">Available {{myZpBalance}} zpETH</div>
+      <div style="  padding: 10px; font-size: 0.7em">Available {{myZpBalance}} zpETH</div>
     </ng-container>
 
     <ng-container *ngIf="!withdrawIsInProgress">
       <h2>Prepare withdraw ZP BlockItem</h2>
 
-      <!--<p class="ng-star-inserted">Enter Zeropool Address of receiver</p>-->
-      <!--<app-zp-address-input label="Enter receivers ZeroPool address" formControlName="toAddress"></app-zp-address-input>-->
       <app-amount-input label="Enter amount of ETH" formControlName="toAmount"></app-amount-input>
 
       <div class="actions">
         <button mat-stroked-button routerLink="/main">Back</button>
         <button mat-flat-button color="accent" [disabled]="!transferForm.valid" (click)="onSendClick()">Send</button>
-        <!-- <button mat-flat-button color="warn" (click)="onSendClick()">Send</button> -->
       </div>
     </ng-container>
 

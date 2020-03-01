@@ -10,11 +10,11 @@ import { mergeMap } from 'rxjs/operators';
 import { Transaction } from 'web3-core';
 
 @Component({
-  selector: 'app-pay-for-gas',
-  templateUrl: './pay-for-gas.component.html',
-  styleUrls: ['./pay-for-gas.component.scss']
+  selector: 'app-gas-is-needed',
+  templateUrl: './gas-is-needed.component.html',
+  styleUrls: ['./gas-is-needed.component.scss']
 })
-export class PayForGasComponent implements OnInit {
+export class GasIsNeededComponent implements OnInit {
 
   @Input()
   availableEthAmount: number;
@@ -67,4 +67,7 @@ export class PayForGasComponent implements OnInit {
     );
   }
 
+  depositGas() {
+    //
+  }
 }

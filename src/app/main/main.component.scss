@@ -30,9 +30,19 @@
 
 .balance {
   margin: 3.5em 0 0.5em 0;
+
+  p {
+    font-size: 14px;
+    margin: 0;
+    line-height: 22px;
+
+    &.balance-gas {
+      color: grey;
+    }
+  }
 }
 
-.circle-buttun {
+.circle-button {
   @media (min-width: 600px) {
     &:hover {
       background-color: rgba(51, 51, 51, .1);

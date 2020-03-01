@@ -20,12 +20,13 @@ import { HttpClientModule } from '@angular/common/http';
 import { InputAmountModule } from '../common/input-amount/input-amount.module';
 import { InputZpAddressModule } from '../common/input-zp-address/input-zp-address.module';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { PayForGasComponent } from './pay-for-gas/pay-for-gas.component';
+import { GasIsNeededComponent } from './gas-is-needed/gas-is-needed.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ClipboardModule } from '@angular/cdk/clipboard';
 import { MatBadgeModule } from '@angular/material/badge';
 import { WithdrawalsListComponent } from './withdrawals-list/withdrawals-list.component';
+import { GasDepositComponent } from './gas-deposit/gas-deposit.component';
 
 @NgModule({
   declarations: [
@@ -33,9 +34,10 @@ import { WithdrawalsListComponent } from './withdrawals-list/withdrawals-list.co
     DepositComponent,
     TransferComponent,
     WithdrawComponent,
-    PayForGasComponent,
+    GasIsNeededComponent,
     SettingsComponent,
-    WithdrawalsListComponent
+    WithdrawalsListComponent,
+    GasDepositComponent
   ],
   imports: [
     CommonModule,
