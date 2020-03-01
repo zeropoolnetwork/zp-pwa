@@ -68,7 +68,7 @@
           <h1 class="balance">
             {{balance}}
             <p *ngIf="balance">zpETH</p>
-            <p class="balance-gas">Gas 0.00003000</p>
+            <p class="balance-gas">Gas {{zpGasBalance$| async}}</p>
           </h1>
 
           <div class="actions mb-20">

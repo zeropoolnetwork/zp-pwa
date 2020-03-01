@@ -5,15 +5,15 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss']
 })
-export class SettingsComponent implements OnInit {
+export class SettingsComponent {
 
   confirmed = false;
-  constructor() { }
 
-  ngOnInit(): void {
+  constructor() {
   }
 
   resetAccount() {
-    // TODO: clear local storag
+    localStorage.mnemonic = '';
+    location.reload();
   }
 }
