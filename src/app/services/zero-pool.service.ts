@@ -52,9 +52,7 @@ export class ZeroPoolService {
 
       return combineLatest(
         [
-          fromPromise(zp.getBalance((update) => {
-            balanceProgress && balanceProgress.next(update);
-          })),
+          fromPromise(zp.getBalance()),
           fromPromise(zp.utxoHistory())
         ]
       ).pipe(
