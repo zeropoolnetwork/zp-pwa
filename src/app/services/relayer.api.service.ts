@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
-import { delay, map, mergeMap, retryWhen } from 'rxjs/operators';
-import { Observable, of, throwError } from 'rxjs';
+import { delay, map, mergeMap, retryWhen, switchMap } from 'rxjs/operators';
+import { interval, Observable, of, throwError } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { BlockItem } from 'zeropool-lib';
 import { Transaction } from 'web3-core';
@@ -15,7 +15,7 @@ export function delayedRetry(delayMs: number, maxRetry = DEFAULT_MAX_RETRIES) {
     src.pipe(
       retryWhen((errors: Observable<any>) => errors.pipe(
         delay(delayMs),
-        mergeMap(error => retries-- > 0 ? of(error) : throwError(error))
+        mergeMap(error => (retries--) > 0 ? of(error) : throwError(error))
       ))
     );
 }
@@ -26,11 +26,15 @@ export function delayedRetry(delayMs: number, maxRetry = DEFAULT_MAX_RETRIES) {
 export class RelayerApiService {
 
   constructor(private http: HttpClient) {
+    //
+  }
+
+  getGasBalance(): Observable<number> {
+    return of(0.25);
   }
 
   sendTx$(blockItem: BlockItem<string>): Observable<string> {
     const url = environment.relayerUrl + '/tx';
-
     return this.http.post<Transaction>(url, blockItem).pipe(
       delayedRetry(1000),
       map(response => {
