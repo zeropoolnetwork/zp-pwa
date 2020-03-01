@@ -7,6 +7,7 @@ import { environment } from '../environments/environment';
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { WelcomeComponent } from './welcome/welcome.component';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { ConnectWalletComponent } from './connect-wallet/connect-wallet.component';
@@ -25,6 +26,7 @@ import { ConnectWalletComponent } from './connect-wallet/connect-wallet.componen
     FlexLayoutModule,
     ServiceWorkerModule.register('ngsw-worker.js', {enabled: environment.production}),
     BrowserAnimationsModule,
+    MatIconModule
   ],
   providers: [],
   bootstrap: [AppComponent]

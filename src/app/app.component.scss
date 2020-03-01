@@ -52,6 +52,29 @@ $toolbar-height: 60px;
   width: 100%;
 }
 
+.warning {
+  background-color: #f44336;
+  justify-content: space-between;
+
+  h2 {
+    width: 50%;
+
+    @media (max-width: 600px) {
+      width: auto;
+      font-size: 14px;
+      line-height: 20px;
+    }
+  }
+
+  button {
+    @media (min-width: 600px) {
+      &:hover {
+        background-color: rgba(255, 255, 255, .12);
+      }
+    }
+  }
+}
+
 .logo {
   font-weight: 400;
 
