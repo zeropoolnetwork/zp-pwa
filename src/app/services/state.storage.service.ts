@@ -1,5 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HistoryState, MyUtxoState } from 'zeropool-lib';
+import { StorageMap } from '@ngx-pwa/local-storage';
+
+@Injectable()
+export class YourService {
+  constructor(private storage: StorageMap) {}
+}
 
 @Injectable({
   providedIn: 'root'

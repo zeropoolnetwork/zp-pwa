@@ -25,6 +25,7 @@
     "@angular/pwa": "^0.900.3",
     "@angular/router": "~9.0.2",
     "@angular/service-worker": "~9.0.2",
+    "@ngx-pwa/local-storage": "^9.0.2",
     "loaders.css": "^0.1.2",
     "ngx-loaders-css": "^1.0.3",
     "rxjs": "~6.5.4",
@@ -33,7 +34,7 @@
     "web3-core": "^1.2.6",
     "web3-eth-contract": "^1.2.6",
     "web3-providers-http": "^1.2.6",
-    "zeropool-lib": "0.4.29",
+    "zeropool-lib": "0  .4.3",
     "zone.js": "~0.10.2"
   },
   "devDependencies": {
