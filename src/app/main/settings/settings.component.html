@@ -1,14 +1,16 @@
 <div class="fixed-center widget-box">
   <div class="widget-box-main-contant settings-content">
     <div class="settings-acount-list"></div>
+
     <section class="settings-delete">
-      <h3 class="settings-text-warning">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Asperiores distinctio et optio reprehenderit temporibus vitae.</h3>
-      <mat-checkbox>I agree</mat-checkbox>
+      <h1>Delete Account</h1>
+      <h3 class="settings-text-warning">
+        By deleting account you wouldn't be able to access you're funds in ZeroPool without seed phrase
+      </h3>
+      <mat-checkbox [(ngModel)]="confirmed">Yes, I understand</mat-checkbox>
       <div class="actions mt-20">
-        <button mat-stroked-button
-                routerLink=""
-                color="warn"
-                disabled>
+        <button mat-stroked-button (click)="resetAccount()" color="warn"
+                [disabled]="!confirmed">
           Delete account
         </button>
       </div>

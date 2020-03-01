@@ -7,9 +7,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SettingsComponent implements OnInit {
 
+  confirmed = false;
   constructor() { }
 
   ngOnInit(): void {
   }
 
+  resetAccount() {
+    // TODO: clear local storag
+  }
 }
