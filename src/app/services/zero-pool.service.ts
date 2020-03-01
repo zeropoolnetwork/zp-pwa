@@ -123,8 +123,8 @@ export class ZeroPoolService {
     // @ts-ignore
     const zp$ = combineLatest([circomLoaded$, web3Loaded$, this.accountService.account$]).pipe(
       map((x) => {
-        const [ok1, ok2, account]: [boolean, boolean, IAccount] = x;
 
+        const [ok1, ok2, account]: [boolean, boolean, IAccount] = x;
         const zp = new ZeroPoolNetwork(
           environment.contractAddress,
           this.web3ProviderService.web3Provider,

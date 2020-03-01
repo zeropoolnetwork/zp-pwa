@@ -3,15 +3,16 @@ import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/fo
 import { ValidateMnemonic } from './mnemonic.validator';
 import { generateMnemonic } from './hd-wallet.utils';
 import { Router } from '@angular/router';
+import { AccountService } from '../services/account.service';
 
 @Component({
   selector: 'app-account-setup',
   templateUrl: './account-setup.component.html',
   styleUrls: ['./account-setup.component.scss']
 })
-export class AccountSetupComponent implements OnInit {
+export class AccountSetupComponent {
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private accountService: AccountService) {
     //
   }
 
@@ -26,11 +27,8 @@ export class AccountSetupComponent implements OnInit {
     return this.mnemonicForm.controls.mnemonic;
   }
 
-  ngOnInit(): void {
-  }
-
   next() {
-    localStorage.setItem('mnemonic', this.mnemonic.value);
+    this.accountService.setMnemonic(this.mnemonic.value);
     this.router.navigate(['/main']);
   }
 
