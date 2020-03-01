@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { fw, PayNote } from 'zeropool-lib';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { environment } from '../../../environments/environment';
+import { fromPromise } from 'rxjs/internal-compatibility';
+import { Transaction } from 'web3-core';
 
 @Component({
   selector: 'app-withdrawals-list',
@@ -20,6 +22,15 @@ export class WithdrawalsListComponent implements OnInit {
     this.expiresBlockNumber = this.zpService.challengeExpiresBlocks;
     this.withdrawals = this.zpService.activeWithdrawals;
 
+  }
+
+  withdraw(w: PayNote) {
+    fromPromise(this.zpService.zp.withdraw(w)).subscribe(
+      (tx: Transaction) => {
+        // @ts-ignore
+        console.log(tx.transactionHash);
+      }
+    );
   }
 
   ngOnInit(): void {
