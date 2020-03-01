@@ -37,9 +37,9 @@ export class StateStorageService {
 
   getUtxoState(): Observable<MyUtxoStateHex> {
     const result$ = this.storage.get<MyUtxoStateHex>('utxo-state').pipe(
-      tap(() => {
-        debugger
-      })
+      // tap(() => {
+      //   debugger
+      // })
     );
     return result$ as Observable<MyUtxoStateHex>;
   }
