@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountService, IAccount } from '../services/account.service';
 import { ZeroPoolService } from '../services/zero-pool.service';
-import { Observable, of, timer } from 'rxjs';
+import { interval, Observable, of, timer } from 'rxjs';
 import { fw, tbn, HistoryItem } from 'zeropool-lib';
 import { MatTooltip } from '@angular/material/tooltip';
 import { delay, filter, tap } from 'rxjs/operators';
@@ -19,7 +19,9 @@ export class MainComponent implements OnInit {
 
   isConnectedEthereum: boolean;
 
-  balance;
+  zpGasBalance$: Observable<number>;
+  balance: number;
+
   history: HistoryItem[];
   tooltipMessage = 'Copy to clipboard';
 
@@ -41,17 +43,18 @@ export class MainComponent implements OnInit {
     private clipboard: Clipboard
   ) {
 
+    this.zpGasBalance$ = this.zpService.zpGasBalance$;
+
     // TODO: fix problem and use ?. operator
     this.isConnectedEthereum = !!(zpService.zp && zpService.zp.ZeroPool.web3Ethereum.ethAddress);
 
     web3Service.isReady$.pipe(
       filter(x => !!x)
-    )
-      .subscribe(
-        () => {
-          this.isConnectedEthereum = true;
-        }
-      );
+    ).subscribe(
+      () => {
+        this.isConnectedEthereum = true;
+      }
+    );
 
     this.account$ = this.accountSvc.account$;
 
@@ -71,7 +74,6 @@ export class MainComponent implements OnInit {
       this.balance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
       this.history = this.zpService.zpHistory;
     });
-
   }
 
   connectWallet() {
