@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { StateStorageService } from '../../services/state.storage.service';
 
 @Component({
   selector: 'app-settings',
@@ -9,11 +10,13 @@ export class SettingsComponent {
 
   confirmed = false;
 
-  constructor() {
+  constructor(private stateService: StateStorageService) {
   }
 
   resetAccount() {
-    localStorage.mnemonic = '';
-    location.reload();
+    this.stateService.resetStorage()
+      .subscribe(() => {
+        location.reload();
+      });
   }
 }

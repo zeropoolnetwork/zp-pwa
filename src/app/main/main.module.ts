@@ -27,6 +27,8 @@ import { ClipboardModule } from '@angular/cdk/clipboard';
 import { MatBadgeModule } from '@angular/material/badge';
 import { WithdrawalsListComponent } from './withdrawals-list/withdrawals-list.component';
 import { GasDepositComponent } from './gas-deposit/gas-deposit.component';
+import { ResetAccountComponent } from './settings/reset-account/reset-account.component';
+import { DustProtectionComponent } from './settings/dust-protection/dust-protection.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +39,9 @@ import { GasDepositComponent } from './gas-deposit/gas-deposit.component';
     GasIsNeededComponent,
     SettingsComponent,
     WithdrawalsListComponent,
-    GasDepositComponent
+    GasDepositComponent,
+    ResetAccountComponent,
+    DustProtectionComponent
   ],
   imports: [
     CommonModule,

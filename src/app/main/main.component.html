@@ -1,34 +1,6 @@
 <!-- Not account yet: show something -->
 <ng-container *ngIf="account$ | async as account">
 
-  <!--
-  <div class="fixed-center widget-box" >
-
-    <div class="widget-box-main-contant">
-      <div class="widget-box-header">
-        <div class="tooltip-box">
-
-          <div class="address-box">
-            <button class="circle-button" mat-icon-button routerLink="./settings">
-              <img class="icon-settings" src="../../assets/icons/settings.png">
-            </button>
-
-            <div #addressTooltip="matTooltip" (click)="onAddressClick(addressTooltip, account)"
-                 [matTooltip]="tooltipMessage"
-                 class="address">
-              <p class="title">Your ZP address:</p>
-              <p>{{account.zeropoolAddressPreview}}</p>
-            </div>
-
-          </div>
-
-        </div>
-        <mat-divider></mat-divider>
-      </div>
-    </div>
-  </div>
-  -->
-
   <div class="fixed-center widget-box">
     <div class="widget-box-main-contant">
 
@@ -68,7 +40,7 @@
         <h1 class="balance">
           {{balance}}
           <p>zpETH</p>
-          <p class="balance-gas">Gas 0.00003000</p>
+          <p class="balance-gas">Gas {{zpGasBalance$ | async}}</p>
         </h1>
 
         <div class="actions mb-20">
