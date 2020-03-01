@@ -94,7 +94,8 @@ export class ZeroPoolService {
     const listenHistoryStateUpdates$ = (zp: ZeroPoolNetwork): Observable<any> => {
       return zp.zpHistoryState$.pipe(
         tap((historyState: HistoryState) => {
-          this.stateStorageService.historyState = historyState;
+          // TODO: think on switchMap here
+          this.stateStorageService.saveHistory(historyState);
         }),
       );
     };
@@ -102,7 +103,9 @@ export class ZeroPoolService {
     const listenUtxoStateUpdates$ = (zp: ZeroPoolNetwork): Observable<any> => {
       return zp.utxoState$.pipe(
         tap((utxoState: MyUtxoState<bigint>) => {
-          this.stateStorageService.utxoState = stringifyUtxoState(utxoState);
+          // TODO: think on switchMap here
+          const hexified = stringifyUtxoState(utxoState);
+          this.stateStorageService.saveUtxo(hexified);
         })
       );
     };
@@ -121,18 +124,24 @@ export class ZeroPoolService {
     };
 
     // @ts-ignore
-    const zp$ = combineLatest([circomLoaded$, web3Loaded$, this.accountService.account$]).pipe(
+    const zp$ = combineLatest([
+      circomLoaded$,
+      web3Loaded$,
+      this.accountService.account$,
+      this.stateStorageService.getUtxoState(),
+      this.stateStorageService.getHistoryState(),
+    ]).pipe(
       map((x) => {
 
-        const [ok1, ok2, account]: [boolean, boolean, IAccount] = x;
+        const [ok1, ok2, account, utxoState, historyState] = x;
         const zp = new ZeroPoolNetwork(
           environment.contractAddress,
           this.web3ProviderService.web3Provider,
           account.zeropoolMnemonic,
           this.circomeSvc.circomeTxJson,
           this.circomeSvc.proverKey,
-          this.stateStorageService.utxoState,
-          this.stateStorageService.historyState
+          utxoState,
+          historyState
         );
 
         listenHistoryStateUpdates$(zp).subscribe();

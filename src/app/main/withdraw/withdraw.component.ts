@@ -4,8 +4,8 @@ import { ZeroPoolService } from '../../services/zero-pool.service';
 import { RelayerApiService } from '../../services/relayer.api.service';
 import { bigintifyUtxoState, BlockItem, MyUtxoState, tw, Utxo } from 'zeropool-lib';
 import { fromPromise } from 'rxjs/internal-compatibility';
-import { mergeMap } from 'rxjs/operators';
-import { StateStorageService } from '../../services/state.storage.service';
+import { mergeMap, switchMap } from 'rxjs/operators';
+import { MyUtxoStateHex, StateStorageService } from '../../services/state.storage.service';
 
 @Component({
   selector: 'app-withdraw',
@@ -51,12 +51,12 @@ export class WithdrawComponent implements OnInit {
 
     const amount = tw(this.toAmount).toNumber();
 
-
-    fromPromise(
-      this.zpService.zp.myUtxoState(
-        bigintifyUtxoState(this.stateStorageService.utxoState)
-      )
-    ).pipe(
+    this.stateStorageService.getUtxoState().pipe(
+      switchMap((utxoState: MyUtxoStateHex) => {
+        const state = bigintifyUtxoState(utxoState);
+        const p$ = this.zpService.zp.myUtxoState(state);
+        return fromPromise(p$);
+      }),
       mergeMap(
         (state: MyUtxoState<bigint>) => {
 
