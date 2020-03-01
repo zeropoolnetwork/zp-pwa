@@ -11,11 +11,15 @@ import { map, tap } from 'rxjs/operators';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'zp-ui';
 
   hasError$: Observable<boolean>;
   circomeResourcesLoaded$: Observable<boolean>;
+
+  get displayWarning(): boolean{
+    return !localStorage.warningWasRead;
+  }
 
   balance = 1;
   history = [
@@ -48,13 +52,7 @@ export class AppComponent implements OnInit {
     this.web3Service.connectWeb3();
   }
 
-  ngOnInit(): void {
-    interval(1000).pipe(
-      tap(() => {
-        //this.web3Service.refreshWeb3ConnectionState();
-      })
-    ).subscribe();
-    // Do refresh after component initialisation
-
+  hideWarning() {
+    localStorage.warningWasRead = true;
   }
 }

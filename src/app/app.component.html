@@ -15,11 +15,16 @@
     </ng-container>
   </div>
 
-  <div class="toolbar warning">
-    <span class="mobile-hidden"></span>
-    <h2>It's BETA version of ZeroPool App that wasn't audited, you can use it on your own risk.</h2>
-    <button mat-icon-button><mat-icon>close</mat-icon></button>
-  </div>
+  <ng-container *ngIf="displayWarning">
+    <div class="toolbar warning">
+      <span class="mobile-hidden"></span>
+      <p>It's not an audited BETA version of the ZeroPool app.
+        We don't suggest deposit assets that you are afraid to lose.</p>
+      <button mat-icon-button (click)="hideWarning()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </ng-container>
 
   <div>
     <router-outlet></router-outlet>
