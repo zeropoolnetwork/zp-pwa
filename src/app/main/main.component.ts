@@ -19,7 +19,7 @@ export class MainComponent implements OnInit {
 
   isConnectedEthereum: boolean;
 
-  balance;
+  balance: number;
   history: HistoryItem[];
   tooltipMessage = 'Copy to clipboard';
 

@@ -12,7 +12,7 @@ import { Transaction } from 'web3-core';
 @Component({
   selector: 'app-gas-is-needed',
   templateUrl: './gas-is-needed.component.html',
-  styleUrls: ['./gas-is-needed.component.scss']
+  // styleUrls: ['./gas-is-needed.component.scss']
 })
 export class GasIsNeededComponent implements OnInit {
 

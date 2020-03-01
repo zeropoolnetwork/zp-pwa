@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  contractAddress: '0x1e2Ac08FDBe055e3A2c431c304D36A889455F5ae',
+  contractAddress: '0x9Dd44CDB4E7e59198b26dd6891F70AD9Ca64CF80',
   relayerUrl: 'http://134.209.172.229:3000',
   ethToken: '0x0000000000000000000000000000000000000000'
 };

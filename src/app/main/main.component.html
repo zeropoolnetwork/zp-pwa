@@ -53,7 +53,7 @@
           <mat-divider></mat-divider>
         </div>
 
-        <ng-container *ngIf="!history || !balance">
+        <ng-container *ngIf="history === undefined || balance === undefined">
           <div>
             <div class="prl mt">
               <h1 style="text-align: center; margin-bottom: 0">Loading</h1>
@@ -63,11 +63,11 @@
           </div>
         </ng-container>
 
-        <ng-container *ngIf="history && balance">
+        <ng-container *ngIf="history !== undefined && balance !== undefined">
 
           <h1 class="balance">
             {{balance}}
-            <p *ngIf="balance">zpETH</p>
+            <p>zpETH</p>
             <p class="balance-gas">Gas 0.00003000</p>
           </h1>
 
