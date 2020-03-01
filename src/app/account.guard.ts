@@ -12,7 +12,7 @@ export class AccountGuard implements CanActivate {
     //
   }
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+  canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
 
     if (!localStorage.getItem('mnemonic')) {
       this.router.navigate(['welcome']);

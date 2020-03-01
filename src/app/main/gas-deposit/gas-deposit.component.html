@@ -1,0 +1,20 @@
+<div class="fixed-center widget-box">
+  <ng-container *ngIf="!isDone" [formGroup]="form">
+    <h1>Gas deposit</h1>
+
+    <p>We kindly ask you to cover relayer gas fees by making gas deposit.</p>
+
+    <br>
+    <app-amount-input label="Enter amount of ETH" formControlName="toAmount"></app-amount-input>
+    <br>
+
+    <div class="actions button-box">
+      <button mat-stroked-button routerLink="/main">Back</button>
+      <button mat-flat-button color="accent" class="next-btn"
+              [disabled]="!form.valid"
+              (click)="depositGas()">
+        Make Gas Deposit
+      </button>
+    </div>
+  </ng-container>
+</div>
