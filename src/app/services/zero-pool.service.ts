@@ -35,7 +35,7 @@ export class ZeroPoolService {
   public activeWithdrawals: PayNote[];
   public currentBlockNumber: number;
 
-  public challengeExpiresBlocks = 5760;
+  public challengeExpiresBlocks = 10;
 
   private balanceProgressNotificator: Subject<GetBalanceProgressNotification> = new Subject();
   public balanceProgressNotificator$: Observable<GetBalanceProgressNotification> =
