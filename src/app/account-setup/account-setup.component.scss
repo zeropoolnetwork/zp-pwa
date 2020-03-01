@@ -23,6 +23,10 @@
   margin-top: 5px;
   width: 100%;
 
+  button {
+    width: auto;
+  }
+
   @media (min-width: 600px) {
     flex-direction: row;
   }
