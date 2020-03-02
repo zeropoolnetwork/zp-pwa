@@ -65,16 +65,16 @@
             <mat-divider></mat-divider>
             <!--<div style="margin: 0.5em">-->
             <!-- <p>#81 - 2/10/2020 at 12:35</p> -->
-            <div class="wrapper" style="text-align: left">
+            <div class="wrapper">
 
-              <span></span>
-              <div class="box a">{{ tx.action.toUpperCase() }}</div>
+<!--              <span></span>-->
+              <div class="box box-cell a">{{ tx.action.toUpperCase() }}</div>
 
-              <div class="box b">
+              <div class="box box-cell b">
                 {{ tx.action === 'transfer' ? (tx.type === 'in' ? '+' : '-') : '' }}{{ tx.action === 'deposit' ? '+' : ''}}{{ tx.action === 'withdraw' ? '-' : ''}}{{ fromDecimals(tx.amount) }}
               </div>
 
-              <div class="box c">zpETH</div>
+              <div class="box box-cell c">zpETH</div>
 
             </div>
           </div>
