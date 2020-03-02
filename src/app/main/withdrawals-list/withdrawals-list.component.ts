@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { fw, PayNote } from 'zeropool-lib';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { environment } from '../../../environments/environment';
@@ -15,11 +15,27 @@ export class WithdrawalsListComponent {
   withdrawals: PayNote[];
   expiresBlockNumber: number;
 
+  isAvailableNewWithdraw = false;
+
   constructor(
     private zpService: ZeroPoolService
   ) {
     this.expiresBlockNumber = this.zpService.challengeExpiresBlocks;
     this.withdrawals = this.zpService.activeWithdrawals;
+
+    this.checkZpEthBalance();
+    zpService.zpUpdates$.subscribe(
+      () => {
+        this.checkZpEthBalance();
+      }
+    );
+  }
+
+  checkZpEthBalance() {
+    const ethAssetId = '0x0';
+    if (this.zpService.zpBalance) {
+      this.isAvailableNewWithdraw = !!this.zpService.zpBalance[ethAssetId];
+    }
   }
 
   isFinalizingNow(w: PayNote): boolean {
