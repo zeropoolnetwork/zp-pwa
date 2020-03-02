@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
-import { delay, map, mergeMap, retryWhen, switchMap } from 'rxjs/operators';
-import { interval, Observable, of, throwError } from 'rxjs';
+import { delay, map, mergeMap, retryWhen } from 'rxjs/operators';
+import { Observable, of, throwError } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { BlockItem } from 'zeropool-lib';
+import { Tx } from 'zeropool-lib';
 import { Transaction } from 'web3-core';
 import { environment } from '../../environments/environment';
 
@@ -29,13 +29,42 @@ export class RelayerApiService {
     //
   }
 
-  getGasBalance(): Observable<number> {
-    return of(0.25);
+  getRelayerAddress$(): Observable<string> {
+    const url = environment.relayerUrl + '/relayer';
+    return this.http.get(url).pipe(
+      delayedRetry(1000),
+      map(
+        (x: any) => {
+          return x.address;
+        }
+      )
+    );
   }
 
-  sendTx$(blockItem: BlockItem<string>): Observable<string> {
+  sendTx$(tx: Tx<string>, depositBlockNumber: string, gasTx: Tx<string>): Observable<Transaction> {
+    const body = {
+      tx,
+      depositBlockNumber,
+      gasTx
+    };
+
     const url = environment.relayerUrl + '/tx';
-    return this.http.post<Transaction>(url, blockItem).pipe(
+    return this.http.post<Transaction>(url, body).pipe(
+      delayedRetry(1000),
+      map(response => {
+        return response;
+      }),
+    );
+  }
+
+  gasDonation$(tx: Tx<string>, ethTxHash: string): Observable<Transaction> {
+    const body = {
+      gasTx: tx,
+      donationHash: ethTxHash
+    };
+
+    const url = environment.relayerUrl + '/tx/donation';
+    return this.http.post<Transaction>(url, body).pipe(
       delayedRetry(1000),
       map(response => {
         return response;

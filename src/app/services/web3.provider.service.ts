@@ -1,8 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpProvider } from 'web3-providers-http';
-import { Observable, of, interval, Subject, merge } from 'rxjs';
+// @ts-ignore
+import * as HDWalletProvider from 'truffle-hdwallet-provider';
+import { interval, merge, Observable, of, Subject } from 'rxjs';
 import { catchError, distinctUntilChanged, filter, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
+import { environment } from '../../environments/environment';
+import Web3 from 'web3';
 
 // TODO: move declarations into polyfills
 declare let ethereum: any;
@@ -56,6 +60,11 @@ export class Web3ProviderService {
     if (getEthAddressSafe()) {
       this.alreadyConnected$.next(window.ethereum);
     }
+  }
+
+  getWeb3GasProvider(): HttpProvider {
+    const w3 = new Web3(environment.sideChainRpc);
+    return w3.currentProvider as HttpProvider;
   }
 
   connectWeb3(): boolean {

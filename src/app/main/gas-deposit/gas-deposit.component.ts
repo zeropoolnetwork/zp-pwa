@@ -1,5 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { tw } from 'zeropool-lib';
+import { fromPromise } from 'rxjs/internal-compatibility';
+import { environment } from '../../../environments/environment';
+import { mergeMap, tap } from 'rxjs/operators';
+import { ZeroPoolService } from '../../services/zero-pool.service';
+import { RelayerApiService } from '../../services/relayer.api.service';
+import { Transaction } from 'web3-core';
+import { combineLatest, of } from 'rxjs';
 
 @Component({
   selector: 'app-gas-deposit',
@@ -14,13 +22,51 @@ export class GasDepositComponent implements OnInit {
     // toAddress: ['']
   });
 
-  constructor(private fb: FormBuilder) {
+  get depositAmount(): number {
+    return this.form.get('toAmount').value;
+  }
+
+  constructor(
+    private fb: FormBuilder,
+    private zpService: ZeroPoolService,
+    private relayerApi: RelayerApiService
+  ) {
   }
 
   ngOnInit(): void {
   }
 
   depositGas() {
+    const amount = tw(this.depositAmount).toNumber();
+
+    const relayerAddress$ = this.relayerApi.getRelayerAddress$();
+
+    relayerAddress$.pipe(
+      mergeMap(
+        (address: string) => {
+          return fromPromise(
+            this.zpService.zp.ZeroPool.web3Ethereum.sendTransaction(
+              address,
+              amount
+            )
+          );
+        }
+      ),
+      mergeMap(
+        (txData: Transaction) => {
+          const zpTxData$ = fromPromise(this.zpService.zpGas.prepareDeposit(environment.ethToken, amount));
+          // @ts-ignore
+          const txHash$ = of(txData.transactionHash);
+          return combineLatest([zpTxData$, txHash$]);
+        }
+      ),
+      mergeMap(
+        (x: any[]) => {
+          const [zpTxData, txHash] = x;
+          return this.relayerApi.gasDonation$(zpTxData[0], txHash);
+        }
+      ),
+    ).subscribe();
 
   }
 }

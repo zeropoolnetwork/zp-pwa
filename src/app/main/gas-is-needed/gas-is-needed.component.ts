@@ -48,23 +48,7 @@ export class GasIsNeededComponent implements OnInit {
   }
 
   onDepositClick(): void {
-    this.depositInProgress = true;
 
-    const amount = tw(this.depositAmount).toNumber();
-
-    // generate tx and send eth to contract
-    fromPromise(this.zpService.zp.deposit(environment.ethToken, amount)).pipe(
-      mergeMap((blockItem: BlockItem<string>) => {
-          return this.relayerApi.sendTx$(blockItem);
-        }
-      )
-    ).subscribe(
-      (tx: any) => {
-      // (tx: Transaction) => {
-        this.isDone = true;
-        this.transactionHash = tx.transactionHash;
-      }
-    );
   }
 
   depositGas() {

@@ -71,8 +71,24 @@
               <!-- <p>#81 - 2/10/2020 at 12:35</p> -->
               <div class="wrapper">
 
-                <!--              <span></span>-->
-                <div class="box box-cell a">{{ tx.action.toUpperCase() }}</div>
+        <h1 class="balance">
+          {{balance}}
+          <p>zpETH</p>
+          <p class="balance-gas">Gas {{zpGasBalance || 0}}</p>
+        </h1>
+
+        <div class="actions mb-20">
+          <button mat-stroked-button routerLink="./deposit">Deposit</button>
+          <button mat-stroked-button routerLink="./transfer" [disabled]="balance === 0">Transfer</button>
+          <button mat-stroked-button
+                  [disabled]="balance === 0 && !hasWithdrawals"
+                  [routerLink]="hasWithdrawals ? 'withdrawals-list' :'./withdraw'"
+                  matBadgePosition="top after"
+                  [matBadge]="totalWithdrawals"
+                  [matBadgeColor]="hasVerifiedWithdrawals ? 'accent' : 'primary'"
+                  [matBadgeHidden]="!hasWithdrawals">Withdraw
+          </button>
+        </div>
 
                 <div class="box box-cell b">
                   {{ tx.action === 'transfer' ? (tx.type === 'in' ? '+' : '-') : '' }}{{ tx.action === 'deposit' ? '+' : ''}}{{ tx.action === 'withdraw' ? '-' : ''}}{{ fromDecimals(tx.amount) }}
