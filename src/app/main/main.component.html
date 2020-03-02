@@ -70,16 +70,9 @@
               <!--<div style="margin: 0.5em">-->
               <!-- <p>#81 - 2/10/2020 at 12:35</p> -->
               <div class="wrapper">
-
-                <!--              <span></span>-->
-                <div class="box box-cell a">{{ tx.action.toUpperCase() }}</div>
-
-                <div class="box box-cell b">
-                  {{ tx.action === 'transfer' ? (tx.type === 'in' ? '+' : '-') : '' }}{{ tx.action === 'deposit' ? '+' : ''}}{{ tx.action === 'withdraw' ? '-' : ''}}{{ fromDecimals(tx.amount) }}
-                </div>
-
+                <div class="box box-cell a">{{tx | stringifyHistory:'title'}}</div>
+                <div class="box box-cell b">{{tx | stringifyHistory:'amount'}}</div>
                 <div class="box box-cell c">zpETH</div>
-
               </div>
             </div>
           </div>
