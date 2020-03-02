@@ -84,9 +84,12 @@ export class MainComponent implements OnInit {
     this.history = this.zpService.zpHistory;
 
     this.totalWithdrawals = this.zpService.activeWithdrawals.length;
+
     if (this.totalWithdrawals !== 0) {
+      //
       this.hasWithdrawals = true;
       const readyBlock = this.zpService.currentBlockNumber - this.zpService.challengeExpiresBlocks;
+      //
       this.zpService.activeWithdrawals.forEach(
         (payNote: PayNote) => {
           if (payNote.blockNumber <= readyBlock) {
