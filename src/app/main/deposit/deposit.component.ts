@@ -1,14 +1,13 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { ZeroPoolService } from '../../services/zero-pool.service';
-import { BlockItem, DepositProgressNotification, tw } from 'zeropool-lib';
-import { Transaction } from 'web3-core';
+import { DepositProgressNotification, tw, Tx } from 'zeropool-lib';
 import { mergeMap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { RelayerApiService } from '../../services/relayer.api.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { environment } from '../../../environments/environment';
-import { Observable, Subject } from 'rxjs';
+import { combineLatest, Observable, of, Subject } from 'rxjs';
 
 
 @Component({
@@ -64,21 +63,29 @@ export class DepositComponent implements OnInit {
 
     const amount = tw(this.depositAmount).toNumber();
 
-    // generate tx and send eth to contract
-    fromPromise(this.zpService.zp.deposit(environment.ethToken, amount, (update) => {
-      this.depositProgressNotificator.next(update);
-    })).pipe(
-      mergeMap((blockItem: BlockItem<string>) => {
-          return this.relayerApi.sendTx$(blockItem);
-        }
-      )
-    ).subscribe(
-      // (tx: Transaction) => {
-      (tx: any) => {
+    fromPromise(this.zpService.zp.prepareDeposit(environment.ethToken, amount))
+      .pipe(
+        mergeMap(
+          ([tx, txHash]: [Tx<string>, string]) => {
+            const depositBlockNumber$ = fromPromise(this.zpService.zp.deposit(environment.ethToken, amount, txHash));
+            const gasTx$ = fromPromise(this.zpService.zpGas.prepareWithdraw(environment.ethToken, environment.relayerFee));
+            const tx$ = of(tx);
+            return combineLatest([tx$, depositBlockNumber$, gasTx$]);
+          }
+        ),
+        mergeMap(
+          ([tx, depositBlockNumber, gasTx]: [Tx<string>, number, [Tx<string>, string]]) => {
+            return this.relayerApi.sendTx$(tx, depositBlockNumber, gasTx[0]);
+          }
+        ),
+      ).subscribe(
+      (transaction: any) => {
         this.isDone = true;
-        this.transactionHash = tx.transactionHash;
+        console.log(transaction.transactionHash);
       }
     );
+
+    // generate tx and send eth to contract
   }
 
 }

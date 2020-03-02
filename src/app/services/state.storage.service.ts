@@ -18,6 +18,15 @@ export class YourService {
 export class StateStorageService {
 
   constructor(private storage: StorageMap) {
+    this.getHistoryState = this.getHistoryState.bind(this);
+    this.saveHistory = this.saveHistory.bind(this);
+    this.getGasHistoryState = this.getGasHistoryState.bind(this);
+    this.saveGasHistory = this.saveGasHistory.bind(this);
+    this.getUtxoState = this.getUtxoState.bind(this);
+    this.saveUtxo = this.saveUtxo.bind(this);
+    this.getGasUtxoState = this.getGasUtxoState.bind(this);
+    this.saveGasUtxo = this.saveGasUtxo.bind(this);
+    this.resetStorage = this.resetStorage.bind(this);
   }
 
   getHistoryState(): Observable<HistoryState<string>> {
@@ -25,7 +34,17 @@ export class StateStorageService {
   }
 
   saveHistory(val: HistoryState<string>): void {
-    this.storage.set('history-state', val).subscribe(() => {});
+    this.storage.set('history-state', val).subscribe(() => {
+    });
+  }
+
+  getGasHistoryState(): Observable<HistoryState<string>> {
+    return this.storage.get<HistoryState<string>>('gas-history-state') as Observable<HistoryState<string>>;
+  }
+
+  saveGasHistory(val: HistoryState<string>): void {
+    this.storage.set('gas-history-state', val).subscribe(() => {
+    });
   }
 
   getUtxoState(): Observable<MyUtxoStateHex> {
@@ -34,10 +53,21 @@ export class StateStorageService {
   }
 
   saveUtxo(val: MyUtxoStateHex): void {
-    this.storage.set('utxo-state', val).subscribe(() => {});
+    this.storage.set('utxo-state', val).subscribe(() => {
+    });
   }
 
-  resetStorage(): Observable<undefined>{
+  getGasUtxoState(): Observable<MyUtxoStateHex> {
+    const result$ = this.storage.get<MyUtxoStateHex>('gas-utxo-state');
+    return result$ as Observable<MyUtxoStateHex>;
+  }
+
+  saveGasUtxo(val: MyUtxoStateHex): void {
+    this.storage.set('gas-utxo-state', val).subscribe(() => {
+    });
+  }
+
+  resetStorage(): Observable<undefined> {
     // this.storage.delete('utxo-state').subscribe(() => {});
     // this.storage.delete('history-state').subscribe(() => {});
     return this.storage.clear();

@@ -41,7 +41,7 @@
         <h1 class="balance">
           {{balance}}
           <p>zpETH</p>
-          <p class="balance-gas">Gas {{zpGasBalance$ | async}}</p>
+          <p class="balance-gas">Gas {{zpGasBalance || 0}}</p>
         </h1>
 
         <div class="actions mb-20">
