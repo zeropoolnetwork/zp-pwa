@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { RelayerApiService } from '../../services/relayer.api.service';
 import { bigintifyUtxoState, BlockItem, MyUtxoState, tw, Utxo } from 'zeropool-lib';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { mergeMap, switchMap } from 'rxjs/operators';
 import { MyUtxoStateHex, StateStorageService } from '../../services/state.storage.service';
+import { getEthAddressSafe, Web3ProviderService } from '../../services/web3.provider.service';
+import { ValidateMnemonic } from '../../account-setup/mnemonic.validator';
 
 @Component({
   selector: 'app-withdraw',
@@ -23,16 +25,19 @@ export class WithdrawComponent implements OnInit {
 
   public transferForm: FormGroup = this.fb.group({
     toAmount: [''],
-    // toAddress: ['']
+    toAddress: new FormControl('', [
+      // Validators.required,
+      // ValidateMnemonic
+    ])
   });
 
   get toAmount(): number {
     return this.transferForm.get('toAmount').value;
   }
 
-  // get toAddress(): string {
-  //   return this.transferForm.get('toAddress').value;
-  // }
+  get toAddress(): string {
+    return this.transferForm.get('toAddress').value;
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -43,7 +48,8 @@ export class WithdrawComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    //
+    const a = getEthAddressSafe();
+    this.transferForm.get('toAddress').setValue(a.replace('0x', ''));
   }
 
   onSendClick(): void {
