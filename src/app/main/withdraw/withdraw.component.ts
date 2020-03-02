@@ -71,7 +71,7 @@ export class WithdrawComponent implements OnInit {
         ),
         mergeMap(
           ([tx, gasTx]: [Tx<string>, [Tx<string>, string]]) => {
-            return this.relayerApi.sendTx$(tx, 0, gasTx[0]);
+            return this.relayerApi.sendTx$(tx, '0x0', gasTx[0]);
           }
         )
       ).subscribe(

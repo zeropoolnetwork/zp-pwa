@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { tw } from 'zeropool-lib';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { environment } from '../../../environments/environment';
-import { mergeMap, tap } from 'rxjs/operators';
+import { mergeMap } from 'rxjs/operators';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { RelayerApiService } from '../../services/relayer.api.service';
 import { Transaction } from 'web3-core';
@@ -17,6 +17,8 @@ import { combineLatest, of } from 'rxjs';
 export class GasDepositComponent implements OnInit {
 
   isDone = false;
+  inProgress = false;
+
   form: FormGroup = this.fb.group({
     toAmount: [''],
     // toAddress: ['']
@@ -37,6 +39,8 @@ export class GasDepositComponent implements OnInit {
   }
 
   depositGas() {
+    this.inProgress = true;
+
     const amount = tw(this.depositAmount).toNumber();
 
     const relayerAddress$ = this.relayerApi.getRelayerAddress$();
@@ -66,7 +70,14 @@ export class GasDepositComponent implements OnInit {
           return this.relayerApi.gasDonation$(zpTxData[0], txHash);
         }
       ),
-    ).subscribe();
+    ).subscribe(
+      (x: any) => {
+        this.inProgress = false;
+        this.isDone = true;
+
+        console.log(x.transactionHash);
+      }
+    );
 
   }
 }
