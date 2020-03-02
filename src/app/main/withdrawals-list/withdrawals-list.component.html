@@ -5,7 +5,9 @@
     <div *ngFor="let w of withdrawals">
       <div class="withdrawals-row">
         <div>
-          <p *ngIf="!isReadyToFinalize(w.blockNumber)">Pending {{ getRemainingBlockNumber(w.blockNumber) }} / {{ expiresBlockNumber }} blocks</p>
+          <p *ngIf="!isReadyToFinalize(w.blockNumber)">
+            Pending {{ getRemainingBlockNumber(w.blockNumber) }} / {{ expiresBlockNumber }} blocks
+          </p>
           <p *ngIf="isReadyToFinalize(w.blockNumber)">Verified</p>
           <h3>{{ getAmount(w.utxo.amount) }} {{ getAssetName(w.utxo.token) }}</h3>
         </div>
