@@ -16,7 +16,9 @@
 }
 
 .title {
-  font-weight:700;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.8em;
 }
 
 .tooltip-box {
@@ -28,9 +30,18 @@
   top: 40px;
 }
 
-.balance {
-  margin: 3.5em 0 0.5em 0;
+.balance-block, .button-block, .history-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 
+
+.balance-zero {
+  margin: 0;
+}
+
+.balance {
   p {
     font-size: 14px;
     margin: 0;
