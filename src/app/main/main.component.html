@@ -65,24 +65,14 @@
             <!-- <p>#81 - 2/10/2020 at 12:35</p> -->
             <div class="wrapper" style="text-align: left">
 
-              <div class="box a">
-                <!-- <img style="margin-top: 1em; margin-left: auto; margin-right: auto" src="/assets/images/zeropool-logo.jpeg" width="40px">-->
-              </div>
+              <span></span>
+              <div class="box a">{{ tx.action.toUpperCase() }}</div>
+
               <div class="box b">
-                <p style="margin: 0; font-weight: bold;">
-                  <!-- TODO: move to pipe -->
-                  {{ tx.action === 'transfer' ? (tx.type === 'in' ? 'INCOMING' : 'OUTGOING') : '' }}
-                  {{ tx.action.toUpperCase() }}
-                </p>
-                <p>
-                  <!-- TODO: move to pipe -->
-                  {{ tx.action === 'transfer' ? (tx.type === 'in' ? '+' : '-') : '' }}
-                  {{ tx.action === 'deposit' ? '+' : ''}}
-                  {{ tx.action === 'withdraw' ? '-' : ''}}
-                  {{ fromDecimals(tx.amount) }} zpETH
-                </p>
+                {{ tx.action === 'transfer' ? (tx.type === 'in' ? '+' : '-') : '' }}{{ tx.action === 'deposit' ? '+' : ''}}{{ tx.action === 'withdraw' ? '-' : ''}}{{ fromDecimals(tx.amount) }}
               </div>
-              <div class="box e"></div>
+
+              <div class="box c">zpETH</div>
 
             </div>
           </div>

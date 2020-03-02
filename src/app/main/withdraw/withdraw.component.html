@@ -6,7 +6,9 @@
     </ng-container>
 
     <ng-container *ngIf="!withdrawIsInProgress">
-      <h2>Prepare withdraw ZP BlockItem</h2>
+      <h2>Place withdraw request</h2>
+
+      <p>Published withdraw requests will be available for the challenge during the next {{10}} blocks.<br> You will be able to transfer funds to your account once that period is expired.</p>
 
       <app-amount-input label="Enter amount of ETH" formControlName="toAmount"></app-amount-input>
 
@@ -25,8 +27,7 @@
       <loaders-css loader="ball-beat" [color]="'rgba(100, 100, 100, 0.5)'" [scale]="1"></loaders-css>
       <h3>Waiting for transaction confirmation <br>
         It will take several minutes</h3>
-      <div class="actions">
-        <!--        <button mat-stroked-button routerLink="./transfer" routerLink="/main">Back</button>-->
+      <div class="actions">s
         <button mat-stroked-button routerLink="/main">Back</button>
       </div>
     </ng-container>
@@ -37,7 +38,6 @@
   <ng-container *ngIf="isDone">
     <h3>Prepare withdraw ZP BlockItem Successful</h3>
     <div class="actions">
-      <!--  <button mat-stroked-button routerLink="./transfer" routerLink="/main">Back</button>-->
       <button mat-stroked-button routerLink="/main">Back</button>
     </div>
   </ng-container>

@@ -69,7 +69,6 @@ export class WithdrawComponent implements OnInit {
             if (tmp >= amount) {
               break;
             }
-
             tmp += Number(utxo.amount);
             utxoIn.push(utxo);
           }
