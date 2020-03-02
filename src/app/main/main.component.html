@@ -2,7 +2,10 @@
 <ng-container *ngIf="account$ | async as account">
 
   <div class="fixed-center widget-box">
-    <div class="widget-box-main-contant">
+    <div [ngClass]="{
+            'widget-box-main-contant': true,
+            'widget-box-center': history === undefined || balance === undefined
+          }">
 
       <div class="widget-box-header">
         <div class="tooltip-box">
@@ -26,17 +29,47 @@
         <mat-divider></mat-divider>
       </div>
 
-      <ng-container *ngIf="history === undefined || balance === undefined">
-        <div>
-          <div class="prl mt">
-            <h1 style="text-align: center; margin-bottom: 0">Loading</h1>
-            <p style="font-style: italic">It could take some time</p>
-            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      <ng-container *ngIf="history !== undefined && balance !== undefined">
+
+        <div class="balance-block">
+          <ng-container *ngIf="balance == 0">
+            <h1 class="balance-zero">{{balance}} zpETH</h1>
+          </ng-container>
+
+          <ng-container *ngIf="balance !== 0">
+            <h1 class="balance">
+              {{balance}}
+              <p>zpETH</p>
+              <p class="balance-gas">Gas {{zpGasBalance$ | async}}</p>
+            </h1>
+          </ng-container>
+        </div>
+
+        <div class="button-block">
+          <div class="actions mb-20">
+            <button mat-stroked-button routerLink="./deposit">Deposit</button>
+            <button mat-stroked-button routerLink="./transfer" [disabled]="balance === 0">Transfer</button>
+            <button mat-stroked-button
+                    [disabled]="balance === 0 && !hasWithdrawals"
+                    [routerLink]="hasWithdrawals ? 'withdrawals-list' :'./withdraw'"
+                    matBadgePosition="top after"
+                    [matBadge]="totalWithdrawals"
+                    [matBadgeColor]="hasVerifiedWithdrawals ? 'accent' : 'primary'"
+                    [matBadgeHidden]="!hasWithdrawals">Withdraw
+            </button>
           </div>
         </div>
-      </ng-container>
 
-      <ng-container *ngIf="history !== undefined && balance !== undefined">
+        <div class="history-block">
+          <!-- TODO: move history to separate component -->
+          <h4 class="title" *ngIf="history?.length !== 0">Transaction History</h4>
+          <p *ngIf="history?.length == 0">No transaction history yet</p>
+          <div style="overflow-y: auto;  min-height: 1px">
+            <div *ngFor="let tx of history">
+              <mat-divider></mat-divider>
+              <!--<div style="margin: 0.5em">-->
+              <!-- <p>#81 - 2/10/2020 at 12:35</p> -->
+              <div class="wrapper">
 
         <h1 class="balance">
           {{balance}}
@@ -57,33 +90,30 @@
           </button>
         </div>
 
-        <!-- TODO: move history to separate component -->
-        <h4 class="title">Transaction History</h4>
-        <p *ngIf="history?.length == 0">No transaction history yet</p>
-        <div style="overflow-y: auto;  min-height: 1px">
-          <div *ngFor="let tx of history">
-            <mat-divider></mat-divider>
-            <!--<div style="margin: 0.5em">-->
-            <!-- <p>#81 - 2/10/2020 at 12:35</p> -->
-            <div class="wrapper" style="text-align: left">
+                <div class="box box-cell b">
+                  {{ tx.action === 'transfer' ? (tx.type === 'in' ? '+' : '-') : '' }}{{ tx.action === 'deposit' ? '+' : ''}}{{ tx.action === 'withdraw' ? '-' : ''}}{{ fromDecimals(tx.amount) }}
+                </div>
 
-              <span></span>
-              <div class="box a">{{ tx.action.toUpperCase() }}</div>
+                <div class="box box-cell c">zpETH</div>
 
-              <div class="box b">
-                {{ tx.action === 'transfer' ? (tx.type === 'in' ? '+' : '-') : '' }}{{ tx.action === 'deposit' ? '+' : ''}}{{ tx.action === 'withdraw' ? '-' : ''}}{{ fromDecimals(tx.amount) }}
               </div>
-
-              <div class="box c">zpETH</div>
-
             </div>
           </div>
         </div>
 
       </ng-container>
 
-    </div>
+      <ng-container *ngIf="history === undefined || balance === undefined">
+        <div>
+          <div class="prl mt">
+            <h1 style="text-align: center; margin-bottom: 0">Loading</h1>
+            <p style="font-style: italic">It could take some time</p>
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+          </div>
+        </div>
+      </ng-container>
 
+    </div>
   </div>
 
   <!--

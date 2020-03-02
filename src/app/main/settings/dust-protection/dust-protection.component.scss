@@ -1,0 +1,16 @@
+.settings-content {
+  justify-content: space-between;
+}
+
+.dust-protection-title {
+  margin-top: 20px;
+
+  @media (min-width: 600px) {
+    margin-top: 0;
+  }
+}
+
+.dust-protection-warning {
+  font-weight: 700;
+  margin: 0;
+}

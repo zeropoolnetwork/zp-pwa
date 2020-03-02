@@ -56,13 +56,11 @@ $toolbar-height: 60px;
   background-color: #f44336;
   justify-content: space-between;
 
-  h2 {
-    width: 50%;
-
+  p {
     @media (max-width: 600px) {
       width: auto;
-      font-size: 14px;
-      line-height: 20px;
+      font-size: 12px;
+      line-height: 18px;
     }
   }
 
