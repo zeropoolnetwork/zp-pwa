@@ -5,7 +5,7 @@ import {
   HistoryItem,
   HistoryState,
   MyUtxoState,
-  PayNote,
+  PayNote, stringifyUtxoHistoryState,
   stringifyUtxoState,
   ZeroPoolNetwork
 } from 'zeropool-lib';
@@ -81,7 +81,7 @@ export class ZeroPoolService {
             history,
             activeWithdrawals,
             blockNumber
-          ]: [ZpBalance, HistoryState, PayNote[], number] = x;
+          ]: [ZpBalance, HistoryState<bigint>, PayNote[], number] = x;
 
           this.zpBalance = balances;
           this.zpHistory = history.items;
@@ -96,9 +96,10 @@ export class ZeroPoolService {
 
     const listenHistoryStateUpdates$ = (zp: ZeroPoolNetwork): Observable<any> => {
       return zp.zpHistoryState$.pipe(
-        tap((historyState: HistoryState) => {
+        tap((historyState: HistoryState<bigint>) => {
           // TODO: think on switchMap here
-          this.stateStorageService.saveHistory(historyState);
+          const hexified = stringifyUtxoHistoryState(historyState);
+          this.stateStorageService.saveHistory(hexified);
         }),
       );
     };
