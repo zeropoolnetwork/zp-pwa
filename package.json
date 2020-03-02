@@ -6,6 +6,7 @@
     "start": "ng serve",
     "start:prod": "ng build --prod && lite-server --baseDir dist/zp-pwa",
     "build:gh-pages": "ng build --prod --output-path docs",
+    "build:prod": "ng build --prod",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
