@@ -94,11 +94,18 @@ html, body { height: 100%; margin: 0;}
   }
 
   &-main-contant {
+    display: grid;
+    padding-top: 65px;
+    height: 100%;
+    position: relative;
+    grid-template-rows: 3fr 1fr 4fr;
+  }
+
+  &-center {
+    height: 100%;
     display: flex;
     flex-direction: column;
-    height: 100%;
     justify-content: center;
-    position: relative;
   }
 
   &-header {
