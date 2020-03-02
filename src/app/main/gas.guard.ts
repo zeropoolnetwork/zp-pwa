@@ -25,11 +25,14 @@ export class GasGuard implements CanActivate {
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
 
-    if (this.gasBalanceWasFetched && this.gasBalance > 0) {
-      return true;
-    }
+    return true;
 
-    this.router.navigate(['/main/gas-is-needed']);
-    return false;
+    // TODO: uncomment when gas logic is implemented
+    // if (this.gasBalanceWasFetched && this.gasBalance > 0) {
+    //   return true;
+    // }
+    //
+    // this.router.navigate(['/main/gas-is-needed']);
+    // return false;
   }
 }

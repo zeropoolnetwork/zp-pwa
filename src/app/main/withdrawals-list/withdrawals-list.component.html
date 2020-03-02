@@ -5,11 +5,19 @@
     <div *ngFor="let w of withdrawals">
       <div class="withdrawals-row">
         <div>
-          <p *ngIf="!isReady(w.blockNumber)">Pending {{ getRemainingBlockNumber(w.blockNumber) }} / {{ expiresBlockNumber }} blocks</p>
-          <p *ngIf="isReady(w.blockNumber)">Verified</p>
+          <p *ngIf="!isReadyToFinalize(w.blockNumber)">Pending {{ getRemainingBlockNumber(w.blockNumber) }} / {{ expiresBlockNumber }} blocks</p>
+          <p *ngIf="isReadyToFinalize(w.blockNumber)">Verified</p>
           <h3>{{ getAmount(w.utxo.amount) }} {{ getAssetName(w.utxo.token) }}</h3>
         </div>
-        <button *ngIf="isReady(w.blockNumber)" (click)="withdraw(w)" mat-stroked-button>Finalize</button>
+
+        <ng-container *ngIf="isFinalizingNow(w)">
+          <loaders-css loader="ball-beat" [color]="'rgba(100, 100, 100, 0.5)'" [scale]="1"></loaders-css>
+        </ng-container>
+
+        <ng-container *ngIf="!isFinalizingNow(w)">
+          <button [disabled]="!isReadyToFinalize(w.blockNumber)" (click)="withdraw(w)" mat-stroked-button>Finalize</button>
+        </ng-container>
+
       </div>
     </div>
 

@@ -10,7 +10,7 @@ import { Transaction } from 'web3-core';
   templateUrl: './withdrawals-list.component.html',
   styleUrls: ['./withdrawals-list.component.scss']
 })
-export class WithdrawalsListComponent implements OnInit {
+export class WithdrawalsListComponent {
 
   withdrawals: PayNote[];
   expiresBlockNumber: number;
@@ -18,13 +18,16 @@ export class WithdrawalsListComponent implements OnInit {
   constructor(
     private zpService: ZeroPoolService
   ) {
-
     this.expiresBlockNumber = this.zpService.challengeExpiresBlocks;
     this.withdrawals = this.zpService.activeWithdrawals;
-
   }
 
-  withdraw(w: PayNote) {
+  isFinalizingNow(w: PayNote): boolean {
+    return localStorage.getItem(w.txHash) === 'in-progress';
+  }
+
+  withdraw(w: PayNote): void {
+    localStorage.setItem(w.txHash, 'in-progress');
     fromPromise(this.zpService.zp.withdraw(w)).subscribe(
       (tx: Transaction) => {
         // @ts-ignore
@@ -33,13 +36,9 @@ export class WithdrawalsListComponent implements OnInit {
     );
   }
 
-  ngOnInit(): void {
-  }
-
-  isReady(withdrawBlockNumber: number): boolean {
+  isReadyToFinalize(withdrawBlockNumber: number): boolean {
     const remainingBlockNum = this.zpService.currentBlockNumber - withdrawBlockNumber;
     return remainingBlockNum > this.expiresBlockNumber;
-
   }
 
   getRemainingBlockNumber(withdrawBlockNumber: number): number {
