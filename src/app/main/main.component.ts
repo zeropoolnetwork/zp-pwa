@@ -101,6 +101,7 @@ export class MainComponent implements OnInit {
 
   }
 
+  // TODO: move to separate component or directive
   onAddressClick(tooltip: MatTooltip, account: IAccount) {
 
     tooltip.hide();

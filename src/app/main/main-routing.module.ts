@@ -11,6 +11,8 @@ import { GasIsNeededComponent } from './gas-is-needed/gas-is-needed.component';
 import { WithdrawalsListComponent } from './withdrawals-list/withdrawals-list.component';
 import { GasGuard } from './gas.guard';
 import { GasDepositComponent } from './gas-deposit/gas-deposit.component';
+import { DustProtectionComponent } from './settings/dust-protection/dust-protection.component';
+import { ResetAccountComponent } from './settings/reset-account/reset-account.component';
 
 const routes: Routes = [
   {path: '', component: MainComponent},
@@ -20,7 +22,9 @@ const routes: Routes = [
   {path: 'transfer', component: TransferComponent, canActivate: [GasGuard]},
   {path: 'withdraw', component: WithdrawComponent, canActivate: [GasGuard]},
   {path: 'withdrawals-list', component: WithdrawalsListComponent, canActivate: [GasGuard]},
-  {path: 'settings', component: SettingsComponent}
+  {path: 'settings', component: SettingsComponent},
+  {path: 'settings/reset', component: ResetAccountComponent},
+  {path: 'settings/dust-protection', component: DustProtectionComponent}
 ];
 
 @NgModule({
