@@ -1,2 +1,23 @@
-<p>dust-protection works!</p>
-<button mat-stroked-button routerLink="/main/settings">Back</button>
+<div class="fixed-center widget-box">
+  <div class="widget-box-main-contant settings-content">
+
+    <div class="mb-20">
+      <h1 class="dust-protection-title">Dust spam protection</h1>
+      <p style="margin: 0">ZeroPool based on UTXO blockchain model similar to bitcoin. Just like in bitcoin UTXO dust might appear, in case of malicious actions.
+        In ZeroPool that can lead to increased Gas consuption that you can avoid by enable Dust Spam protection.</p>
+    </div>
+
+    <div>
+      <mat-checkbox class="mb-20">Enable UTXO auto join</mat-checkbox>
+      <app-amount-input label="Max gas fees for join transaction (Gwei)" formControlName="a"></app-amount-input>
+      <app-amount-input label="Minimal UTXO size to join (ETH)" formControlName="b"></app-amount-input>
+    </div>
+
+    <p class="dust-protection-warning">This settings deticated for experienced users, please don’t change this it if you aren’t confident enough.</p>
+
+    <div class="actions mt-10">
+      <button mat-stroked-button routerLink="/main/settings">Back</button>
+      <button mat-stroked-button>Save</button>
+    </div>
+  </div>
+</div>
