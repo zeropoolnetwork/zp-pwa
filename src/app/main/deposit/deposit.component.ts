@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { ZeroPoolService } from '../../services/zero-pool.service';
-import { DepositProgressNotification, tw, Tx } from 'zeropool-lib';
+import { DepositProgressNotification, toHex, tw, Tx } from 'zeropool-lib';
 import { mergeMap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { RelayerApiService } from '../../services/relayer.api.service';
@@ -75,7 +75,7 @@ export class DepositComponent implements OnInit {
         ),
         mergeMap(
           ([tx, depositBlockNumber, gasTx]: [Tx<string>, number, [Tx<string>, string]]) => {
-            return this.relayerApi.sendTx$(tx, depositBlockNumber, gasTx[0]);
+            return this.relayerApi.sendTx$(tx, toHex(depositBlockNumber), gasTx[0]);
           }
         ),
       ).subscribe(

@@ -41,7 +41,7 @@ export class RelayerApiService {
     );
   }
 
-  sendTx$(tx: Tx<string>, depositBlockNumber: number, gasTx: Tx<string>): Observable<Transaction> {
+  sendTx$(tx: Tx<string>, depositBlockNumber: string, gasTx: Tx<string>): Observable<Transaction> {
     const body = {
       tx,
       depositBlockNumber,
