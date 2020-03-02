@@ -29,6 +29,7 @@ import { WithdrawalsListComponent } from './withdrawals-list/withdrawals-list.co
 import { GasDepositComponent } from './gas-deposit/gas-deposit.component';
 import { ResetAccountComponent } from './settings/reset-account/reset-account.component';
 import { DustProtectionComponent } from './settings/dust-protection/dust-protection.component';
+import { StringifyHistoryPipe } from '../history-item-stringify.pipe';
 
 @NgModule({
   declarations: [
@@ -41,7 +42,8 @@ import { DustProtectionComponent } from './settings/dust-protection/dust-protect
     WithdrawalsListComponent,
     GasDepositComponent,
     ResetAccountComponent,
-    DustProtectionComponent
+    DustProtectionComponent,
+    StringifyHistoryPipe
   ],
   imports: [
     CommonModule,

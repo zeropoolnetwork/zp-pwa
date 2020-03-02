@@ -128,7 +128,5 @@ export class MainComponent implements OnInit {
     });
   }
 
-  fromDecimals(val: number): string {
-    return tbn(val).div(1e18).toFixed(8).toString();
-  }
+
 }

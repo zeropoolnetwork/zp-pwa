@@ -23,7 +23,7 @@
 
           </div>
         </div>
-        <mat-divider></mat-divider>
+        <mat-divider></mat-divider>Нуgs
       </div>
 
       <ng-container *ngIf="history === undefined || balance === undefined">
@@ -36,7 +36,7 @@
         </div>
       </ng-container>
 
-      <ng-container *ngIf="history !== undefined && balance !== undefined">
+      <ng-container *ngIf="histy !== undefined && balance !== undefined">
 
         <h1 class="balance">
           {{balance}}
@@ -66,16 +66,10 @@
             <!--<div style="margin: 0.5em">-->
             <!-- <p>#81 - 2/10/2020 at 12:35</p> -->
             <div class="wrapper" style="text-align: left">
-
               <span></span>
-              <div class="box a">{{ tx.action.toUpperCase() }}</div>
-
-              <div class="box b">
-                {{ tx.action === 'transfer' ? (tx.type === 'in' ? '+' : '-') : '' }}{{ tx.action === 'deposit' ? '+' : ''}}{{ tx.action === 'withdraw' ? '-' : ''}}{{ fromDecimals(tx.amount) }}
-              </div>
-
+              <div class="box a">{{tx | stringifyHistory:'title'}}</div>
+              <div class="box b">{{tx | stringifyHistory:'amount'}}</div>
               <div class="box c">zpETH</div>
-
             </div>
           </div>
         </div>
