@@ -80,9 +80,12 @@
 
 .wrapper {
   display: grid;
-  grid-template-columns: 25px repeat(auto-fill, 100px);
+  //grid-template-columns: 25px repeat(auto-fill, 100px);
+  grid-template-columns: repeat(3, 1fr);
   background-color: white;
   color: #444;
+  padding: 0 25px;
+  height: 40px;
 }
 
 .box {
@@ -92,21 +95,25 @@
   font-size: 100%;
 }
 
+.box-cell {
+  text-align: left;
+  line-height: 40px;
+}
+
 .a {
-  grid-column: 2 / 4 ;
+  //grid-column: 2 / 4 ;
   grid-row: 1;
-  margin: .5em 0;
+  text-transform: uppercase;
 }
 
 .b {
-  grid-column: 3 / 4;
+  //grid-column: 3 / 4;
   grid-row: 1;
-  margin: .5em 0;
 }
 
 .c {
-  grid-column: 4 / 4;
+  //grid-column: 4 / 4;
   grid-row: 1;
-  margin: .5em 0 .5em 30px;
+  text-align: right;
 }
 
