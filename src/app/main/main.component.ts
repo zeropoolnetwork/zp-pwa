@@ -19,7 +19,7 @@ export class MainComponent implements OnInit {
 
   isConnectedEthereum: boolean;
 
-  zpGasBalance$: Observable<number>;
+  zpGasBalance: number;
   balance: number;
 
   history: HistoryItem[];
@@ -42,8 +42,6 @@ export class MainComponent implements OnInit {
     private web3Service: Web3ProviderService,
     private clipboard: Clipboard
   ) {
-
-    this.zpGasBalance$ = this.zpService.zpGasBalance$;
 
     // TODO: fix problem and use ?. operator
     this.isConnectedEthereum = !!(zpService.zp && zpService.zp.ZeroPool.web3Ethereum.ethAddress);
@@ -82,6 +80,7 @@ export class MainComponent implements OnInit {
 
     this.balance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
     this.history = this.zpService.zpHistory;
+    this.zpGasBalance = fw(this.zpService.zpGasBalance);
 
     this.totalWithdrawals = this.zpService.activeWithdrawals.length;
 

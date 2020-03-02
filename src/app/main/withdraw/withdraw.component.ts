@@ -2,12 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { RelayerApiService } from '../../services/relayer.api.service';
-import { bigintifyUtxoState, BlockItem, MyUtxoState, tw, Utxo } from 'zeropool-lib';
+import { bigintifyUtxoState, BlockItem, MyUtxoState, tw, Tx, Utxo } from 'zeropool-lib';
 import { fromPromise } from 'rxjs/internal-compatibility';
-import { mergeMap, switchMap } from 'rxjs/operators';
+import { mergeMap, switchMap, tap } from 'rxjs/operators';
 import { MyUtxoStateHex, StateStorageService } from '../../services/state.storage.service';
 import { getEthAddressSafe, Web3ProviderService } from '../../services/web3.provider.service';
 import { ValidateMnemonic } from '../../account-setup/mnemonic.validator';
+import { environment } from '../../../environments/environment';
+import { combineLatest, of } from 'rxjs';
+import { Transaction } from 'web3-core';
 
 @Component({
   selector: 'app-withdraw',
@@ -57,38 +60,22 @@ export class WithdrawComponent implements OnInit {
 
     const amount = tw(this.toAmount).toNumber();
 
-    this.stateStorageService.getUtxoState().pipe(
-      switchMap((utxoState: MyUtxoStateHex) => {
-        const state = bigintifyUtxoState(utxoState);
-        const p$ = this.zpService.zp.myUtxoState(state);
-        return fromPromise(p$);
-      }),
-      mergeMap(
-        (state: MyUtxoState<bigint>) => {
-
-          let tmp = 0;
-          const utxoIn: Utxo<bigint>[] = [];
-          for (const [i, utxo] of state.utxoList.entries()) {
-            if (i === 2) {
-              throw new Error('max 2 utxo per withdraw');
-            }
-            if (tmp >= amount) {
-              break;
-            }
-            tmp += Number(utxo.amount);
-            utxoIn.push(utxo);
+    fromPromise(this.zpService.zp.prepareWithdraw(environment.ethToken, amount))
+      .pipe(
+        mergeMap(
+          ([tx, txHash]: [Tx<string>, string]) => {
+            const gasTx$ = fromPromise(this.zpService.zpGas.prepareWithdraw(environment.ethToken, environment.relayerFee));
+            const tx$ = of(tx);
+            return combineLatest([tx$, gasTx$]);
           }
-
-          return fromPromise(this.zpService.zp.prepareWithdraw(utxoIn));
-        }
-      ),
-      mergeMap((blockItem: BlockItem<string>) => {
-          return this.relayerApi.sendTx$(blockItem);
-        }
-      )
-    ).subscribe(
+        ),
+        mergeMap(
+          ([tx, gasTx]: [Tx<string>, [Tx<string>, string]]) => {
+            return this.relayerApi.sendTx$(tx, '0x0', gasTx[0]);
+          }
+        )
+      ).subscribe(
       (tx: any) => {
-        // (tx: Transaction) => {
         this.isDone = true;
         this.transactionHash = tx.transactionHash;
       }
