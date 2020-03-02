@@ -20,11 +20,11 @@ export class StateStorageService {
   constructor(private storage: StorageMap) {
   }
 
-  getHistoryState(): Observable<HistoryState> {
-    return this.storage.get<HistoryState>('history-state') as Observable<HistoryState>;
+  getHistoryState(): Observable<HistoryState<string>> {
+    return this.storage.get<HistoryState<string>>('history-state') as Observable<HistoryState<string>>;
   }
 
-  saveHistory(val: HistoryState): void {
+  saveHistory(val: HistoryState<string>): void {
     this.storage.set('history-state', val).subscribe(() => {});
   }
 
