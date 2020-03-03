@@ -3,6 +3,7 @@ import { CircomeLoaderService } from './circome-loader.service';
 import {
   fw,
   GetBalanceProgressNotification,
+  HistoryAndBalances,
   HistoryItem,
   HistoryState,
   MyUtxoState,
@@ -73,8 +74,7 @@ export class ZeroPoolService {
       balanceProgress?: Subject<GetBalanceProgressNotification>,
     ): Observable<boolean> => {
 
-      const getBalance$ = fromPromise(zp.getBalance());
-      const getHistory$ = fromPromise(zp.utxoHistory());
+      const getBalanceAndHistory$ = fromPromise(zp.getBalanceAndHistory());
       const getActiveWithdrawals$ = fromPromise(zp.getActiveWithdrawals());
       const getBlockNumber = fromPromise(zp.ZeroPool.web3Ethereum.getBlockNumber());
       const getGasBalance = fromPromise(zpGas.getBalance());
@@ -85,8 +85,7 @@ export class ZeroPoolService {
 
       return combineLatest(
         [
-          getBalance$,
-          getHistory$,
+          getBalanceAndHistory$,
           getActiveWithdrawals$,
           getBlockNumber,
           getGasBalance,
@@ -95,16 +94,15 @@ export class ZeroPoolService {
       ).pipe(
         tap((x) => {
           const [
-            balances,
-            history,
+            balancesAndhistory,
             activeWithdrawals,
             blockNumber,
             gasBalance,
             ethBalance
-          ]: [ZpBalance, HistoryState<bigint>, PayNote[], number, ZpBalance, string] = x;
+          ]: [HistoryAndBalances, PayNote[], number, ZpBalance, string] = x;
 
-          this.zpBalance = balances;
-          this.zpHistory = history.items;
+          this.zpBalance = balancesAndhistory.balances;
+          this.zpHistory = balancesAndhistory.historyItems;
           this.activeWithdrawals = activeWithdrawals;
           this.currentBlockNumber = blockNumber;
 
@@ -145,7 +143,7 @@ export class ZeroPoolService {
 
     // todo: catch error
     const pushUpdates$ = (zp: ZeroPoolNetwork, gasZp: ZeroPoolNetwork): Observable<any> => {
-      return interval(5000).pipe(
+      return interval(10000).pipe(
         concatMap(() => {
           return updateStates$(zp, gasZp);
         }),
