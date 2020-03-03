@@ -5,8 +5,10 @@ import { fromPromise } from 'rxjs/internal-compatibility';
 import { ZeroPoolService } from './zero-pool.service';
 import { RelayerApiService } from './relayer.api.service';
 import { PayNote, toHex, Tx } from 'zeropool-lib';
-import { Transaction } from 'web3-core';
 import { environment } from '../../environments/environment';
+
+
+type TxContainer = [Tx<string>, string];
 
 @Injectable({
   providedIn: 'root'
@@ -40,7 +42,7 @@ export class TransactionService {
         }
       ),
       mergeMap(
-        ([tx, depositBlockNumber, gasTx]: [Tx<string>, number, [Tx<string>, string]]) => {
+        ([tx, depositBlockNumber, gasTx]: [Tx<string>, number, TxContainer]) => {
           progressCallback('sending-transaction');
           return this.relayerApi.sendTx$(tx, toHex(depositBlockNumber), gasTx[0]);
         }
@@ -97,7 +99,7 @@ export class TransactionService {
         }
       ),
       mergeMap(
-        ([tx, gasTx]: [[Tx<string>, string], [Tx<string>, string]]) => {
+        ([tx, gasTx]: [TxContainer, TxContainer]) => {
           // Transaction is sent,
           // Wait for ZeroPool block
           return this.relayerApi.sendTx$(tx[0], '0x0', gasTx[0]);
@@ -122,7 +124,7 @@ export class TransactionService {
         }
       ),
       mergeMap(
-        ([tx, gasTx]: [[Tx<string>, string], [Tx<string>, string]]) => {
+        ([tx, gasTx]: [TxContainer, TxContainer]) => {
           // Wait for ZeroPool block
           return this.relayerApi.sendTx$(tx[0], '0x0', gasTx[0]);
         }
