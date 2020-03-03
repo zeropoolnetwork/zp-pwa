@@ -11,7 +11,7 @@
 
       <ng-container>
         <app-amount-input label="Enter amount of ETH" formControlName="amount"></app-amount-input>
-        <mat-hint>Maximum amount of deposit is: 0.001 ETH</mat-hint>
+        <mat-hint>Maximum amount of deposit is: 0.1 ETH</mat-hint>
       </ng-container>
 
       <div class="actions mt-20">
@@ -19,7 +19,7 @@
         <button mat-flat-button color="accent" (click)="onDepositClick()"
                 [disabled]="depositAmount > this.availableEthAmount ||
                   !depositForm.valid ||
-                  depositAmount > 0.001">Deposit
+                  depositAmount > 0.1">Deposit
         </button>
       </div>
     </ng-container>
