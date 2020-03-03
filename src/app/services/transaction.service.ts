@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { filter, map, mergeMap } from 'rxjs/operators';
+import { filter, map, mergeMap, tap } from 'rxjs/operators';
 import { combineLatest, Observable, of } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { ZeroPoolService } from './zero-pool.service';
@@ -24,13 +24,15 @@ export class TransactionService {
     );
   }
 
-  public deposit(token: string, amount: number, fee: number): Observable<string> {
+  public deposit(token: string, amount: number, fee: number,
+                 progressCallback: (msg) => void): Observable<string> {
     return this.isZpReady$.pipe(
       mergeMap(() => {
         return fromPromise(this.zpService.zp.prepareDeposit(token, amount));
       }),
       mergeMap(
         ([tx, txHash]: [Tx<string>, string]) => {
+          progressCallback('open-metamask');
           const depositBlockNumber$ = fromPromise(this.zpService.zp.deposit(token, amount, txHash));
           const gasTx$ = fromPromise(this.zpService.zpGas.prepareWithdraw(environment.ethToken, fee));
           const tx$ = of(tx);
@@ -39,6 +41,7 @@ export class TransactionService {
       ),
       mergeMap(
         ([tx, depositBlockNumber, gasTx]: [Tx<string>, number, [Tx<string>, string]]) => {
+          progressCallback('sending-transaction');
           return this.relayerApi.sendTx$(tx, toHex(depositBlockNumber), gasTx[0]);
         }
       ),
