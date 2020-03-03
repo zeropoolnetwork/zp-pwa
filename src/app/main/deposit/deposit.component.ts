@@ -1,14 +1,13 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { DepositProgressNotification, toHex, tw, Tx } from 'zeropool-lib';
 import { mergeMap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { RelayerApiService } from '../../services/relayer.api.service';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { environment } from '../../../environments/environment';
 import { combineLatest, Observable, of, Subject } from 'rxjs';
-
 
 @Component({
   selector: 'app-deposit',
@@ -21,7 +20,6 @@ export class DepositComponent implements OnInit {
   private depositProgressNotificator$: Observable<DepositProgressNotification> =
     this.depositProgressNotificator.asObservable();
 
-  @Input()
   availableEthAmount: number;
 
   transactionHash: string;
@@ -52,7 +50,7 @@ export class DepositComponent implements OnInit {
       }
     );
 
-    this.availableEthAmount = 0.0000;
+    this.availableEthAmount = this.zpService.ethBalance;
   }
 
   ngOnInit(): void {

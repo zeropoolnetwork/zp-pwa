@@ -34,6 +34,7 @@
         <div class="balance-block">
           <ng-container *ngIf="balance == 0">
             <h1 class="balance-zero">{{balance}} zpETH</h1>
+            <p *ngIf="zpGasBalance !== 0" style="margin-top: .2em" class="balance-gas">Gas {{zpGasBalance || 0}}</p>
           </ng-container>
 
           <ng-container *ngIf="balance !== 0">

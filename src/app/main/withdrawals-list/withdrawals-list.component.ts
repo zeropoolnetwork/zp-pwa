@@ -27,6 +27,7 @@ export class WithdrawalsListComponent {
     zpService.zpUpdates$.subscribe(
       () => {
         this.checkZpEthBalance();
+        this.withdrawals = this.zpService.activeWithdrawals;
       }
     );
   }

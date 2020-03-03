@@ -16,7 +16,10 @@
 
       <div class="actions mt-20">
         <button mat-stroked-button routerLink="/main">Back</button>
-        <button mat-flat-button color="accent" (click)="onDepositClick()" [disabled]="!depositForm.valid">Deposit
+        <button mat-flat-button color="accent" (click)="onDepositClick()"
+                [disabled]="depositAmount > this.availableEthAmount ||
+                  !depositForm.valid ||
+                  depositAmount > 0.001">Deposit
         </button>
       </div>
     </ng-container>

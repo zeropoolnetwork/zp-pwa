@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CircomeLoaderService } from './circome-loader.service';
 import {
+  fw,
   GetBalanceProgressNotification,
   HistoryItem,
   HistoryState,
@@ -30,6 +31,7 @@ export class ZeroPoolService {
   public zp: ZeroPoolNetwork;
   public zpGas: ZeroPoolNetwork;
 
+  public ethBalance: number;
   public zpBalance: ZpBalance;
   public zpHistory: HistoryItem[];
   public activeWithdrawals: PayNote[];
@@ -76,6 +78,10 @@ export class ZeroPoolService {
       const getActiveWithdrawals$ = fromPromise(zp.getActiveWithdrawals());
       const getBlockNumber = fromPromise(zp.ZeroPool.web3Ethereum.getBlockNumber());
       const getGasBalance = fromPromise(zpGas.getBalance());
+      const getEthBalance = fromPromise(
+        // @ts-ignore todo: fix it
+        zp.ZeroPool.web3Ethereum.getBalance(window.ethereum.selectedAddress)
+      );
 
       return combineLatest(
         [
@@ -83,7 +89,8 @@ export class ZeroPoolService {
           getHistory$,
           getActiveWithdrawals$,
           getBlockNumber,
-          getGasBalance
+          getGasBalance,
+          getEthBalance
         ]
       ).pipe(
         tap((x) => {
@@ -93,7 +100,8 @@ export class ZeroPoolService {
             activeWithdrawals,
             blockNumber,
             gasBalance,
-          ]: [ZpBalance, HistoryState<bigint>, PayNote[], number, ZpBalance] = x;
+            ethBalance
+          ]: [ZpBalance, HistoryState<bigint>, PayNote[], number, ZpBalance, string] = x;
 
           this.zpBalance = balances;
           this.zpHistory = history.items;
@@ -101,7 +109,7 @@ export class ZeroPoolService {
           this.currentBlockNumber = blockNumber;
 
           this.zpGasBalance = gasBalance['0x0'] || 0;
-          // this.zpGasHistory = gasHistory.items;
+          this.ethBalance = fw(ethBalance);
 
         }),
         map(() => {

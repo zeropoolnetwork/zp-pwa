@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpProvider } from 'web3-providers-http';
-// @ts-ignore
-import * as HDWalletProvider from 'truffle-hdwallet-provider';
 import { interval, merge, Observable, of, Subject } from 'rxjs';
 import { catchError, distinctUntilChanged, filter, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';

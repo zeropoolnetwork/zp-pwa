@@ -27,14 +27,9 @@ export class MainComponent implements OnInit {
 
   // amountOfPendingWithdrawals = 1;
   // amountOfVerifiedWithdrawals = 3;
-  totalWithdrawals = 3;
+  totalWithdrawals = 0;
   hasWithdrawals = false;
   hasVerifiedWithdrawals = true;
-
-  withdrawals$ = of({
-    pending: 1,
-    verified: 2
-  });
 
   constructor(
     private accountSvc: AccountService,

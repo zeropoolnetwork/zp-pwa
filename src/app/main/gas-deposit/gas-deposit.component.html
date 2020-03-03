@@ -1,5 +1,5 @@
 <div class="fixed-center widget-box">
-  <ng-container *ngIf="!inProgress" [formGroup]="form">
+  <ng-container *ngIf="!inProgress && !isDone" [formGroup]="form">
     <h1>Gas deposit</h1>
 
     <p>We kindly ask you to cover relayer gas fees by making gas deposit.</p>
@@ -18,7 +18,7 @@
     </div>
   </ng-container>
 
-  <ng-container *ngIf="inProgress">
+  <ng-container *ngIf="inProgress && !isDone ">
     <h2>Withdraw in progress</h2>
     <div>
       <img src="/assets/images/guy-fawkes-cross-fingers.png" width="240px">
