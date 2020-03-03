@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountService, IAccount } from '../services/account.service';
 import { ZeroPoolService } from '../services/zero-pool.service';
-import { Observable, of, timer } from 'rxjs';
-import { fw, HistoryItem, PayNote, tbn } from 'zeropool-lib';
+import { Observable, timer } from 'rxjs';
+import { fw, HistoryItem, PayNote } from 'zeropool-lib';
 import { MatTooltip } from '@angular/material/tooltip';
 import { delay, filter, tap } from 'rxjs/operators';
 import { Web3ProviderService } from '../services/web3.provider.service';
@@ -62,10 +62,21 @@ export class MainComponent implements OnInit {
       this.syncState();
     }
 
-
     this.zpService.zpUpdates$.subscribe(() => {
+      this.accountSvc.deleteNewAccountFlag();
       this.syncState();
     });
+
+  }
+
+  isNeedToShowLoader(): boolean {
+    return (
+      !this.accountSvc.isNewAccount() &&
+      (
+        this.history === undefined ||
+        this.balance === undefined
+      )
+    );
   }
 
   connectWallet() {

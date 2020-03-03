@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { getKeyPair } from 'zeropool-lib';
-import { filter, map, shareReplay, tap } from 'rxjs/operators';
+import { filter, map, shareReplay } from 'rxjs/operators';
 import { isValidMnemonic } from '../account-setup/hd-wallet.utils';
 
 
@@ -32,7 +32,7 @@ export class AccountService {
       ),
       map((mnemonic: string) => {
         // const zeropoolMnemonic = 'session oppose search lunch cave enact quote wire debate knee noble drama exit way scene';
-        const {publicKey} = getKeyPair(mnemonic);
+        const { publicKey } = getKeyPair(mnemonic);
         const zeropoolAddress = `0x` + publicKey.toString(16);
 
         const account: IAccount = {
@@ -45,6 +45,18 @@ export class AccountService {
       }),
       shareReplay()
     );
+  }
+
+  setNewAccountFlag(): void {
+    localStorage.setItem('new-account', 'true');
+  }
+
+  deleteNewAccountFlag(): void {
+    localStorage.removeItem('new-account');
+  }
+
+  isNewAccount(): boolean {
+    return localStorage.getItem('new-account') === 'true';
   }
 
   setMnemonic(mnemonic: string): void {

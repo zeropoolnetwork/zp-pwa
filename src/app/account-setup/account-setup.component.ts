@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ValidateMnemonic } from './mnemonic.validator';
 import { generateMnemonic } from './hd-wallet.utils';
@@ -11,6 +11,8 @@ import { AccountService } from '../services/account.service';
   styleUrls: ['./account-setup.component.scss']
 })
 export class AccountSetupComponent {
+
+  private autoGenMnemonic = '';
 
   constructor(private router: Router, private accountService: AccountService) {
     //
@@ -29,11 +31,15 @@ export class AccountSetupComponent {
 
   next() {
     this.accountService.setMnemonic(this.mnemonic.value);
+    if (this.autoGenMnemonic === this.mnemonic.value) {
+      this.accountService.setNewAccountFlag();
+    }
     this.router.navigate(['/main']);
   }
 
   generateNew() {
     const m = generateMnemonic();
+    this.autoGenMnemonic = m;
     this.mnemonicForm.controls.mnemonic.setValue(m);
   }
 }

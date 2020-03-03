@@ -4,7 +4,7 @@
   <div class="fixed-center widget-box">
     <div [ngClass]="{
             'widget-box-main-contant': true,
-            'widget-box-center': history === undefined || balance === undefined
+            'widget-box-center': isNeedToShowLoader()
           }">
 
       <div class="widget-box-header">
@@ -29,17 +29,17 @@
         <mat-divider></mat-divider>
       </div>
 
-      <ng-container *ngIf="history !== undefined && balance !== undefined">
+      <ng-container *ngIf="!isNeedToShowLoader()">
 
         <div class="balance-block">
-          <ng-container *ngIf="balance == 0">
-            <h1 class="balance-zero">{{balance}} zpETH</h1>
-            <p *ngIf="zpGasBalance !== 0" style="margin-top: .2em" class="balance-gas">Gas {{zpGasBalance || 0}}</p>
+          <ng-container *ngIf="!balance">
+            <h1 class="balance-zero">{{balance || 0}} zpETH</h1>
+            <p *ngIf="zpGasBalance" style="margin-top: .2em" class="balance-gas">Gas {{zpGasBalance || 0}}</p>
           </ng-container>
 
-          <ng-container *ngIf="balance !== 0">
+          <ng-container *ngIf="balance">
             <h1 class="balance">
-              {{balance}}
+              {{balance || 0}}
               <p>zpETH</p>
               <p class="balance-gas">Gas {{zpGasBalance || 0}}</p>
             </h1>
@@ -49,9 +49,9 @@
         <div class="button-block">
           <div class="actions mb-20">
             <button mat-stroked-button routerLink="./deposit">Deposit</button>
-            <button mat-stroked-button routerLink="./transfer" [disabled]="balance === 0">Transfer</button>
+            <button mat-stroked-button routerLink="./transfer" [disabled]="!balance">Transfer</button>
             <button mat-stroked-button
-                    [disabled]="balance === 0 && !hasWithdrawals"
+                    [disabled]="!balance && !hasWithdrawals"
                     [routerLink]="hasWithdrawals ? 'withdrawals-list' :'./withdraw'"
                     matBadgePosition="top after"
                     [matBadge]="totalWithdrawals"
@@ -62,10 +62,10 @@
         </div>
 
         <div class="history-block"
-             [ngStyle]="{'justify-content': history?.length !== 0 ? 'flex-start': 'center'} " style="overflow: hidden;">
+             [ngStyle]="{'justify-content': history && history?.length !== 0 ? 'flex-start': 'center'} " style="overflow: hidden;">
           <!-- TODO: move history to separate component -->
-          <h4 class="title" *ngIf="history?.length !== 0">Transaction History</h4>
-          <p *ngIf="history?.length == 0">No transaction history yet</p>
+          <h4 class="title" *ngIf="history && history?.length !== 0">Transaction History</h4>
+          <p *ngIf="!history || history?.length == 0">No transaction history yet</p>
           <div style="overflow-y: auto;  min-height: 1px">
             <div *ngFor="let tx of history">
               <mat-divider></mat-divider>
@@ -82,7 +82,7 @@
 
       </ng-container>
 
-      <ng-container *ngIf="history === undefined || balance === undefined">
+      <ng-container *ngIf="isNeedToShowLoader()">
         <div>
           <div class="prl mt">
             <h1 style="text-align: center; margin-bottom: 0">Loading</h1>

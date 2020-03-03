@@ -9,13 +9,13 @@ import {
   MyUtxoState,
   PayNote,
   stringifyUtxoHistoryState,
-  stringifyUtxoState, toHex, Tx,
+  stringifyUtxoState,
   ZeroPoolNetwork
 } from 'zeropool-lib';
-import { concatMap, filter, map, mergeMap, tap } from 'rxjs/operators';
+import { concatMap, filter, map, shareReplay, tap } from 'rxjs/operators';
 import { AccountService } from './account.service';
 import { environment } from '../../environments/environment';
-import { combineLatest, interval, Observable, of, Subject } from 'rxjs';
+import { combineLatest, interval, Observable, Subject } from 'rxjs';
 import { Web3ProviderService } from './web3.provider.service';
 import { StateStorageService } from './state.storage.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
@@ -29,6 +29,8 @@ export interface ZpBalance {
 })
 export class ZeroPoolService {
 
+  public isReady$: Observable<boolean>;
+
   public zp: ZeroPoolNetwork;
   public zpGas: ZeroPoolNetwork;
 
@@ -39,7 +41,6 @@ export class ZeroPoolService {
   public currentBlockNumber: number;
 
   public zpGasBalance: number;
-  // public zpGasHistory: HistoryItem[];
 
   public challengeExpiresBlocks = 10;
 
@@ -160,7 +161,6 @@ export class ZeroPoolService {
       this.stateStorageService.getUtxoState(),
       this.stateStorageService.getHistoryState(),
       this.stateStorageService.getGasUtxoState(),
-      // this.stateStorageService.getGasHistoryState(),
     ]).pipe(
       tap((x) => {
 
@@ -171,7 +171,6 @@ export class ZeroPoolService {
           utxoState,
           historyState,
           gasUtxoState,
-          // gasHistoryState,
         ] = x;
 
         const zp = new ZeroPoolNetwork(
@@ -193,7 +192,6 @@ export class ZeroPoolService {
           this.circomeSvc.circomeTxJson,
           this.circomeSvc.proverKey,
           gasUtxoState,
-          // gasHistoryState
         );
 
         listenHistoryStateUpdates$(zp, this.stateStorageService.saveHistory).subscribe();
@@ -202,7 +200,14 @@ export class ZeroPoolService {
         // listenHistoryStateUpdates$(zpGas, this.stateStorageService.saveGasHistory).subscribe();
         listenUtxoStateUpdates$(zpGas, this.stateStorageService.saveGasUtxo).subscribe();
 
-        updateStates$(zp, zpGas, this.balanceProgressNotificator).subscribe(() => {
+        this.isReady$ = updateStates$(zp, zpGas, this.balanceProgressNotificator).pipe(
+          tap(() => {
+            this.zpUpdatesSubject.next(true);
+          }),
+          shareReplay()
+        );
+
+        this.isReady$.subscribe(() => {
           pushUpdates$(zp, zpGas).subscribe();
         });
 

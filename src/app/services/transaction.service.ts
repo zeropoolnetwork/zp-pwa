@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { map, mergeMap } from 'rxjs/operators';
+import { filter, map, mergeMap } from 'rxjs/operators';
 import { combineLatest, Observable, of } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { ZeroPoolService } from './zero-pool.service';
@@ -13,41 +13,48 @@ import { environment } from '../../environments/environment';
 })
 export class TransactionService {
 
+  isZpReady$: Observable<boolean>;
+
   constructor(
     private zpService: ZeroPoolService,
     private relayerApi: RelayerApiService
   ) {
-
+    this.isZpReady$ = this.zpService.isReady$.pipe(
+      filter((isReady: boolean) => isReady)
+    );
   }
 
   public deposit(token: string, amount: number, fee: number): Observable<string> {
-    return fromPromise(this.zpService.zp.prepareDeposit(token, amount))
-      .pipe(
-        mergeMap(
-          ([tx, txHash]: [Tx<string>, string]) => {
-            const depositBlockNumber$ = fromPromise(this.zpService.zp.deposit(token, amount, txHash));
-            const gasTx$ = fromPromise(this.zpService.zpGas.prepareWithdraw(environment.ethToken, fee));
-            const tx$ = of(tx);
-            return combineLatest([tx$, depositBlockNumber$, gasTx$]);
-          }
-        ),
-        mergeMap(
-          ([tx, depositBlockNumber, gasTx]: [Tx<string>, number, [Tx<string>, string]]) => {
-            return this.relayerApi.sendTx$(tx, toHex(depositBlockNumber), gasTx[0]);
-          }
-        ),
-        map(
-          (tx: any) => {
-            return tx.transactionHash;
-          }
-        )
-      );
+    return this.isZpReady$.pipe(
+      mergeMap(() => {
+        return fromPromise(this.zpService.zp.prepareDeposit(token, amount));
+      }),
+      mergeMap(
+        ([tx, txHash]: [Tx<string>, string]) => {
+          const depositBlockNumber$ = fromPromise(this.zpService.zp.deposit(token, amount, txHash));
+          const gasTx$ = fromPromise(this.zpService.zpGas.prepareWithdraw(environment.ethToken, fee));
+          const tx$ = of(tx);
+          return combineLatest([tx$, depositBlockNumber$, gasTx$]);
+        }
+      ),
+      mergeMap(
+        ([tx, depositBlockNumber, gasTx]: [Tx<string>, number, [Tx<string>, string]]) => {
+          return this.relayerApi.sendTx$(tx, toHex(depositBlockNumber), gasTx[0]);
+        }
+      ),
+      map(
+        (tx: any) => {
+          return tx.transactionHash;
+        }
+      )
+    );
   }
 
   public gasDeposit(amount: number): Observable<string> {
-    const relayerAddress$ = this.relayerApi.getRelayerAddress$();
-
-    return relayerAddress$.pipe(
+    return this.isZpReady$.pipe(
+      mergeMap(() => {
+        return this.relayerApi.getRelayerAddress$();
+      }),
       mergeMap(
         (address: string) => {
           return fromPromise(
@@ -81,53 +88,60 @@ export class TransactionService {
   }
 
   public transfer(token: string, to: string, amount: number, fee: number): Observable<string> {
-    return fromPromise(this.zpService.zp.transfer(token, to, amount))
-      .pipe(
-        mergeMap(
-          ([tx, txHash]: [Tx<string>, string]) => {
-            const gasTx$ = fromPromise(this.zpService.zpGas.prepareWithdraw(environment.ethToken, fee));
-            const tx$ = of(tx);
-            return combineLatest([tx$, gasTx$]);
-          }
-        ),
-        mergeMap(
-          ([tx, gasTx]: [Tx<string>, [Tx<string>, string]]) => {
-            return this.relayerApi.sendTx$(tx, '0x0', gasTx[0]);
-          }
-        ),
-        map(
-          (txData: any) => {
-            return txData.transactionHash;
-          }
-        )
-      );
+    return this.isZpReady$.pipe(
+      mergeMap(() => {
+        return fromPromise(this.zpService.zp.transfer(token, to, amount));
+      }),
+      mergeMap(
+        ([tx, txHash]: [Tx<string>, string]) => {
+          const gasTx$ = fromPromise(this.zpService.zpGas.prepareWithdraw(environment.ethToken, fee));
+          const tx$ = of(tx);
+          return combineLatest([tx$, gasTx$]);
+        }
+      ),
+      mergeMap(
+        ([tx, gasTx]: [Tx<string>, [Tx<string>, string]]) => {
+          return this.relayerApi.sendTx$(tx, '0x0', gasTx[0]);
+        }
+      ),
+      map(
+        (txData: any) => {
+          return txData.transactionHash;
+        }
+      )
+    );
   }
 
   public prepareWithdraw(token: string, amount: number, fee: number) {
-    return fromPromise(this.zpService.zp.prepareWithdraw(token, amount))
-      .pipe(
-        mergeMap(
-          ([tx, txHash]: [Tx<string>, string]) => {
-            const gasTx$ = fromPromise(this.zpService.zpGas.prepareWithdraw(environment.ethToken, fee));
-            const tx$ = of(tx);
-            return combineLatest([tx$, gasTx$]);
-          }
-        ),
-        mergeMap(
-          ([tx, gasTx]: [Tx<string>, [Tx<string>, string]]) => {
-            return this.relayerApi.sendTx$(tx, '0x0', gasTx[0]);
-          }
-        ),
-        map(
-          (txData: any) => {
-            return txData.transactionHash;
-          }
-        )
-      );
+    return this.isZpReady$.pipe(
+      mergeMap(() => {
+        return fromPromise(this.zpService.zp.prepareWithdraw(token, amount));
+      }),
+      mergeMap(
+        ([tx, txHash]: [Tx<string>, string]) => {
+          const gasTx$ = fromPromise(this.zpService.zpGas.prepareWithdraw(environment.ethToken, fee));
+          const tx$ = of(tx);
+          return combineLatest([tx$, gasTx$]);
+        }
+      ),
+      mergeMap(
+        ([tx, gasTx]: [Tx<string>, [Tx<string>, string]]) => {
+          return this.relayerApi.sendTx$(tx, '0x0', gasTx[0]);
+        }
+      ),
+      map(
+        (txData: any) => {
+          return txData.transactionHash;
+        }
+      )
+    );
   }
 
   public withdraw(w: PayNote): Observable<string> {
-    return fromPromise(this.zpService.zp.withdraw(w)).pipe(
+    return this.isZpReady$.pipe(
+      mergeMap(() => {
+        return fromPromise(this.zpService.zp.withdraw(w));
+      }),
       map(
         (txData: any) => {
           return txData.transactionHash;
