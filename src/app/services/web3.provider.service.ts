@@ -74,6 +74,9 @@ export class Web3ProviderService {
       ethereum.on('networkChanged', () => {
         window.location.reload();
       });
+      ethereum.on('accountsChanged', () => {
+        window.location.reload();
+      });
       return true;
     }
 
@@ -110,6 +113,7 @@ export class Web3ProviderService {
   }
 
   public checkNetwork(provider: any): boolean {
+    console.log({chain: provider.chainId});
     return provider.chainId === environment.chainId;
   }
 
