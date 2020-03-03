@@ -30,10 +30,10 @@ export class AccountGuard implements CanActivate {
       return;
     }
 
-    if (!this.web3Service.isCorrectNetworkSelected()) {
-      this.router.navigate(['select-network']);
-      return;
-    }
+    // if (!this.web3Service.isCorrectNetworkSelected()) {
+    //   this.router.navigate(['select-network']);
+    //   return;
+    // }
 
     return true;
 

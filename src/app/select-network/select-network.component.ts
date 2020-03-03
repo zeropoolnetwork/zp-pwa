@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { interval } from 'rxjs';
-import { map, take, tap } from 'rxjs/operators';
+import { filter, map, take, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { Web3ProviderService } from '../services/web3.provider.service';
 
@@ -53,6 +53,7 @@ export class SelectNetworkComponent {
       map( () => {
         return web3Service.isCorrectNetworkSelected();
       }),
+      filter((isOk) => isOk),
       take(1),
       tap( () => {
         router.navigate(['/main']);
