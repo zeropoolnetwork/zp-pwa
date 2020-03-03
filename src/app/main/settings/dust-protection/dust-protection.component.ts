@@ -10,21 +10,21 @@ export class DustProtectionComponent implements OnInit {
 
   enable: boolean;
 
-  public protectionForm: FormGroup = this.fb.group({
-    maxGasFee: ['', [Validators.required]],
-    minUtxoSize: ['', [Validators.required]],
-    activate: [false, [Validators.requiredTrue]],
+  public form: FormGroup = this.fb.group({
+    maxGasFee: [32000, [Validators.required]],
+    minUtxoSize: [320, [Validators.required]],
+    activate: [true, [Validators.requiredTrue]],
   });
 
   get maxGasFee(): string {
     return (
-      BigInt(this.protectionForm.get('maxGasFee').value) * (10n ** 9n)
+      BigInt(this.form.get('maxGasFee').value) * (10n ** 9n)
     ).toString();
   }
 
   get minUtxoSize(): string {
     return (
-      BigInt(this.protectionForm.get('minUtxoSize').value) * (10n ** 9n)
+      BigInt(this.form.get('minUtxoSize').value) * (10n ** 9n)
     ).toString();
   }
 
