@@ -5,6 +5,7 @@ import { catchError, distinctUntilChanged, filter, map, shareReplay, switchMap, 
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { environment } from '../../environments/environment';
 import Web3 from 'web3';
+import { Router } from '@angular/router';
 
 // TODO: move declarations into polyfills
 declare let ethereum: any;
@@ -29,13 +30,16 @@ export class Web3ProviderService {
   private alreadyConnected$ = new Subject<HttpProvider>();
   private manuallyConnected$ = new Subject<HttpProvider>();
 
-  constructor() {
+  constructor(router: Router) {
 
     this.address$ = merge(this.alreadyConnected$, this.manuallyConnected$).pipe(
-      tap((provider: HttpProvider) => {
+      filter((provider: HttpProvider) => {
         this.web3Provider = provider;
         const isOk = this.checkNetwork(provider);
-        console.log(isOk);
+        if (!isOk) {
+          router.navigate(['select-network']);
+        }
+        return isOk;
       }),
       map(() => getEthAddressSafe()),
       distinctUntilChanged(),
@@ -110,6 +114,10 @@ export class Web3ProviderService {
         this.manuallyConnected$.next(eth);
       })
     ).subscribe();
+  }
+
+  public isCorrectNetworkSelected(): boolean {
+    return this.web3Provider && (this.web3Provider as any).chainId === environment.chainId;
   }
 
   public checkNetwork(provider: any): boolean {

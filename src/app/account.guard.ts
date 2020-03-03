@@ -8,7 +8,7 @@ import { getEthAddressSafe, Web3ProviderService } from './services/web3.provider
 })
 export class AccountGuard implements CanActivate {
 
-  constructor(private router: Router, web3: Web3ProviderService) {
+  constructor(private router: Router, private web3Service: Web3ProviderService) {
     //
   }
 
@@ -16,11 +16,24 @@ export class AccountGuard implements CanActivate {
 
     if (!localStorage.getItem('mnemonic')) {
       this.router.navigate(['welcome']);
+      return;
     }
 
     if (!getEthAddressSafe()) {
       this.router.navigate(['connect-wallet']);
+      return;
     }
+
+
+    if (!getEthAddressSafe()) {
+      this.router.navigate(['connect-wallet']);
+      return;
+    }
+
+    // if (!this.web3Service.isCorrectNetworkSelected()) {
+    //   this.router.navigate(['select-network']);
+    //   return;
+    // }
 
     return true;
 
