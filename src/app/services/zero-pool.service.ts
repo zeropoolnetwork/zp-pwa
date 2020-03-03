@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CircomeLoaderService } from './circome-loader.service';
+import { CircomLoaderService } from './circom-loader.service';
 import {
   fw,
   GetBalanceProgressNotification,
@@ -52,7 +52,7 @@ export class ZeroPoolService {
   public zpUpdates$: Observable<boolean> = this.zpUpdatesSubject.asObservable();
 
   constructor(
-    private circomeSvc: CircomeLoaderService,
+    private circomeSvc: CircomLoaderService,
     private accountService: AccountService,
     private web3ProviderService: Web3ProviderService,
     private stateStorageService: StateStorageService

@@ -6,7 +6,7 @@ import { catchError, map } from 'rxjs/operators';
 @Injectable({
   providedIn: 'root'
 })
-export class CircomeLoaderService {
+export class CircomLoaderService {
 
   proverKey: ArrayBuffer;
   circomeTxJson: any;

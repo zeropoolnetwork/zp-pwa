@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CircomeLoaderService } from './services/circome-loader.service';
+import { CircomLoaderService } from './services/circom-loader.service';
 import { interval, Observable } from 'rxjs';
 import { AccountService, toAddressPreview } from './services/account.service';
 import { ZeroPoolService } from './services/zero-pool.service';
@@ -31,7 +31,7 @@ export class AppComponent {
   ethAddress$: Observable<{ full: string, short: string }>;
 
   constructor(
-    private circomeSvc: CircomeLoaderService,
+    private circomeSvc: CircomLoaderService,
     private accountSvc: AccountService,
     private zeropoolSvc: ZeroPoolService,
     private web3Service: Web3ProviderService
