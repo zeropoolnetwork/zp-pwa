@@ -112,6 +112,10 @@ export class Web3ProviderService {
     ).subscribe();
   }
 
+  public isCorrectNetworkSelected(): boolean {
+    return this.web3Provider && (this.web3Provider as any).chainId === environment.chainId;
+  }
+
   public checkNetwork(provider: any): boolean {
     console.log({chain: provider.chainId});
     return provider.chainId === environment.chainId;
