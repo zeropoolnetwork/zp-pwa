@@ -20,9 +20,9 @@ export class MainComponent implements OnInit {
   isConnectedEthereum: boolean;
 
   zpGasBalance: number;
-  balance: number = 1;
+  balance: number;
 
-  history: HistoryItem[] = [];
+  history: HistoryItem[];
   tooltipMessage = 'Copy to clipboard';
 
   // amountOfPendingWithdrawals = 1;
