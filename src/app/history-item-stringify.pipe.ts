@@ -25,7 +25,7 @@ export class StringifyHistoryPipe implements PipeTransform {
 
   // :"MM/dd/yy"
   // tx.action.toUpperCase()
-  // {{ tx.action === 'transfer' ? (tx.type === 'in' ? '+' : '-') : '' }}{{ tx.action === 'deposit' ? '+' : ''}}{{ tx.action === 'withdraw' ? '-' : ''}}{{ fromDecimals(tx.amount) }}
+  // {{ tx.action === 'transfer' ? (tx.type === 'in' ? '+' : '-') : '' }}{{ tx.action === 'deposit' ? '+' : ''}}{{ tx.action === 'prepareWithdraw' ? '-' : ''}}{{ fromDecimals(tx.amount) }}
 
   transform(tx: HistoryItem, ...args: string[]): string {
 

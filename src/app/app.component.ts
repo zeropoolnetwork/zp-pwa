@@ -25,7 +25,7 @@ export class AppComponent {
   history = [
     {type: 'transfer', amount: 10},
     {type: 'deposit', amount: 10},
-    {type: 'withdraw', amount: 10},
+    {type: 'prepareWithdraw', amount: 10},
   ];
 
   ethAddress$: Observable<{ full: string, short: string }>;

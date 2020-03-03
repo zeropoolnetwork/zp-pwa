@@ -30,6 +30,7 @@ import { GasDepositComponent } from './gas-deposit/gas-deposit.component';
 import { ResetAccountComponent } from './settings/reset-account/reset-account.component';
 import { DustProtectionComponent } from './settings/dust-protection/dust-protection.component';
 import { StringifyHistoryPipe } from '../history-item-stringify.pipe';
+import { TransactionService } from '../services/transaction.service';
 
 @NgModule({
   declarations: [
@@ -69,7 +70,8 @@ import { StringifyHistoryPipe } from '../history-item-stringify.pipe';
     MatBadgeModule
   ],
   providers: [
-    RelayerApiService
+    RelayerApiService,
+    TransactionService
   ]
 })
 export class MainModule {

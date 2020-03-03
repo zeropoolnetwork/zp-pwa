@@ -1,13 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { fromPromise } from 'rxjs/internal-compatibility';
-import { mergeMap, tap } from 'rxjs/operators';
-import { tw, Tx } from 'zeropool-lib';
-import { ZeroPoolService } from '../../services/zero-pool.service';
+import { tw } from 'zeropool-lib';
 import { environment } from '../../../environments/environment';
-import { RelayerApiService } from '../../services/relayer.api.service';
-import { combineLatest, of } from 'rxjs';
-import { Transaction } from 'web3-core';
+import { TransactionService } from '../../services/transaction.service';
 
 @Component({
   selector: 'app-transfer',
@@ -38,8 +33,7 @@ export class TransferComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private zpService: ZeroPoolService,
-    private relayerApi: RelayerApiService
+    private txService: TransactionService
   ) {
   }
 
@@ -52,24 +46,10 @@ export class TransferComponent implements OnInit {
 
     const amount = tw(this.toAmount).toNumber();
 
-    fromPromise(this.zpService.zp.transfer(environment.ethToken, this.toAddress, amount))
-      .pipe(
-        mergeMap(
-          ([tx, txHash]: [Tx<string>, string]) => {
-            const gasTx$ = fromPromise(this.zpService.zpGas.prepareWithdraw(environment.ethToken, environment.relayerFee));
-            const tx$ = of(tx);
-            return combineLatest([tx$, gasTx$]);
-          }
-        ),
-        mergeMap(
-          ([tx, gasTx]: [Tx<string>, [Tx<string>, string]]) => {
-            return this.relayerApi.sendTx$(tx, '0x0', gasTx[0]);
-          }
-        )
-      ).subscribe(
-      (transaction: any) => {
+    this.txService.transfer(environment.ethToken, this.toAddress, amount, environment.relayerFee).subscribe(
+      (txHash: string) => {
         this.isDone = true;
-        console.log(transaction.transactionHash);
+        console.log({ transfer: txHash });
       }
     );
 
