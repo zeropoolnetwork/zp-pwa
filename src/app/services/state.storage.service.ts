@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HistoryState, MyUtxoState } from 'zeropool-lib';
 import { StorageMap } from '@ngx-pwa/local-storage';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 export type MyUtxoStateHex = MyUtxoState<string>;
 export type MyUtxoStateInt = MyUtxoState<bigint>;
@@ -16,6 +16,9 @@ export class YourService {
   providedIn: 'root'
 })
 export class StateStorageService {
+
+  // onStorageReset$ = new Subject<boolean>();
+  storageResetWasCalled = false;
 
   constructor(private storage: StorageMap) {
     this.getHistoryState = this.getHistoryState.bind(this);
@@ -34,6 +37,10 @@ export class StateStorageService {
   }
 
   saveHistory(val: HistoryState<string>): void {
+    if (this.storageResetWasCalled) {
+      return;
+    }
+
     this.storage.set('history-state', val).subscribe(() => {
     });
   }
@@ -43,6 +50,10 @@ export class StateStorageService {
   }
 
   saveGasHistory(val: HistoryState<string>): void {
+    if (this.storageResetWasCalled) {
+      return;
+    }
+
     this.storage.set('gas-history-state', val).subscribe(() => {
     });
   }
@@ -53,6 +64,10 @@ export class StateStorageService {
   }
 
   saveUtxo(val: MyUtxoStateHex): void {
+    if (this.storageResetWasCalled) {
+      return;
+    }
+
     this.storage.set('utxo-state', val).subscribe(() => {
     });
   }
@@ -63,11 +78,17 @@ export class StateStorageService {
   }
 
   saveGasUtxo(val: MyUtxoStateHex): void {
+    if (this.storageResetWasCalled) {
+      return;
+    }
+
     this.storage.set('gas-utxo-state', val).subscribe(() => {
     });
   }
 
   resetStorage(): Observable<undefined> {
+    this.storageResetWasCalled = true;
+    // this.onStorageReset$.next(true);
     // this.storage.delete('utxo-state').subscribe(() => {});
     // this.storage.delete('history-state').subscribe(() => {});
     return this.storage.clear();
