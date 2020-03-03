@@ -9,17 +9,17 @@
 
     <div>
       <div class="mb-20">
-        <mat-checkbox>Enable UTXO auto join</mat-checkbox>
+        <mat-checkbox formControlName="activate">Enable UTXO auto join</mat-checkbox>
       </div>
       <app-amount-input label="Max gas fees for join transaction (Gwei)" formControlName="maxGasFee"></app-amount-input>
-      <app-amount-input label="Minimal UTXO size to join (ETH)" formControlName="minUtxoSize"></app-amount-input>
+      <app-amount-input label="Minimal UTXO size to join (Gwei)" formControlName="minUtxoSize"></app-amount-input>
     </div>
 
     <p class="dust-protection-warning">This settings deticated for experienced users, please don’t change this it if you aren’t confident enough.</p>
 
     <div class="actions mt-10">
       <button mat-stroked-button routerLink="/main/settings">Back</button>
-      <button mat-stroked-button>Save</button>
+      <button mat-stroked-button [disabled]="!protectionForm.valid" (click)="saveSettings()">Save</button>
     </div>
   </div>
 </div>

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-dust-protection',
@@ -8,17 +8,24 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 })
 export class DustProtectionComponent implements OnInit {
 
+  enable: boolean;
+
   public protectionForm: FormGroup = this.fb.group({
-    maxGasFee: [''],
-    minUtxoSize: [''],
+    maxGasFee: ['', [Validators.required]],
+    minUtxoSize: ['', [Validators.required]],
+    activate: [false, [Validators.requiredTrue]],
   });
 
-  get maxGasFee(): number {
-    return this.protectionForm.get('maxGasFee').value;
+  get maxGasFee(): string {
+    return (
+      BigInt(this.protectionForm.get('maxGasFee').value) * (10n ** 9n)
+    ).toString();
   }
 
-  get minUtxoSize(): number {
-    return this.protectionForm.get('minUtxoSize').value;
+  get minUtxoSize(): string {
+    return (
+      BigInt(this.protectionForm.get('minUtxoSize').value) * (10n ** 9n)
+    ).toString();
   }
 
   constructor(
@@ -27,6 +34,10 @@ export class DustProtectionComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  saveSettings() {
+
   }
 
 }
