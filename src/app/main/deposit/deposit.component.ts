@@ -27,6 +27,9 @@ export class DepositComponent implements OnInit {
   isFinishedWithError = false;
 
   depositInProgress = false;
+  progressMessageLineOne: string = '';
+  progressMessageLineTwo: string = '';
+  isLineTwoBold = false;
   color = 'rgba(100, 100, 100, 0.5)';
 
 
@@ -59,10 +62,26 @@ export class DepositComponent implements OnInit {
 
   onDepositClick(): void {
     this.depositInProgress = true;
+    this.progressMessageLineOne = 'Generate ZeroPool transaction';
+    this.progressMessageLineTwo = 'It might take some time';
+    this.isLineTwoBold = false;
 
     const amount = tw(this.depositAmount).toNumber();
 
-    this.txService.deposit(environment.ethToken, amount, environment.relayerFee).pipe(
+    // Generate ZeroPool transaction
+
+    this.txService.deposit(environment.ethToken, amount, environment.relayerFee, (progressStep) => {
+      if (progressStep === 'open-metamask') {
+        this.progressMessageLineOne = 'Transaction generated';
+        this.progressMessageLineTwo = 'Please check your metamask';
+        this.isLineTwoBold = true;
+      } else if (progressStep === 'sending-transaction') {
+        this.progressMessageLineOne = 'Transaction published';
+        this.progressMessageLineTwo = 'Wait for ZeroPool block';
+        this.isLineTwoBold = true;
+      }
+
+    }).pipe(
       tap((txHash: any) => {
         this.depositInProgress = false;
         this.isFinished = true;
