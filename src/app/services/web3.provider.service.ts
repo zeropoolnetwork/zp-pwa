@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpProvider } from 'web3-providers-http';
 import { interval, merge, Observable, of, Subject } from 'rxjs';
-import { catchError, distinctUntilChanged, filter, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, filter, map, shareReplay, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { environment } from '../../environments/environment';
 import Web3 from 'web3';
@@ -34,9 +34,12 @@ export class Web3ProviderService {
     this.address$ = merge(this.alreadyConnected$, this.manuallyConnected$).pipe(
       tap((provider: HttpProvider) => {
         this.web3Provider = provider;
+        const isOk = this.checkNetwork(provider);
+        console.log(isOk);
       }),
       map(() => getEthAddressSafe()),
-      distinctUntilChanged()
+      distinctUntilChanged(),
+      shareReplay()
     );
 
     this.isReady$ = this.address$.pipe(
@@ -68,9 +71,9 @@ export class Web3ProviderService {
   connectWeb3(): boolean {
     if (typeof ethereum !== 'undefined') {
       this.enableWeb3(ethereum);
-      // ethereum.on('networkChanged', () => {
-      //   window.location.reload();
-      // });
+      ethereum.on('networkChanged', () => {
+        window.location.reload();
+      });
       return true;
     }
 
@@ -104,6 +107,10 @@ export class Web3ProviderService {
         this.manuallyConnected$.next(eth);
       })
     ).subscribe();
+  }
+
+  public checkNetwork(provider: any): boolean {
+    return provider.chainId === environment.chainId;
   }
 
 }

@@ -4,6 +4,7 @@
 
 export const environment = {
   production: false,
+  chainId: '0x4',
   contractAddress: '0x40e0E6076D907c2bf843d0295E78e7523E6aB990',
   sideChainAddress: '0x7F0f954269e9b0010E0Aa43d6732F66eB0F5Cb84',
   sideChainRpc: 'https://kovan.infura.io/v3/a3f4d001c1fc4a359ea70dd27fd9cb51',
