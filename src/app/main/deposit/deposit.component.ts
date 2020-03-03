@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { ZeroPoolService } from '../../services/zero-pool.service';
-import { DepositProgressNotification, tw } from 'zeropool-lib';
+import { tw } from 'zeropool-lib';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { environment } from '../../../environments/environment';
-import { Observable, of, Subject } from 'rxjs';
+import { of } from 'rxjs';
 import { TransactionService } from '../../services/transaction.service';
 import { catchError, tap } from 'rxjs/operators';
 
@@ -15,10 +15,6 @@ import { catchError, tap } from 'rxjs/operators';
 })
 export class DepositComponent implements OnInit {
 
-  private depositProgressNotificator: Subject<DepositProgressNotification> = new Subject();
-  private depositProgressNotificator$: Observable<DepositProgressNotification> =
-    this.depositProgressNotificator.asObservable();
-
   availableEthAmount: number;
 
   transactionHash: string;
@@ -27,8 +23,8 @@ export class DepositComponent implements OnInit {
   isFinishedWithError = false;
 
   depositInProgress = false;
-  progressMessageLineOne: string = '';
-  progressMessageLineTwo: string = '';
+  progressMessageLineOne = '';
+  progressMessageLineTwo = '';
   isLineTwoBold = false;
   color = 'rgba(100, 100, 100, 0.5)';
 
@@ -47,12 +43,6 @@ export class DepositComponent implements OnInit {
     private txService: TransactionService,
     private fb: FormBuilder
   ) {
-
-    this.depositProgressNotificator$.subscribe(
-      (update) => {
-        console.log(update);
-      }
-    );
 
     this.availableEthAmount = this.zpService.ethBalance;
   }
