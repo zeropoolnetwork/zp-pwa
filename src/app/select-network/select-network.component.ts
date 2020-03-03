@@ -1,5 +1,9 @@
 import { Component } from '@angular/core';
 import { environment } from '../../environments/environment';
+import { interval } from 'rxjs';
+import { map, take, tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { Web3ProviderService } from '../services/web3.provider.service';
 
 
 function networkId2Name(chainIdHex: string): string {
@@ -43,8 +47,17 @@ function networkId2Name(chainIdHex: string): string {
 export class SelectNetworkComponent {
   networkName: string;
 
-  constructor() {
+  constructor(router: Router, web3Service: Web3ProviderService) {
     this.networkName = networkId2Name(environment.chainId);
+    interval(500).pipe(
+      map( () => {
+        return web3Service.isCorrectNetworkSelected();
+      }),
+      take(1),
+      tap( () => {
+        router.navigate(['/main']);
+      })
+    ).subscribe()
   }
 
 
