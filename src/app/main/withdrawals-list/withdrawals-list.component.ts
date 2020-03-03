@@ -2,8 +2,7 @@ import { Component } from '@angular/core';
 import { fw, PayNote } from 'zeropool-lib';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { environment } from '../../../environments/environment';
-import { fromPromise } from 'rxjs/internal-compatibility';
-import { Transaction } from 'web3-core';
+import { TransactionService } from '../../services/transaction.service';
 
 @Component({
   selector: 'app-withdrawals-list',
@@ -18,7 +17,8 @@ export class WithdrawalsListComponent {
   isAvailableNewWithdraw = false;
 
   constructor(
-    private zpService: ZeroPoolService
+    private zpService: ZeroPoolService,
+    private txService: TransactionService
   ) {
     this.expiresBlockNumber = this.zpService.challengeExpiresBlocks;
     this.withdrawals = this.zpService.activeWithdrawals;
@@ -45,10 +45,10 @@ export class WithdrawalsListComponent {
 
   withdraw(w: PayNote): void {
     localStorage.setItem(w.txHash, 'in-progress');
-    fromPromise(this.zpService.zp.withdraw(w)).subscribe(
-      (tx: Transaction) => {
+    this.txService.withdraw(w).subscribe(
+      (txHash: string) => {
         // @ts-ignore
-        console.log(tx.transactionHash);
+        console.log({ withdraw: txHash });
       }
     );
   }

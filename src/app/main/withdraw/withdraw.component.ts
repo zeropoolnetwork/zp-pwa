@@ -1,16 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { ZeroPoolService } from '../../services/zero-pool.service';
-import { RelayerApiService } from '../../services/relayer.api.service';
-import { bigintifyUtxoState, BlockItem, MyUtxoState, tw, Tx, Utxo } from 'zeropool-lib';
-import { fromPromise } from 'rxjs/internal-compatibility';
-import { mergeMap, switchMap, tap } from 'rxjs/operators';
-import { MyUtxoStateHex, StateStorageService } from '../../services/state.storage.service';
-import { getEthAddressSafe, Web3ProviderService } from '../../services/web3.provider.service';
-import { ValidateMnemonic } from '../../account-setup/mnemonic.validator';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { tw } from 'zeropool-lib';
+import { getEthAddressSafe } from '../../services/web3.provider.service';
 import { environment } from '../../../environments/environment';
-import { combineLatest, of } from 'rxjs';
-import { Transaction } from 'web3-core';
+import { TransactionService } from '../../services/transaction.service';
 
 @Component({
   selector: 'app-withdraw',
@@ -44,9 +37,7 @@ export class WithdrawComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private zpService: ZeroPoolService,
-    private relayerApi: RelayerApiService,
-    private stateStorageService: StateStorageService
+    private txService: TransactionService
   ) {
   }
 
@@ -60,24 +51,11 @@ export class WithdrawComponent implements OnInit {
 
     const amount = tw(this.toAmount).toNumber();
 
-    fromPromise(this.zpService.zp.prepareWithdraw(environment.ethToken, amount))
-      .pipe(
-        mergeMap(
-          ([tx, txHash]: [Tx<string>, string]) => {
-            const gasTx$ = fromPromise(this.zpService.zpGas.prepareWithdraw(environment.ethToken, environment.relayerFee));
-            const tx$ = of(tx);
-            return combineLatest([tx$, gasTx$]);
-          }
-        ),
-        mergeMap(
-          ([tx, gasTx]: [Tx<string>, [Tx<string>, string]]) => {
-            return this.relayerApi.sendTx$(tx, '0x0', gasTx[0]);
-          }
-        )
-      ).subscribe(
-      (tx: any) => {
+    this.txService.prepareWithdraw(environment.ethToken, amount, environment.relayerFee).subscribe(
+      (txHash: string) => {
         this.isDone = true;
-        this.transactionHash = tx.transactionHash;
+        this.transactionHash = txHash;
+        console.log({ prepareWithdraw: txHash });
       }
     );
 

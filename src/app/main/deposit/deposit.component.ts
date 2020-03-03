@@ -1,13 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { ZeroPoolService } from '../../services/zero-pool.service';
-import { DepositProgressNotification, toHex, tw, Tx } from 'zeropool-lib';
-import { mergeMap } from 'rxjs/operators';
-import { fromPromise } from 'rxjs/internal-compatibility';
-import { RelayerApiService } from '../../services/relayer.api.service';
-import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
+import { DepositProgressNotification, tw } from 'zeropool-lib';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { environment } from '../../../environments/environment';
-import { combineLatest, Observable, of, Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+import { TransactionService } from '../../services/transaction.service';
 
 @Component({
   selector: 'app-deposit',
@@ -40,7 +38,7 @@ export class DepositComponent implements OnInit {
   constructor(
     private location: Location,
     private zpService: ZeroPoolService,
-    private relayerApi: RelayerApiService,
+    private txService: TransactionService,
     private fb: FormBuilder
   ) {
 
@@ -61,29 +59,13 @@ export class DepositComponent implements OnInit {
 
     const amount = tw(this.depositAmount).toNumber();
 
-    fromPromise(this.zpService.zp.prepareDeposit(environment.ethToken, amount))
-      .pipe(
-        mergeMap(
-          ([tx, txHash]: [Tx<string>, string]) => {
-            const depositBlockNumber$ = fromPromise(this.zpService.zp.deposit(environment.ethToken, amount, txHash));
-            const gasTx$ = fromPromise(this.zpService.zpGas.prepareWithdraw(environment.ethToken, environment.relayerFee));
-            const tx$ = of(tx);
-            return combineLatest([tx$, depositBlockNumber$, gasTx$]);
-          }
-        ),
-        mergeMap(
-          ([tx, depositBlockNumber, gasTx]: [Tx<string>, number, [Tx<string>, string]]) => {
-            return this.relayerApi.sendTx$(tx, toHex(depositBlockNumber), gasTx[0]);
-          }
-        ),
-      ).subscribe(
-      (transaction: any) => {
+    this.txService.deposit(environment.ethToken, amount, environment.relayerFee).subscribe(
+      (txHash: any) => {
         this.isDone = true;
-        console.log(transaction.transactionHash);
+        console.log({ deposit: txHash });
       }
     );
 
-    // generate tx and send eth to contract
   }
 
 }
