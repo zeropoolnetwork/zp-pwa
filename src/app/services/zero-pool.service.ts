@@ -15,7 +15,7 @@ import {
 import { concatMap, filter, map, shareReplay, tap } from 'rxjs/operators';
 import { AccountService } from './account.service';
 import { environment } from '../../environments/environment';
-import { combineLatest, interval, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, combineLatest, interval, Observable, Subject } from 'rxjs';
 import { Web3ProviderService } from './web3.provider.service';
 import { StateStorageService } from './state.storage.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
@@ -28,8 +28,10 @@ export interface ZpBalance {
   providedIn: 'root'
 })
 export class ZeroPoolService {
-
-  public isReady$: Observable<boolean>;
+  private isReady: Subject<boolean> = new BehaviorSubject<boolean>(false);
+  public isReady$: Observable<boolean> = this.isReady.asObservable().pipe(
+    shareReplay()
+  );
 
   public zp: ZeroPoolNetwork;
   public zpGas: ZeroPoolNetwork;
@@ -200,16 +202,15 @@ export class ZeroPoolService {
         // listenHistoryStateUpdates$(zpGas, this.stateStorageService.saveGasHistory).subscribe();
         listenUtxoStateUpdates$(zpGas, this.stateStorageService.saveGasUtxo).subscribe();
 
-        this.isReady$ = updateStates$(zp, zpGas, this.balanceProgressNotificator).pipe(
+        updateStates$(zp, zpGas, this.balanceProgressNotificator).pipe(
           tap(() => {
+            this.isReady.next(true);
             this.zpUpdatesSubject.next(true);
           }),
-          shareReplay()
-        );
-
-        this.isReady$.subscribe(() => {
+        ).subscribe(() => {
           pushUpdates$(zp, zpGas).subscribe();
         });
+
 
         this.zp = zp;
         this.zpGas = zpGas;

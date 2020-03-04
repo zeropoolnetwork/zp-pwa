@@ -31,6 +31,8 @@ import { ResetAccountComponent } from './settings/reset-account/reset-account.co
 import { DustProtectionComponent } from './settings/dust-protection/dust-protection.component';
 import { StringifyHistoryPipe } from '../history-item-stringify.pipe';
 import { TransactionService } from '../services/transaction.service';
+import { AutoJoinUtxoService } from '../services/auto-join-utxo.service';
+import { ZeroPoolService } from '../services/zero-pool.service';
 
 @NgModule({
   declarations: [
@@ -71,7 +73,8 @@ import { TransactionService } from '../services/transaction.service';
   ],
   providers: [
     RelayerApiService,
-    TransactionService
+    TransactionService,
+    AutoJoinUtxoService
   ]
 })
 export class MainModule {

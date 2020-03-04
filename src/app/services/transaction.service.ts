@@ -15,20 +15,17 @@ type TxContainer = [Tx<string>, string];
 })
 export class TransactionService {
 
-  isZpReady$: Observable<boolean>;
 
   constructor(
     private zpService: ZeroPoolService,
     private relayerApi: RelayerApiService
   ) {
-    this.isZpReady$ = this.zpService.isReady$.pipe(
-      filter((isReady: boolean) => isReady)
-    );
   }
 
   public deposit(token: string, amount: number, fee: number,
                  progressCallback: (msg) => void): Observable<string> {
-    return this.isZpReady$.pipe(
+    return this.zpService.isReady$.pipe(
+      filter((isReady: boolean) => isReady),
       mergeMap(() => {
         return fromPromise(this.zpService.zp.prepareDeposit(token, amount));
       }),
@@ -56,7 +53,8 @@ export class TransactionService {
   }
 
   public gasDeposit(amount: number): Observable<string> {
-    return this.isZpReady$.pipe(
+    return this.zpService.isReady$.pipe(
+      filter((isReady: boolean) => isReady),
       mergeMap(() => {
         return this.relayerApi.getRelayerAddress$();
       }),
@@ -89,7 +87,8 @@ export class TransactionService {
 
   public transfer(token: string, to: string, amount: number, fee: number): Observable<string> {
 
-    return this.isZpReady$.pipe(
+    return this.zpService.isReady$.pipe(
+      filter((isReady: boolean) => isReady),
       mergeMap(
         () => {
           // Generate ZP transaction
@@ -115,7 +114,8 @@ export class TransactionService {
   }
 
   public prepareWithdraw(token: string, amount: number, fee: number) {
-    return this.isZpReady$.pipe(
+    return this.zpService.isReady$.pipe(
+      filter((isReady: boolean) => isReady),
       mergeMap(() => {
           // Generate ZP transaction
           const gasTx$ = fromPromise(this.zpService.zpGas.prepareWithdraw(environment.ethToken, fee));
@@ -138,8 +138,10 @@ export class TransactionService {
   }
 
   public withdraw(w: PayNote): Observable<string> {
-    return this.isZpReady$.pipe(
+    return this.zpService.isReady$.pipe(
+      filter((isReady: boolean) => isReady),
       mergeMap(() => {
+        debugger
         // Open Metamask
         return fromPromise(this.zpService.zp.withdraw(w));
       }),

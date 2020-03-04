@@ -12,6 +12,7 @@ import { WelcomeComponent } from './welcome/welcome.component';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { ConnectWalletComponent } from './connect-wallet/connect-wallet.component';
 import { SelectNetworkComponent } from './select-network/select-network.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [

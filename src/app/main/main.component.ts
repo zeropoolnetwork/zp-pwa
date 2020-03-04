@@ -7,6 +7,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { delay, filter, tap } from 'rxjs/operators';
 import { Web3ProviderService } from '../services/web3.provider.service';
 import { Clipboard } from '@angular/cdk/clipboard';
+import { AutoJoinUtxoService } from '../services/auto-join-utxo.service';
 
 @Component({
   selector: 'app-main',
@@ -37,7 +38,9 @@ export class MainComponent implements OnInit {
     private accountSvc: AccountService,
     private zpService: ZeroPoolService,
     private web3Service: Web3ProviderService,
-    private clipboard: Clipboard
+    private clipboard: Clipboard,
+    private autoJoin: AutoJoinUtxoService
+
   ) {
 
     // TODO: fix problem and use ?. operator
