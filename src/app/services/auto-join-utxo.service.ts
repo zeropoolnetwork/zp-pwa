@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { combineLatest, Observable, of } from 'rxjs';
+import { combineLatest, from, Observable, of } from 'rxjs';
 import { TransactionService } from './transaction.service';
 import { StateStorageService } from './state.storage.service';
-import { catchError, concatMap, map, mergeMap, tap } from 'rxjs/operators';
+import { catchError, concatMap, map, mergeMap, take, tap } from 'rxjs/operators';
 import { MyUtxoState, Utxo } from 'zeropool-lib';
 import { AccountService, IAccount } from './account.service';
 import { environment } from '../../environments/environment';
@@ -38,7 +38,8 @@ export class AutoJoinUtxoService {
   }
 
   private joinUtxo(account: IAccount): void {
-    this.zpService.zpUpdates$.pipe(
+    const update$ = this.zpService.zpUpdates$.pipe(
+      take(1),
       concatMap(() => {
           return this.processJoinUtxo(account);
         }
@@ -48,7 +49,10 @@ export class AutoJoinUtxoService {
           console.log('join-utxo: ', data);
         }
       }),
+      take(1),
     );
+
+    update$.subscribe();
   }
 
   private processJoinUtxo(account: IAccount): Observable<any> {
@@ -56,14 +60,13 @@ export class AutoJoinUtxoService {
       this.stateStorageService.getUtxoState(),
       this.stateStorageService.getGasUtxoState()
     ]).pipe(
-      map(
-        (x: any) => {
-          const [state, gasState]: [MyUtxoState<string>, MyUtxoState<string>] = x;
-          return this.calculateJoinAmount(state, gasState, account);
-        }
-      ),
+      take(1),
       mergeMap(
-        ({ myAddress, amountToJoin }) => {
+        (x) => {
+
+          const [state, gasState]: [MyUtxoState<string>, MyUtxoState<string>] = x;
+
+          const { myAddress, amountToJoin } = this.calculateJoinAmount(state, gasState, account);
 
           if (amountToJoin === 0 && myAddress === '0') {
             return of('');
@@ -80,6 +83,7 @@ export class AutoJoinUtxoService {
           );
         }
       ),
+      take(1),
     );
   }
 

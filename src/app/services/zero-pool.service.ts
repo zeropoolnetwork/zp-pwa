@@ -15,7 +15,7 @@ import {
 import { concatMap, filter, map, shareReplay, tap } from 'rxjs/operators';
 import { AccountService } from './account.service';
 import { environment } from '../../environments/environment';
-import { combineLatest, interval, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, combineLatest, interval, Observable, Subject } from 'rxjs';
 import { Web3ProviderService } from './web3.provider.service';
 import { StateStorageService } from './state.storage.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
@@ -28,7 +28,7 @@ export interface ZpBalance {
   providedIn: 'root'
 })
 export class ZeroPoolService {
-  private isReady: Subject<boolean> = new Subject<boolean>();
+  private isReady: Subject<boolean> = new BehaviorSubject<boolean>(false);
   public isReady$: Observable<boolean> = this.isReady.asObservable().pipe(
     shareReplay()
   );
