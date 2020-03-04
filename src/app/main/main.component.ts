@@ -16,6 +16,8 @@ import { AutoJoinUtxoService } from '../services/auto-join-utxo.service';
 })
 export class MainComponent implements OnInit {
 
+  isNeedToShowLoader = true;
+
   account$: Observable<IAccount>;
 
   isConnectedEthereum: boolean;
@@ -40,8 +42,9 @@ export class MainComponent implements OnInit {
     private web3Service: Web3ProviderService,
     private clipboard: Clipboard,
     private autoJoin: AutoJoinUtxoService
-
   ) {
+
+    this.zpService.start$.subscribe();
 
     // TODO: fix problem and use ?. operator
     this.isConnectedEthereum = !!(zpService.zp && zpService.zp.ZeroPool.web3Ethereum.ethAddress);
@@ -72,16 +75,6 @@ export class MainComponent implements OnInit {
 
   }
 
-  isNeedToShowLoader(): boolean {
-    return (
-      !this.accountSvc.isNewAccount() &&
-      (
-        this.history === undefined ||
-        this.balance === undefined
-      )
-    );
-  }
-
   connectWallet() {
     this.web3Service.connectWeb3();
   }
@@ -108,6 +101,8 @@ export class MainComponent implements OnInit {
         }
       );
     }
+
+    this.isNeedToShowLoader = false;
   }
 
   ngOnInit(): void {

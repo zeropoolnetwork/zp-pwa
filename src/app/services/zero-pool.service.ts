@@ -6,13 +6,14 @@ import {
   HistoryAndBalances,
   HistoryItem,
   HistoryState,
+  IMerkleTree,
   MyUtxoState,
   PayNote,
   stringifyUtxoHistoryState,
   stringifyUtxoState,
   ZeroPoolNetwork
 } from 'zeropool-lib';
-import { concatMap, filter, map, shareReplay, tap } from 'rxjs/operators';
+import { concatMap, filter, map, mergeMap, shareReplay, tap, timeout } from 'rxjs/operators';
 import { AccountService } from './account.service';
 import { environment } from '../../environments/environment';
 import { BehaviorSubject, combineLatest, interval, Observable, Subject } from 'rxjs';
@@ -32,6 +33,8 @@ export class ZeroPoolService {
   public isReady$: Observable<boolean> = this.isReady.asObservable().pipe(
     shareReplay()
   );
+
+  public start$: Observable<any>;
 
   public zp: ZeroPoolNetwork;
   public zpGas: ZeroPoolNetwork;
@@ -54,7 +57,7 @@ export class ZeroPoolService {
   public zpUpdates$: Observable<boolean> = this.zpUpdatesSubject.asObservable();
 
   constructor(
-    private circomeSvc: CircomLoaderService,
+    private circomService: CircomLoaderService,
     private accountService: AccountService,
     private web3ProviderService: Web3ProviderService,
     private stateStorageService: StateStorageService
@@ -63,7 +66,7 @@ export class ZeroPoolService {
     // todo: challengeExpiresBlocks - this.zp.ZeroPool.getChallengeExpiresBlocks();
     // see: prepareWithdraw / prepareWithdraw-list components
 
-    const circomLoaded$ = this.circomeSvc.isReady$.pipe(
+    const circomLoaded$ = this.circomService.isReady$.pipe(
       filter((isReady) => isReady),
     );
 
@@ -71,92 +74,7 @@ export class ZeroPoolService {
       filter((isReady: boolean) => isReady),
     );
 
-    const updateStates$ = (
-      zp: ZeroPoolNetwork,
-      zpGas: ZeroPoolNetwork,
-      balanceProgress?: Subject<GetBalanceProgressNotification>,
-    ): Observable<boolean> => {
-
-      const getBalanceAndHistory$ = fromPromise(zp.getBalanceAndHistory());
-      const getActiveWithdrawals$ = fromPromise(zp.getActiveWithdrawals());
-      const getBlockNumber = fromPromise(zp.ZeroPool.web3Ethereum.getBlockNumber());
-      const getGasBalance = fromPromise(zpGas.getBalance());
-      const getEthBalance = fromPromise(
-        // @ts-ignore todo: fix it
-        zp.ZeroPool.web3Ethereum.getBalance(window.ethereum.selectedAddress)
-      );
-
-      return combineLatest(
-        [
-          getBalanceAndHistory$,
-          getActiveWithdrawals$,
-          getBlockNumber,
-          getGasBalance,
-          getEthBalance
-        ]
-      ).pipe(
-        tap((x) => {
-          const [
-            balancesAndhistory,
-            activeWithdrawals,
-            blockNumber,
-            gasBalance,
-            ethBalance
-          ]: [HistoryAndBalances, PayNote[], number, ZpBalance, string] = x;
-
-          this.zpBalance = balancesAndhistory.balances;
-          this.zpHistory = balancesAndhistory.historyItems;
-          this.activeWithdrawals = activeWithdrawals;
-          this.currentBlockNumber = blockNumber;
-
-          this.zpGasBalance = gasBalance['0x0'] || 0;
-          this.ethBalance = fw(ethBalance);
-
-        }),
-        map(() => {
-          return true;
-        })
-      );
-    };
-
-    function listenHistoryStateUpdates$(zp: ZeroPoolNetwork, saveHistory: (val: HistoryState<string>) => void): Observable<any> {
-
-      return zp.zpHistoryState$.pipe(
-        tap((historyState: HistoryState<bigint>) => {
-          // TODO: think on switchMap here
-          const hexified = stringifyUtxoHistoryState(historyState);
-          saveHistory(hexified);
-        }),
-      );
-
-    }
-
-    function listenUtxoStateUpdates$(zp: ZeroPoolNetwork, saveUtxo: (val: MyUtxoState<string>) => void): Observable<any> {
-
-      return zp.utxoState$.pipe(
-        tap((utxoState: MyUtxoState<bigint>) => {
-          // TODO: think on switchMap here
-          const hexified = stringifyUtxoState(utxoState);
-          saveUtxo(hexified);
-        })
-      );
-
-    }
-
-
-    // todo: catch error
-    const pushUpdates$ = (zp: ZeroPoolNetwork, gasZp: ZeroPoolNetwork): Observable<any> => {
-      return interval(10000).pipe(
-        concatMap(() => {
-          return updateStates$(zp, gasZp);
-        }),
-        tap(() => {
-          this.zpUpdatesSubject.next(true);
-        }),
-      );
-    };
-
-    combineLatest([
+    this.start$ = combineLatest([
       circomLoaded$,
       web3Loaded$,
       this.accountService.account$,
@@ -164,7 +82,7 @@ export class ZeroPoolService {
       this.stateStorageService.getHistoryState(),
       this.stateStorageService.getGasUtxoState(),
     ]).pipe(
-      tap((x) => {
+      mergeMap((x) => {
 
         const [
           ok1,
@@ -179,8 +97,8 @@ export class ZeroPoolService {
           environment.contractAddress,
           this.web3ProviderService.web3Provider,
           account.zeropoolMnemonic,
-          this.circomeSvc.circomeTxJson,
-          this.circomeSvc.proverKey,
+          this.circomService.circomeTxJson,
+          this.circomService.proverKey,
           utxoState,
           historyState
         );
@@ -191,32 +109,167 @@ export class ZeroPoolService {
           environment.sideChainAddress,
           gasWeb3Provider,
           account.zeropoolMnemonic,
-          this.circomeSvc.circomeTxJson,
-          this.circomeSvc.proverKey,
+          this.circomService.circomeTxJson,
+          this.circomService.proverKey,
           gasUtxoState,
         );
 
-        listenHistoryStateUpdates$(zp, this.stateStorageService.saveHistory).subscribe();
-        listenUtxoStateUpdates$(zp, this.stateStorageService.saveUtxo).subscribe();
+        this.listenHistoryStateUpdates$(zp, this.stateStorageService.saveHistory).subscribe();
+        this.listenUtxoStateUpdates$(zp, this.stateStorageService.saveUtxo).subscribe();
 
-        // listenHistoryStateUpdates$(zpGas, this.stateStorageService.saveGasHistory).subscribe();
-        listenUtxoStateUpdates$(zpGas, this.stateStorageService.saveGasUtxo).subscribe();
-
-        updateStates$(zp, zpGas, this.balanceProgressNotificator).pipe(
-          tap(() => {
-            this.isReady.next(true);
-            this.zpUpdatesSubject.next(true);
-          }),
-        ).subscribe(() => {
-          pushUpdates$(zp, zpGas).subscribe();
-        });
-
+        this.listenUtxoStateUpdates$(zpGas, this.stateStorageService.saveGasUtxo).subscribe();
 
         this.zp = zp;
         this.zpGas = zpGas;
-      }),
-    ).subscribe();
 
+        if (this.accountService.isNewAccount()) {
+          return this.lightUpdate(zp, zpGas).pipe(
+            mergeMap(() => {
+              this.isReady.next(true);
+              this.zpUpdatesSubject.next(true);
+              return this.pushUpdates$(zp, zpGas);
+            }),
+          );
+        }
+
+        return this.updateStates$(zp, zpGas, this.balanceProgressNotificator).pipe(
+          mergeMap(() => {
+            this.isReady.next(true);
+            this.zpUpdatesSubject.next(true);
+            return this.pushUpdates$(zp, zpGas);
+          }),
+        );
+
+      }),
+      shareReplay()
+    );
+
+  }
+
+  private updateStates$(
+    zp: ZeroPoolNetwork,
+    zpGas: ZeroPoolNetwork,
+    balanceProgress?: Subject<GetBalanceProgressNotification>,
+  ): Observable<boolean> {
+
+    const getBalanceAndHistory$ = fromPromise(zp.getBalanceAndHistory());
+    const getActiveWithdrawals$ = fromPromise(zp.getActiveWithdrawals());
+    const getBlockNumber = fromPromise(zp.ZeroPool.web3Ethereum.getBlockNumber());
+    const getGasBalance = fromPromise(zpGas.getBalance());
+    const getEthBalance = fromPromise(
+      // @ts-ignore todo: fix it
+      zp.ZeroPool.web3Ethereum.getBalance(window.ethereum.selectedAddress)
+    );
+
+    return combineLatest(
+      [
+        getBalanceAndHistory$,
+        getActiveWithdrawals$,
+        getBlockNumber,
+        getGasBalance,
+        getEthBalance
+      ]
+    ).pipe(
+      tap((x) => {
+        const [
+          balancesAndhistory,
+          activeWithdrawals,
+          blockNumber,
+          gasBalance,
+          ethBalance
+        ]: [HistoryAndBalances, PayNote[], number, ZpBalance, string] = x;
+
+        this.zpBalance = balancesAndhistory.balances;
+        this.zpHistory = balancesAndhistory.historyItems;
+        this.activeWithdrawals = activeWithdrawals;
+        this.currentBlockNumber = blockNumber;
+
+        this.zpGasBalance = gasBalance['0x0'] || 0;
+        this.ethBalance = fw(ethBalance);
+
+      }),
+      map(() => {
+        return true;
+      })
+    );
+  }
+
+  private lightUpdate(
+    zp: ZeroPoolNetwork,
+    zpGas: ZeroPoolNetwork,
+  ): Observable<boolean> {
+
+    const zpTree$ = zp.fetchMerkleTree();
+    const zpGasTree$ = zpGas.fetchMerkleTree();
+
+    // @ts-ignore todo: fix it
+    const getEthBalance = zp.ZeroPool.web3Ethereum.getBalance(window.ethereum.selectedAddress);
+
+    return combineLatest([
+      fromPromise(zpTree$),
+      fromPromise(zpGasTree$),
+      fromPromise(getEthBalance)
+    ]).pipe(
+      tap(
+        (x) => {
+          const [
+            zpTree,
+            zpGasTree,
+            ethBalance,
+          ]: [IMerkleTree, IMerkleTree, string] = x;
+
+          this.zpBalance = { '0x0': 0 };
+          this.zpHistory = [];
+          this.activeWithdrawals = [];
+          this.currentBlockNumber = 0;
+
+          this.zpGasBalance = 0;
+          this.ethBalance = fw(ethBalance);
+
+        }
+      ),
+      map(() => {
+        return true;
+      })
+    );
+
+  }
+
+  private listenHistoryStateUpdates$(zp: ZeroPoolNetwork, saveHistory: (val: HistoryState<string>) => void): Observable<any> {
+
+    return zp.zpHistoryState$.pipe(
+      tap((historyState: HistoryState<bigint>) => {
+        // TODO: think on switchMap here
+        const hexified = stringifyUtxoHistoryState(historyState);
+        saveHistory(hexified);
+      }),
+    );
+
+  }
+
+  private listenUtxoStateUpdates$(zp: ZeroPoolNetwork, saveUtxo: (val: MyUtxoState<string>) => void): Observable<any> {
+
+    return zp.utxoState$.pipe(
+      tap((utxoState: MyUtxoState<bigint>) => {
+        // TODO: think on switchMap here
+        const hexified = stringifyUtxoState(utxoState);
+        saveUtxo(hexified);
+      })
+    );
+
+  }
+
+
+  // todo: catch error
+  private pushUpdates$(zp: ZeroPoolNetwork, gasZp: ZeroPoolNetwork): Observable<any> {
+    return interval(10000).pipe(
+      concatMap(() => {
+        return this.updateStates$(zp, gasZp);
+      }),
+      tap(() => {
+        this.zpUpdatesSubject.next(true);
+      }),
+    );
   }
 
 

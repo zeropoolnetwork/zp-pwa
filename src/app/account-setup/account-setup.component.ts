@@ -42,4 +42,5 @@ export class AccountSetupComponent {
     this.autoGenMnemonic = m;
     this.mnemonicForm.controls.mnemonic.setValue(m);
   }
+
 }

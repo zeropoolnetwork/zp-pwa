@@ -4,7 +4,7 @@
   <div class="fixed-center widget-box">
     <div [ngClass]="{
             'widget-box-main-contant': true,
-            'widget-box-center': isNeedToShowLoader()
+            'widget-box-center': isNeedToShowLoader
           }">
 
       <div class="widget-box-header">
@@ -29,7 +29,7 @@
         <mat-divider></mat-divider>
       </div>
 
-      <ng-container *ngIf="!isNeedToShowLoader()">
+      <ng-container *ngIf="!isNeedToShowLoader">
 
         <div class="balance-block">
           <ng-container *ngIf="!balance">
@@ -82,7 +82,7 @@
 
       </ng-container>
 
-      <ng-container *ngIf="isNeedToShowLoader()">
+      <ng-container *ngIf="isNeedToShowLoader">
         <div>
           <div class="prl mt">
             <h1 style="text-align: center; margin-bottom: 0">Loading</h1>
