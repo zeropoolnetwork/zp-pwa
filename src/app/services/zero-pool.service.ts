@@ -121,16 +121,13 @@ export class ZeroPoolService {
         this.zp = zp;
         this.zpGas = zpGas;
 
-        fromPromise(this.zp.ZeroPool.getChallengeExpiresBlocks())
-          .subscribe(
-            (blocksNum) => {
-              this.challengeExpiresBlocks = blocksNum;
-            }
-          );
-
         if (this.accountService.isNewAccount()) {
           return this.lightUpdate(zp, zpGas).pipe(
             mergeMap(() => {
+              return fromPromise(this.zp.ZeroPool.getChallengeExpiresBlocks());
+            }),
+            mergeMap((blocksNum) => {
+              this.challengeExpiresBlocks = +blocksNum;
               this.isReady.next(true);
               this.zpUpdatesSubject.next(true);
               return this.pushUpdates$(zp, zpGas);
@@ -140,6 +137,10 @@ export class ZeroPoolService {
 
         return this.updateStates$(zp, zpGas, this.balanceProgressNotificator).pipe(
           mergeMap(() => {
+            return fromPromise(this.zp.ZeroPool.getChallengeExpiresBlocks());
+          }),
+          mergeMap((blocksNum) => {
+            this.challengeExpiresBlocks = +blocksNum;
             this.isReady.next(true);
             this.zpUpdatesSubject.next(true);
             return this.pushUpdates$(zp, zpGas);
