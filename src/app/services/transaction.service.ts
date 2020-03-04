@@ -159,7 +159,6 @@ export class TransactionService {
     return this.zpService.isReady$.pipe(
       filter((isReady: boolean) => isReady),
       mergeMap(() => {
-        debugger;
         // Open Metamask
         return fromPromise(this.zpService.zp.withdraw(w));
       }),
