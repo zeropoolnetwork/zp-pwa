@@ -28,8 +28,10 @@ export interface ZpBalance {
   providedIn: 'root'
 })
 export class ZeroPoolService {
-
-  public isReady$: Observable<boolean>;
+  private isReady: Subject<boolean> = new Subject<boolean>();
+  public isReady$: Observable<boolean> = this.isReady.asObservable().pipe(
+    shareReplay()
+  );
 
   public zp: ZeroPoolNetwork;
   public zpGas: ZeroPoolNetwork;
@@ -200,16 +202,15 @@ export class ZeroPoolService {
         // listenHistoryStateUpdates$(zpGas, this.stateStorageService.saveGasHistory).subscribe();
         listenUtxoStateUpdates$(zpGas, this.stateStorageService.saveGasUtxo).subscribe();
 
-        this.isReady$ = updateStates$(zp, zpGas, this.balanceProgressNotificator).pipe(
+        updateStates$(zp, zpGas, this.balanceProgressNotificator).pipe(
           tap(() => {
+            this.isReady.next(true);
             this.zpUpdatesSubject.next(true);
           }),
-          shareReplay()
-        );
-
-        this.isReady$.subscribe(() => {
+        ).subscribe(() => {
           pushUpdates$(zp, zpGas).subscribe();
         });
+
 
         this.zp = zp;
         this.zpGas = zpGas;

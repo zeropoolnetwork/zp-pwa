@@ -5,6 +5,7 @@ import { AccountService, toAddressPreview } from './services/account.service';
 import { ZeroPoolService } from './services/zero-pool.service';
 import { Web3ProviderService } from './services/web3.provider.service';
 import { map, tap } from 'rxjs/operators';
+import { AutoJoinUtxoService } from './services/auto-join-utxo.service';
 
 @Component({
   selector: 'app-root',
@@ -34,7 +35,7 @@ export class AppComponent {
     private circomeSvc: CircomLoaderService,
     private accountSvc: AccountService,
     private zeropoolSvc: ZeroPoolService,
-    private web3Service: Web3ProviderService
+    private web3Service: Web3ProviderService,
   ) {
     this.hasError$ = this.circomeSvc.hasError$;
     this.circomeResourcesLoaded$ = this.circomeSvc.isReady$;

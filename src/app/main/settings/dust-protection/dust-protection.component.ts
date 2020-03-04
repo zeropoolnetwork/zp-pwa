@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AutoJoinUtxoService } from '../../../services/auto-join-utxo.service';
 
 @Component({
   selector: 'app-dust-protection',
@@ -16,20 +17,21 @@ export class DustProtectionComponent implements OnInit {
     activate: [true, [Validators.requiredTrue]],
   });
 
-  get maxGasFee(): string {
-    return (
+  get maxGasFee(): number {
+    return Number((
       BigInt(this.form.get('maxGasFee').value) * (10n ** 9n)
-    ).toString();
+    ));
   }
 
-  get minUtxoSize(): string {
-    return (
+  get minUtxoSize(): number {
+    return Number((
       BigInt(this.form.get('minUtxoSize').value) * (10n ** 9n)
-    ).toString();
+    ));
   }
 
   constructor(
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private autoJoinService: AutoJoinUtxoService
   ) {
   }
 
@@ -37,7 +39,10 @@ export class DustProtectionComponent implements OnInit {
   }
 
   saveSettings() {
-
+    this.autoJoinService.activateAutoJoin(
+      this.maxGasFee,
+      this.minUtxoSize
+    );
   }
 
 }
