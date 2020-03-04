@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { tw } from 'zeropool-lib';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { fw, tw } from 'zeropool-lib';
 import { environment } from '../../../environments/environment';
 import { TransactionService } from '../../services/transaction.service';
 import { catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { ZeroPoolService } from '../../services/zero-pool.service';
 
 @Component({
   selector: 'app-transfer',
@@ -25,23 +26,33 @@ export class TransferComponent implements OnInit {
   isDoneWithError = false;
   transferIsInProgress = false;
 
-  public transferForm: FormGroup = this.fb.group({
-    toAmount: [''],
-    toAddress: ['']
+  public form: FormGroup = this.fb.group({
+    toAmount: new FormControl('', [Validators.required]),
+    toAddress: new FormControl('', [Validators.required]),
   });
 
   get toAmount(): number {
-    return this.transferForm.get('toAmount').value;
+    return this.form.get('toAmount').value;
   }
 
   get toAddress(): string {
-    return this.transferForm.get('toAddress').value;
+    return this.form.get('toAddress').value;
   }
 
   constructor(
     private fb: FormBuilder,
-    private txService: TransactionService
+    private txService: TransactionService,
+    private zpService: ZeroPoolService
   ) {
+    const ethAssetId = '0x0';
+    this.myZpBalance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
+
+    this.form.get('toAmount').setValidators([
+      Validators.required,
+      Validators.min(0),
+      Validators.max(this.myZpBalance)
+    ]);
+    this.form.get('toAmount').updateValueAndValidity();
   }
 
   ngOnInit(): void {

@@ -1,9 +1,5 @@
 <div class="fixed-center widget-box">
-  <ng-container *ngIf="!isDone && !isDoneWithError" [formGroup]="transferForm">
-
-    <ng-container *ngIf="myZpBalance">
-      <div style="padding: 10px; font-size: 0.7em">Available {{myZpBalance}} zpETH</div>
-    </ng-container>
+  <ng-container *ngIf="!isDone && !isDoneWithError" [formGroup]="form">
 
     <ng-container *ngIf="!transferIsInProgress">
       <h2>Transfer</h2>
@@ -11,14 +7,26 @@
       <p class="ng-star-inserted">Enter ZeroPool Address of receiver</p>
 
       <div class="mt-10">
-        <app-zp-address-input label="Enter receivers ZeroPool address"
-                              formControlName="toAddress"></app-zp-address-input>
-        <app-amount-input label="Enter amount of ETH" formControlName="toAmount"></app-amount-input>
+
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>Enter receivers ZeroPool address</mat-label>
+          <input matInput formControlName="toAddress" autocomplete="off">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>Enter amount of ETH</mat-label>
+          <input matInput formControlName="toAmount" autocomplete="off">
+        </mat-form-field>
+
+        <ng-container *ngIf="myZpBalance">
+          <div style="font-size: 0.7em; margin-top: -15px">Available {{myZpBalance}} zpETH</div>
+        </ng-container>
+
       </div>
 
-      <div class="actions">
+      <div class="actions" style="margin-top: 10px">
         <button mat-stroked-button routerLink="/main">Back</button>
-        <button mat-flat-button color="accent" [disabled]="!transferForm.valid" (click)="onSendClick()">Send</button>
+        <button mat-flat-button color="accent" [disabled]="!form.valid" (click)="onSendClick()">Send</button>
       </div>
     </ng-container>
 
