@@ -52,8 +52,7 @@ export class TransferComponent implements OnInit {
     this.transferIsInProgress = true;
 
     const amount = tw(this.toAmount).toNumber();
-
-    this.txService.transfer(environment.ethToken, this.toAddress, amount, environment.relayerFee, (progressStep) => {
+    const progressCallback = (progressStep) => {
       if (progressStep === 'generate-zp-tx') {
         this.progressMessageLineOne = 'Generating Zero Pool Transaction';
         this.progressMessageLineTwo = 'It will take a bit';
@@ -63,8 +62,9 @@ export class TransferComponent implements OnInit {
         this.progressMessageLineTwo = 'Wait for ZeroPool block';
         this.isLineTwoBold = true;
       }
+    };
 
-    }).pipe(
+    this.txService.transfer(environment.ethToken, this.toAddress, amount, environment.relayerFee, progressCallback).pipe(
       tap((txHash: any) => {
         this.transferIsInProgress = false;
         this.isDone = true;
@@ -75,7 +75,6 @@ export class TransferComponent implements OnInit {
       catchError((e) => {
         this.transferIsInProgress = false;
         this.isDoneWithError = true;
-
         console.log(e);
         return of('');
       })

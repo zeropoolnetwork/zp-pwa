@@ -1,5 +1,5 @@
 <div class="fixed-center widget-box">
-  <ng-container *ngIf="!isDone" [formGroup]="transferForm">
+  <ng-container *ngIf="!isDone && !isDoneWithError" [formGroup]="transferForm">
 
     <ng-container *ngIf="myZpBalance">
       <div style="padding: 10px; font-size: 0.7em">Available {{myZpBalance}} zpETH</div>
@@ -29,7 +29,11 @@
       </div>
 
       <loaders-css loader="ball-beat" [color]="'rgba(100, 100, 100, 0.5)'" [scale]="1"></loaders-css>
-      <h3>{{progressMessageLineOne}}<br><span [ngClass]="{'bold': isLineTwoBold}">{{progressMessageLineTwo}}</span></h3>
+      <h3>
+        {{progressMessageLineOne}}
+        <br>
+        <span [ngClass]="{'bold': isLineTwoBold}">{{progressMessageLineTwo}}</span>
+      </h3>
       <!--<h3>Waiting for transaction confirmation <br>-->
       <!--It will take several minutes</h3>-->
       <!--<div class="actions">-->
