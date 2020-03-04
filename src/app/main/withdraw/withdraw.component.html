@@ -1,5 +1,5 @@
 <div class="fixed-center widget-box">
-  <ng-container *ngIf="!isDone" [formGroup]="transferForm">
+  <ng-container *ngIf="!isDone && !isDoneWithError" [formGroup]="transferForm">
 
     <ng-container *ngIf="myZpBalance">
       <div style="  padding: 10px; font-size: 0.7em">Available {{myZpBalance}} zpETH</div>

@@ -23,7 +23,7 @@ export class WithdrawComponent implements OnInit {
   myZpBalance: number;
 
   isDone = false;
-  isDoneWithError: boolean;
+  isDoneWithError = false;
   withdrawIsInProgress = false;
 
   public transferForm: FormGroup = this.fb.group({
@@ -58,7 +58,7 @@ export class WithdrawComponent implements OnInit {
 
     const amount = tw(this.toAmount).toNumber();
 
-    this.txService.prepareWithdraw(environment.ethToken, amount, environment.relayerFee, (progressStep) => {
+    const progressCallback = (progressStep) => {
       if (progressStep === 'generate-zp-tx') {
         this.progressMessageLineOne = 'Generating Zero Pool Transaction';
         this.progressMessageLineTwo = 'It will take a bit';
@@ -68,8 +68,9 @@ export class WithdrawComponent implements OnInit {
         this.progressMessageLineTwo = 'Wait for ZeroPool block';
         this.isLineTwoBold = true;
       }
+    };
 
-    }).pipe(
+    this.txService.prepareWithdraw(environment.ethToken, amount, environment.relayerFee, progressCallback).pipe(
       tap((txHash: any) => {
         this.withdrawIsInProgress = false;
         this.isDone = true;
