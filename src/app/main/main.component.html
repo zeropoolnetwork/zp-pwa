@@ -48,6 +48,7 @@
 
         <div class="button-block">
           <div class="actions mb-20">
+
             <button mat-stroked-button routerLink="./deposit">Deposit</button>
             <button mat-stroked-button routerLink="./transfer" [disabled]="!balance">Transfer</button>
             <button mat-stroked-button
@@ -62,7 +63,8 @@
         </div>
 
         <div class="history-block"
-             [ngStyle]="{'justify-content': history && history?.length !== 0 ? 'flex-start': 'center'} " style="overflow: hidden;">
+             [ngStyle]="{'justify-content': history && history?.length !== 0 ? 'flex-start': 'center'} "
+             style="overflow: hidden;">
           <!-- TODO: move history to separate component -->
           <h4 class="title" *ngIf="history && history?.length !== 0">Transaction History</h4>
           <p *ngIf="!history || history?.length == 0">No transaction history yet</p>

@@ -9,17 +9,17 @@
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#1976d2">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style type="text/css">
+    .notice-block-hidden {
+      display: none !important;
+    }
+  </style>
 </head>
 <!--<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap" rel="stylesheet">-->
 <body class="mat-typography">
 
-  <div id="notice" class="widget-box notice-block notice-block-hidden">
 
-    <!--
-    <h1 class="notice-title">
-      Your browser doesn't have <b>native support of BigInt</b>, <b>required for heavy computation</b> in the ZeroPool App.
-    </h1>
-    -->
+  <div id="notice" class="widget-box notice-block notice-block-hidden">
     <h1 class="notice-title">
       Oops, your browser is not supported yet.
     </h1>
@@ -28,6 +28,11 @@
       Please, open it on your PC to use. We recommend Mozilla or Chrome.
     </h3>
     <p style="text-align: center"><a href="https://caniuse.com/#feat=bigint">List of supported browsers</a></p>
+    <!--
+    <h1 class="notice-title">
+      Your browser doesn't have <b>native support of BigInt</b>, <b>required for heavy computation</b> in the ZeroPool App.
+    </h1>
+    -->
   </div>
 
   <script>

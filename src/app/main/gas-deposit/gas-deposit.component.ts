@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { tw } from 'zeropool-lib';
 import { TransactionService } from '../../services/transaction.service';
+import { catchError, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-gas-deposit',
@@ -11,7 +13,12 @@ import { TransactionService } from '../../services/transaction.service';
 export class GasDepositComponent implements OnInit {
 
   isDone = false;
+  isDoneWithError = false;
   inProgress = false;
+
+  progressMessageLineOne: string;
+  progressMessageLineTwo: string;
+  isLineTwoBold = true;
 
   form: FormGroup = this.fb.group({
     toAmount: [''],
@@ -36,14 +43,32 @@ export class GasDepositComponent implements OnInit {
 
     const amount = tw(this.depositAmount).toNumber();
 
-    this.txService.gasDeposit(amount).subscribe(
-      (txHash: string) => {
+    const progressCallback = (progressStep) => {
+      if (progressStep === 'wait-for-zp-block') {
+        this.progressMessageLineOne = 'Transaction published';
+        this.progressMessageLineTwo = 'Wait for ZeroPool block';
+        this.isLineTwoBold = false;
+      }
+    };
+
+    this.progressMessageLineOne = 'Transaction generated';
+    this.progressMessageLineTwo = 'Please check your metamask';
+    this.isLineTwoBold = true;
+
+    // progressCallback
+    this.txService.gasDeposit(amount, progressCallback).pipe(
+      tap((txHash: string) => {
         this.inProgress = false;
         this.isDone = true;
-
-        console.log({ gasDeposit: txHash });
-      }
-    );
+        console.log({gasDeposit: txHash});
+      }),
+      catchError((e) => {
+        this.inProgress = false;
+        this.isDoneWithError = true;
+        console.log(e);
+        return of(e);
+      })
+    ).subscribe();
 
   }
 }

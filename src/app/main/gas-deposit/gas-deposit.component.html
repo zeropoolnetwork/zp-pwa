@@ -1,5 +1,5 @@
 <div class="fixed-center widget-box">
-  <ng-container *ngIf="!inProgress && !isDone" [formGroup]="form">
+  <ng-container *ngIf="!inProgress && !isDone && !isDoneWithError" [formGroup]="form">
     <h1>Gas deposit</h1>
 
     <p>We kindly ask you to cover relayer gas fees by making gas deposit.</p>
@@ -18,21 +18,37 @@
     </div>
   </ng-container>
 
-  <ng-container *ngIf="inProgress && !isDone ">
+  <ng-container *ngIf="inProgress && !isDone && !isDoneWithError">
     <h2>Gas deposit in progress</h2>
     <div>
       <img src="/assets/images/guy-fawkes-cross-fingers.png" width="240px">
     </div>
 
     <loaders-css loader="ball-beat" [color]="'rgba(100, 100, 100, 0.5)'" [scale]="1"></loaders-css>
-    <h3>Waiting for transaction confirmation <br> It might take several minutes</h3>
+    <h3>{{progressMessageLineOne}}<br><span [ngClass]="{'bold': isLineTwoBold}">{{progressMessageLineTwo}}</span></h3>
     <div class="actions">
       <button mat-stroked-button routerLink="/main">Back</button>
     </div>
   </ng-container>
 
   <ng-container *ngIf="isDone && !inProgress">
-    <h3>Successful</h3>
+    <h1>Done!</h1>
+    <div>
+      <img src="/assets/images/guy-fawkes-burn-2.png" width="240px">
+    </div>
+    <h2>Now we have Gas to burn!</h2>
+    <div class="actions">
+      <button mat-stroked-button routerLink="/main">Back</button>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="isDoneWithError && !inProgress">
+    <h2 class="title" style="padding: 10px">Oops!<br>something went wrong</h2>
+    <div>
+      <!--      <img src="/assets/images/guy-fawkes-oh-no.png" width="240px">-->
+      <img src="/assets/images/guy-fawkes-dont-know.png" width="240px">
+    </div>
+    <h3 class="title" style="padding: 10px"></h3>
     <div class="actions">
       <button mat-stroked-button routerLink="/main">Back</button>
     </div>
