@@ -12,6 +12,22 @@
 </head>
 <!--<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap" rel="stylesheet">-->
 <body class="mat-typography">
+
+  <div id="notice" class="widget-box notice-block notice-block-hidden">
+    <h1 class="notice-title">Your, browser doesn't have native support of BigInt, reuqired by ZeroPool App.
+      <br><br>We work on that, but at the moment please use other browser.</h1>
+  </div>
+
+  <script>
+		try {
+			const bigInt = BigInt(1);
+		}
+		catch (e) {
+			const notice = document.getElementById('notice');
+			notice.classList.remove('notice-block-hidden');
+		}
+  </script>
+
   <app-root></app-root>
   <noscript>Please enable JavaScript to continue using this application.</noscript>
 </body>
