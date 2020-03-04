@@ -88,8 +88,8 @@ export class MainComponent implements OnInit {
 
     this.totalWithdrawals = this.zpService.activeWithdrawals.length;
 
-    if (this.totalWithdrawals !== 0) {
-      //
+    if (this.totalWithdrawals !== 0 && (typeof this.zpService.challengeExpiresBlocks == 'number')) {
+      //s
       this.hasWithdrawals = true;
       const readyBlock = this.zpService.currentBlockNumber - this.zpService.challengeExpiresBlocks;
       //

@@ -14,7 +14,7 @@ import { of } from 'rxjs';
 export class WithdrawalsListComponent {
 
   withdrawals: PayNote[];
-  expiresBlockNumber: number;
+  expiresBlockNumber: number | string;
 
   isAvailableNewWithdraw = false;
 
@@ -22,6 +22,7 @@ export class WithdrawalsListComponent {
     private zpService: ZeroPoolService,
     private txService: TransactionService
   ) {
+
     this.expiresBlockNumber = this.zpService.challengeExpiresBlocks;
     this.withdrawals = this.zpService.activeWithdrawals;
 
@@ -66,7 +67,12 @@ export class WithdrawalsListComponent {
     return remainingBlockNum > this.expiresBlockNumber;
   }
 
-  getRemainingBlockNumber(withdrawBlockNumber: number): number {
+  getRemainingBlockNumber(withdrawBlockNumber: number): number | string {
+
+    if (typeof this.expiresBlockNumber !== 'number') {
+      return '?';
+    }
+
     const remainingBlockNum = this.zpService.currentBlockNumber - withdrawBlockNumber;
     if (remainingBlockNum > this.expiresBlockNumber) {
       return this.expiresBlockNumber;

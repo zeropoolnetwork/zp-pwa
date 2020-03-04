@@ -3,11 +3,6 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { Location } from '@angular/common';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { RelayerApiService } from '../../services/relayer.api.service';
-import { BlockItem, tw } from 'zeropool-lib';
-import { fromPromise } from 'rxjs/internal-compatibility';
-import { environment } from '../../../environments/environment';
-import { mergeMap } from 'rxjs/operators';
-import { Transaction } from 'web3-core';
 
 @Component({
   selector: 'app-gas-is-needed',

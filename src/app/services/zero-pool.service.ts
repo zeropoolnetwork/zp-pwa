@@ -47,7 +47,7 @@ export class ZeroPoolService {
 
   public zpGasBalance: number;
 
-  public challengeExpiresBlocks = 10;
+  public challengeExpiresBlocks: number | string = '?';
 
   private balanceProgressNotificator: Subject<GetBalanceProgressNotification> = new Subject();
   public balanceProgressNotificator$: Observable<GetBalanceProgressNotification> =
@@ -63,7 +63,6 @@ export class ZeroPoolService {
     private stateStorageService: StateStorageService
   ) {
 
-    // todo: challengeExpiresBlocks - this.zp.ZeroPool.getChallengeExpiresBlocks();
     // see: prepareWithdraw / prepareWithdraw-list components
 
     const circomLoaded$ = this.circomService.isReady$.pipe(
@@ -121,6 +120,13 @@ export class ZeroPoolService {
 
         this.zp = zp;
         this.zpGas = zpGas;
+
+        fromPromise(this.zp.ZeroPool.getChallengeExpiresBlocks())
+          .subscribe(
+            (blocksNum) => {
+              this.challengeExpiresBlocks = blocksNum;
+            }
+          );
 
         if (this.accountService.isNewAccount()) {
           return this.lightUpdate(zp, zpGas).pipe(
@@ -218,7 +224,7 @@ export class ZeroPoolService {
             ethBalance,
           ]: [IMerkleTree, IMerkleTree, string] = x;
 
-          this.zpBalance = { '0x0': 0 };
+          this.zpBalance = {'0x0': 0};
           this.zpHistory = [];
           this.activeWithdrawals = [];
           this.currentBlockNumber = 0;

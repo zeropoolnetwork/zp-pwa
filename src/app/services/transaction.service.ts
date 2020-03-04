@@ -52,7 +52,7 @@ export class TransactionService {
     );
   }
 
-  public gasDeposit(amount: number): Observable<string> {
+  public gasDeposit(amount: number, progressCallback: (msg) => void): Observable<string> {
     return this.zpService.isReady$.pipe(
       filter((isReady: boolean) => isReady),
       mergeMap(() => {
@@ -74,7 +74,8 @@ export class TransactionService {
       ),
       mergeMap(
         (x: any[]) => {
-          // Wait for ZeroPool block
+          progressCallback && progressCallback('wait-for-block');
+          //
           const [zpTxData, txHash] = x;
           return this.relayerApi.gasDonation$(zpTxData[0], txHash);
         }
