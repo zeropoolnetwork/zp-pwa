@@ -124,7 +124,8 @@ export class ZeroPoolService {
         fromPromise(this.zp.ZeroPool.getChallengeExpiresBlocks())
           .subscribe(
             (blocksNum) => {
-              this.challengeExpiresBlocks = blocksNum;
+              console.log(blocksNum);
+              this.challengeExpiresBlocks = +blocksNum;
             }
           );
 
