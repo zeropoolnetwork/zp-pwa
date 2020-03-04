@@ -28,10 +28,11 @@
       </div>
 
       <loaders-css loader="ball-beat" [color]="'rgba(100, 100, 100, 0.5)'" [scale]="1"></loaders-css>
-      <h3>Waiting for transaction confirmation <br> It might take several minutes</h3>
-      <div class="actions">
-        <button mat-stroked-button routerLink="/main">Back</button>
-      </div>
+      <!--<h3>Waiting for transaction confirmation <br> It might take several minutes</h3>-->
+      <!--<div class="actions">-->
+        <!--<button mat-stroked-button routerLink="/main">Back</button>-->
+      <!--</div>-->
+      <h3>{{progressMessageLineOne}}<br><span [ngClass]="{'bold': isLineTwoBold}">{{progressMessageLineTwo}}</span></h3>
     </ng-container>
 
   </ng-container>
@@ -39,6 +40,18 @@
 
   <ng-container *ngIf="isDone">
     <h3>Prepare withdraw ZP BlockItem Successful</h3>
+    <div class="actions">
+      <button mat-stroked-button routerLink="/main">Back</button>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="isDoneWithError">
+    <h2 class="title" style="padding: 10px">Oops!<br>something went wrong</h2>
+    <div>
+      <!--      <img src="/assets/images/guy-fawkes-oh-no.png" width="240px">-->
+      <img src="/assets/images/guy-fawkes-dont-know.png" width="240px">
+    </div>
+    <h3 class="title" style="padding: 10px"></h3>
     <div class="actions">
       <button mat-stroked-button routerLink="/main">Back</button>
     </div>

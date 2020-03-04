@@ -3,6 +3,8 @@ import { fw, PayNote } from 'zeropool-lib';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { environment } from '../../../environments/environment';
 import { TransactionService } from '../../services/transaction.service';
+import { catchError, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-withdrawals-list',
@@ -45,12 +47,18 @@ export class WithdrawalsListComponent {
 
   withdraw(w: PayNote): void {
     localStorage.setItem(w.txHash, 'in-progress');
-    this.txService.withdraw(w).subscribe(
-      (txHash: string) => {
-        // @ts-ignore
-        console.log({ withdraw: txHash });
-      }
-    );
+    this.txService.withdraw(w).pipe(
+      tap((txHash: any) => {
+        console.log({
+          withdraw: txHash
+        });
+      }),
+      catchError((e) => {
+        localStorage.removeItem(w.txHash);
+        console.log(e);
+        return of('');
+      })
+    ).subscribe();
   }
 
   isReadyToFinalize(withdrawBlockNumber: number): boolean {

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { filter, map, mergeMap, tap } from 'rxjs/operators';
+import { filter, map, mergeMap } from 'rxjs/operators';
 import { combineLatest, Observable, of } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { ZeroPoolService } from './zero-pool.service';
@@ -85,12 +85,21 @@ export class TransactionService {
     );
   }
 
-  public transfer(token: string, to: string, amount: number, fee: number): Observable<string> {
+  public transfer(
+    token: string,
+    to: string,
+    amount: number,
+    fee: number,
+    progressCallback?: (msg) => void
+  ): Observable<string> {
 
     return this.zpService.isReady$.pipe(
       filter((isReady: boolean) => isReady),
       mergeMap(
         () => {
+          if (progressCallback) {
+            progressCallback('generate-zp-tx');
+          }
           // Generate ZP transaction
           const gasTx$ = fromPromise(this.zpService.zpGas.prepareWithdraw(environment.ethToken, fee));
           const tx$ = fromPromise(this.zpService.zp.transfer(token, to, amount));
@@ -99,6 +108,9 @@ export class TransactionService {
       ),
       mergeMap(
         ([tx, gasTx]: [TxContainer, TxContainer]) => {
+          if (progressCallback) {
+            progressCallback('wait-for-zp-block');
+          }
           // Transaction is sent,
           // Wait for ZeroPool block
           return this.relayerApi.sendTx$(tx[0], '0x0', gasTx[0]);
@@ -113,10 +125,13 @@ export class TransactionService {
     );
   }
 
-  public prepareWithdraw(token: string, amount: number, fee: number) {
+  public prepareWithdraw(token: string, amount: number, fee: number, progressCallback?: (msg) => void) {
     return this.zpService.isReady$.pipe(
       filter((isReady: boolean) => isReady),
       mergeMap(() => {
+          if (progressCallback) {
+            progressCallback('generate-zp-tx');
+          }
           // Generate ZP transaction
           const gasTx$ = fromPromise(this.zpService.zpGas.prepareWithdraw(environment.ethToken, fee));
           const tx$ = fromPromise(this.zpService.zp.prepareWithdraw(token, amount));
@@ -125,6 +140,9 @@ export class TransactionService {
       ),
       mergeMap(
         ([tx, gasTx]: [TxContainer, TxContainer]) => {
+          if (progressCallback) {
+            progressCallback('wait-for-zp-block');
+          }
           // Wait for ZeroPool block
           return this.relayerApi.sendTx$(tx[0], '0x0', gasTx[0]);
         }
@@ -141,7 +159,7 @@ export class TransactionService {
     return this.zpService.isReady$.pipe(
       filter((isReady: boolean) => isReady),
       mergeMap(() => {
-        debugger
+        debugger;
         // Open Metamask
         return fromPromise(this.zpService.zp.withdraw(w));
       }),
