@@ -13,10 +13,11 @@
           <input matInput formControlName="toAddress" autocomplete="off">
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="field">
-          <mat-label>Enter amount of ETH</mat-label>
-          <input matInput formControlName="toAmount" autocomplete="off">
-        </mat-form-field>
+        <app-amount-input
+          formControlName="toAmount"
+          label="Enter amount of ETH"
+          placeholder="0.005">
+        </app-amount-input>
 
         <ng-container *ngIf="myZpBalance">
           <div style="font-size: 0.7em; margin-top: -15px">Available {{myZpBalance}} zpETH</div>
@@ -47,7 +48,7 @@
       <!--<div class="actions">-->
       <!--&lt;!&ndash;        <button mat-stroked-button routerLink="./transfer" routerLink="/main">Back</button>&ndash;&gt;-->
       <!--<button mat-stroked-button routerLink="/main">Back</button>-->
-      <!--</div>--> 
+      <!--</div>-->
     </ng-container>
 
   </ng-container>
