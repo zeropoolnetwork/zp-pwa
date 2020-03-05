@@ -32,8 +32,9 @@ export class AccountService {
       ),
       map((mnemonic: string) => {
         // const zeropoolMnemonic = 'session oppose search lunch cave enact quote wire debate knee noble drama exit way scene';
-        const { publicKey } = getKeyPair(mnemonic);
-        const zeropoolAddress = `0x` + publicKey.toString(16);
+        const {publicKey} = getKeyPair(mnemonic);
+
+        const zeropoolAddress = `0x` + publicKey.toString(16).padStart(64);
 
         const account: IAccount = {
           zeropoolMnemonic: mnemonic,

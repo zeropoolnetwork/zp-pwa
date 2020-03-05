@@ -6,6 +6,7 @@ import { TransactionService } from '../../services/transaction.service';
 import { catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ZeroPoolService } from '../../services/zero-pool.service';
+import { ValidateAddress } from '../../common/validateAddress';
 
 @Component({
   selector: 'app-transfer',
@@ -28,7 +29,7 @@ export class TransferComponent implements OnInit {
 
   public form: FormGroup = this.fb.group({
     toAmount: new FormControl('', [Validators.required]),
-    toAddress: new FormControl('', [Validators.required]),
+    toAddress: new FormControl('', [Validators.required, ValidateAddress]),
   });
 
   get toAmount(): number {
