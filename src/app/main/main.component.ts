@@ -8,6 +8,7 @@ import { delay, filter, tap } from 'rxjs/operators';
 import { Web3ProviderService } from '../services/web3.provider.service';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { AutoJoinUtxoService } from '../services/auto-join-utxo.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-main',
@@ -41,7 +42,8 @@ export class MainComponent implements OnInit {
     private zpService: ZeroPoolService,
     private web3Service: Web3ProviderService,
     private clipboard: Clipboard,
-    private autoJoin: AutoJoinUtxoService
+    private autoJoin: AutoJoinUtxoService,
+    private router: Router
   ) {
 
     this.zpService.start$.subscribe();
@@ -132,6 +134,5 @@ export class MainComponent implements OnInit {
       console.log('!');
     });
   }
-
-
+  
 }
