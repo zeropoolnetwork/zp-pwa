@@ -74,7 +74,7 @@ export class TransactionService {
       ),
       mergeMap(
         (x: any[]) => {
-          progressCallback && progressCallback('wait-for-block');
+          progressCallback && progressCallback('wait-for-zp-block');
           //
           const [zpTxData, txHash] = x;
           return this.relayerApi.gasDonation$(zpTxData[0], txHash);
