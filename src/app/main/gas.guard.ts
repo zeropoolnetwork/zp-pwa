@@ -2,43 +2,34 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
 import { ZeroPoolService } from '../services/zero-pool.service';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GasGuard implements CanActivate {
 
-  private gasBalance: number;
-  private gasBalanceWasFetched = false;
-
   constructor(private router: Router, private zpService: ZeroPoolService) {
-    // Watch for gas
-
-    if (this.zpService.zpGasBalance) {
-      this.gasBalance = this.zpService.zpGasBalance;
-      this.gasBalanceWasFetched = true;
-    }
-
-    this.zpService.zpUpdates$.subscribe(
-      () => {
-        this.gasBalance = this.zpService.zpGasBalance;
-        this.gasBalanceWasFetched = true;
-      }
-    );
+    //
   }
 
   canActivate(
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
 
-    // return true;
+    return this.zpService.isReady$.pipe(
+      map((isReady) => {
 
-    // TODO: uncomment when gas logic is implemented
-    if (this.gasBalanceWasFetched && this.gasBalance > 0) {
-      return true;
-    }
+        let url = '';
+        if (!isReady) {
+          url = '/main';
+        } else if (!this.zpService.zpGasBalance) {
+          url = '/main/gas-is-needed';
+        }
 
-    this.router.navigate(['/main/gas-is-needed']);
-    return false;
+        return url ? this.router.parseUrl(url) : true;
+      }),
+    );
   }
 }
+

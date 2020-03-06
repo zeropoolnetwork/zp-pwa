@@ -6,16 +6,17 @@ import { AccountGuard } from './account.guard';
 import { SelectNetworkComponent } from './select-network/select-network.component';
 
 const routes: Routes = [
-  {path: '',  redirectTo: '/main', pathMatch: 'full'},
+  {path: '', redirectTo: '/main', pathMatch: 'full'},
   {path: 'welcome', component: WelcomeComponent},
   {path: 'account-setup', loadChildren: () => import('./account-setup/account-setup.module').then(m => m.AccountSetupModule)},
   {path: 'connect-wallet', component: ConnectWalletComponent},
   {path: 'select-network', component: SelectNetworkComponent},
   {
     path: 'main',
-    canActivate: [ AccountGuard ],
+    canActivate: [AccountGuard],
     loadChildren: () => import('./main/main.module').then(m => m.MainModule)
   },
+  {path: '**', redirectTo: 'main'} // TODO: page: not found
 ];
 
 @NgModule({
