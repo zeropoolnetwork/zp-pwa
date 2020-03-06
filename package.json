@@ -37,7 +37,7 @@
     "web3-core": "^1.2.6",
     "web3-eth-contract": "^1.2.6",
     "web3-providers-http": "^1.2.6",
-    "zeropool-lib": "0.4.85",
+    "zeropool-lib": "0.4.86",
     "zone.js": "~0.10.2"
   },
   "devDependencies": {
