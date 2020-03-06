@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { getKeyPair } from 'zeropool-lib';
+import { getBabyJubKeyPair } from 'zeropool-lib';
 import { filter, map, shareReplay } from 'rxjs/operators';
 import { isValidMnemonic } from '../account-setup/hd-wallet.utils';
 
@@ -32,7 +32,7 @@ export class AccountService {
       ),
       map((mnemonic: string) => {
         // const zeropoolMnemonic = 'session oppose search lunch cave enact quote wire debate knee noble drama exit way scene';
-        const {publicKey} = getKeyPair(mnemonic);
+        const {publicKey} = getBabyJubKeyPair(mnemonic);
 
         const zeropoolAddress = `0x` + publicKey.toString(16).padStart(64, '0');
 
