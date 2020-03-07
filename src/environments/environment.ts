@@ -4,10 +4,10 @@
 
 export const environment = {
   production: false,
-  chainId: '0x4',
-  contractAddress: '0x2eA4a5Bdc5535Ff409836248495562Da4a983D96',
-  sideChainAddress: '0xF8f3ff565FCb368f12Ba539ed30f052a8F3b8BA5',
-  sideChainRpc: 'https://kovan.infura.io/v3/a3f4d001c1fc4a359ea70dd27fd9cb51',
+  chainId: '0xNaN',
+  contractAddress: '0x20656D3Aee9Cd3B4280840DE17EFE80d9487a948',
+  sideChainAddress: '0x567a47E3AE32CBbe95ac4eE67F735Fec317662ab',
+  sideChainRpc: 'http://127.0.0.1:8545',
   relayerUrl: 'http://127.0.0.1:3000',
   // relayerUrl: 'https://testnet.relayer.zeropool.network',
   ethToken: '0x0000000000000000000000000000000000000000',

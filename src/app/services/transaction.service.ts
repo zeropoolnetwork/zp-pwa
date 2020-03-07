@@ -8,6 +8,8 @@ import { PayNote, toHex, Tx } from 'zeropool-lib';
 import { environment } from '../../environments/environment';
 
 
+const waitBlocks = 1;
+
 type TxContainer = [Tx<string>, string];
 
 @Injectable({
@@ -46,7 +48,7 @@ export class TransactionService {
       ),
       map(
         (tx: any) => {
-          return tx.transactionHash;
+          return tx.transactionHash || tx;
         }
       )
     );
@@ -60,13 +62,12 @@ export class TransactionService {
       }),
       mergeMap(
         (address: string) => {
-          //
-          const zpTxData$ = fromPromise(this.zpService.zpGas.prepareDeposit(environment.ethToken, amount));
 
-          // Check metamask
-          const p$ = this.zpService.zp.ZeroPool.web3Ethereum.sendTransaction(address, amount);
+          const zpTxData$ = fromPromise(this.zpService.zpGas.prepareDeposit(environment.ethToken, amount));
+            // Check metamask
+          const p$ = this.zpService.zp.ZeroPool.web3Ethereum.sendTransaction(address, amount, undefined, waitBlocks);
           const txHash$ = fromPromise(p$).pipe(
-            map((txData: any) => txData.transactionHash)
+            map((txData: any) => txData.transactionHash || txData)
           );
 
           return combineLatest([zpTxData$, txHash$]);
@@ -120,7 +121,7 @@ export class TransactionService {
       map(
         (txData: any) => {
           // Done
-          return txData.transactionHash;
+          return txData.transactionHash || txData;
         }
       )
     );
@@ -150,7 +151,7 @@ export class TransactionService {
       ),
       map(
         (txData: any) => {
-          return txData.transactionHash;
+          return txData.transactionHash || txData;
         }
       )
     );
@@ -161,11 +162,11 @@ export class TransactionService {
       filter((isReady: boolean) => isReady),
       mergeMap(() => {
         // Open Metamask
-        return fromPromise(this.zpService.zp.withdraw(w));
+        return fromPromise(this.zpService.zp.withdraw(w, waitBlocks));
       }),
       map(
         (txData: any) => {
-          return txData.transactionHash;
+          return txData.transactionHash || txData;
         }
       )
     );
