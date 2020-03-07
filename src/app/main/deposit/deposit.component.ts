@@ -7,6 +7,7 @@ import { environment } from '../../../environments/environment';
 import { of } from 'rxjs';
 import { TransactionService } from '../../services/transaction.service';
 import { catchError, tap } from 'rxjs/operators';
+import { UnconfirmedTransactionService } from '../../services/unconfirmed-transaction.service';
 
 @Component({
   selector: 'app-deposit',
@@ -78,11 +79,12 @@ export class DepositComponent implements OnInit {
         console.log({
           deposit: txHash
         });
+        UnconfirmedTransactionService.deleteDepositTransaction();
       }),
       catchError((e) => {
         this.depositInProgress = false;
         this.isFinishedWithError = true;
-
+        UnconfirmedTransactionService.deleteDepositTransaction();
         console.log(e);
         return of('');
       }),
