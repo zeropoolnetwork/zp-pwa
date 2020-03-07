@@ -20,12 +20,12 @@
         </app-amount-input>
 
         <ng-container *ngIf="myZpBalance">
-          <div style="font-size: 0.7em; margin-top: -15px">Available {{myZpBalance}} zpETH</div>
+          <div class="available-eth" style="margin-top: -15px;">Available {{myZpBalance}} zpETH</div>
         </ng-container>
 
       </div>
 
-      <div class="actions" style="margin-top: 10px">
+      <div class="actions mt-10">
         <button mat-stroked-button routerLink="/main">Back</button>
         <button mat-flat-button color="accent" [disabled]="!form.valid" (click)="onSendClick()">Send</button>
       </div>
@@ -63,12 +63,12 @@
   </ng-container>
 
   <ng-container *ngIf="isDoneWithError">
-    <h2 class="title" style="padding: 10px">Oops!<br>something went wrong</h2>
+    <h2 class="title">Oops!<br>something went wrong</h2>
     <div>
       <!--      <img src="/assets/images/guy-fawkes-oh-no.png" width="240px">-->
       <img src="/assets/images/guy-fawkes-dont-know.png" width="240px">
     </div>
-    <h3 class="title" style="padding: 10px"></h3>
+    <h3 class="title"></h3>
     <div class="actions">
       <button mat-stroked-button routerLink="/main">Back</button>
     </div>

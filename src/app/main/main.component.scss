@@ -19,6 +19,11 @@
   font-weight: 700;
   text-transform: uppercase;
   font-size: 0.8em;
+  padding: 10px;
+
+  &WithOutPadding {
+    padding: 0;
+  }
 }
 
 .tooltip-box {
