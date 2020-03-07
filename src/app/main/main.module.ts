@@ -32,7 +32,7 @@ import { DustProtectionComponent } from './settings/dust-protection/dust-protect
 import { StringifyHistoryPipe } from '../history-item-stringify.pipe';
 import { TransactionService } from '../services/transaction.service';
 import { AutoJoinUtxoService } from '../services/auto-join-utxo.service';
-import { ZeroPoolService } from '../services/zero-pool.service';
+import { ProgressMessageComponent } from './progress-message/progress-message.component';
 
 @NgModule({
   declarations: [
@@ -46,7 +46,8 @@ import { ZeroPoolService } from '../services/zero-pool.service';
     GasDepositComponent,
     ResetAccountComponent,
     DustProtectionComponent,
-    StringifyHistoryPipe
+    StringifyHistoryPipe,
+    ProgressMessageComponent,
   ],
   imports: [
     CommonModule,

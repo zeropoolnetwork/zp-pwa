@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { tw } from 'zeropool-lib';
@@ -7,13 +7,14 @@ import { environment } from '../../../environments/environment';
 import { of } from 'rxjs';
 import { TransactionService } from '../../services/transaction.service';
 import { catchError, tap } from 'rxjs/operators';
+import { ProgressMessageComponent } from '../progress-message/progress-message.component';
 
 @Component({
   selector: 'app-deposit',
   templateUrl: './deposit.component.html',
   styleUrls: ['./deposit.component.scss']
 })
-export class DepositComponent implements OnInit {
+export class DepositComponent implements AfterViewInit {
 
   availableEthAmount: number;
 
@@ -27,6 +28,9 @@ export class DepositComponent implements OnInit {
   progressMessageLineTwo = '';
   isLineTwoBold = false;
   color = 'rgba(100, 100, 100, 0.5)';
+
+  @ViewChild('progressDialog')
+  progressDialog: ProgressMessageComponent;
 
 
   public form: FormGroup = this.fb.group({
@@ -47,7 +51,12 @@ export class DepositComponent implements OnInit {
     this.availableEthAmount = this.zpService.ethBalance;
   }
 
-  ngOnInit(): void {
+  ngAfterViewInit(): void {
+    //debugger
+    //setTimeout(() => {
+      this.progressDialog.showMessage();
+    //}, 1000)
+
   }
 
   onDepositClick(): void {

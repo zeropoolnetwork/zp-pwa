@@ -18,7 +18,7 @@ const routes: Routes = [
   {path: '', component: MainComponent},
   {path: 'gas-is-needed', component: GasIsNeededComponent},
   {path: 'gas-deposit', component: GasDepositComponent},
-  {path: 'deposit', component: DepositComponent, canActivate: [GasGuard]},
+  {path: 'deposit', component: DepositComponent},
   {path: 'transfer', component: TransferComponent, canActivate: [GasGuard]},
   {path: 'withdraw', component: WithdrawComponent, canActivate: [GasGuard]},
   {path: 'withdrawals-list', component: WithdrawalsListComponent, canActivate: [GasGuard]},

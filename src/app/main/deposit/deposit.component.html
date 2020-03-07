@@ -1,5 +1,7 @@
 <div class="fixed-center widget-box">
 
+  <app-progress-message #progressDialog></app-progress-message>
+
   <ng-container *ngIf="!isFinished && !isFinishedWithError">
     <ng-container [formGroup]="form" *ngIf="!depositInProgress">
 
