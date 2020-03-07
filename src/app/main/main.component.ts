@@ -9,6 +9,7 @@ import { Web3ProviderService } from '../services/web3.provider.service';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { AutoJoinUtxoService } from '../services/auto-join-utxo.service';
 import { Router } from '@angular/router';
+import { UnconfirmedTransactionService } from '../services/unconfirmed-transaction.service';
 
 @Component({
   selector: 'app-main',
@@ -43,6 +44,7 @@ export class MainComponent implements OnInit {
     private web3Service: Web3ProviderService,
     private clipboard: Clipboard,
     private autoJoin: AutoJoinUtxoService,
+    private unconfirmedTx: UnconfirmedTransactionService,
     private router: Router
   ) {
 
@@ -134,5 +136,5 @@ export class MainComponent implements OnInit {
       console.log('!');
     });
   }
-  
+
 }

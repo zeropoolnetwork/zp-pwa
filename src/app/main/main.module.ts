@@ -33,6 +33,7 @@ import { StringifyHistoryPipe } from '../history-item-stringify.pipe';
 import { TransactionService } from '../services/transaction.service';
 import { AutoJoinUtxoService } from '../services/auto-join-utxo.service';
 import { ZeroPoolService } from '../services/zero-pool.service';
+import { UnconfirmedTransactionService } from '../services/unconfirmed-transaction.service';
 
 @NgModule({
   declarations: [
@@ -74,7 +75,8 @@ import { ZeroPoolService } from '../services/zero-pool.service';
   providers: [
     RelayerApiService,
     TransactionService,
-    AutoJoinUtxoService
+    AutoJoinUtxoService,
+    UnconfirmedTransactionService
   ]
 })
 export class MainModule {
