@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { PayNote, toHex, Tx } from 'zeropool-lib';
 import { ZeroPoolService } from './zero-pool.service';
-import { combineLatest, interval, Observable } from 'rxjs';
+import { combineLatest, interval, Observable, timer } from 'rxjs';
 import { filter, map, mergeMap, take } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { environment } from '../../environments/environment';
@@ -69,7 +69,7 @@ export class UnconfirmedTransactionService {
 
     const tryEachMillisecond = 30000;
 
-    interval(tryEachMillisecond).pipe(
+    timer(0, tryEachMillisecond).pipe(
       take(Math.ceil(timePassed / tryEachMillisecond)),
       mergeMap(() => {
         return combineLatest([unconfirmedDeposit$, gasTx$]);
