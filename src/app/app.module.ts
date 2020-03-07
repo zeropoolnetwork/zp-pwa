@@ -12,7 +12,7 @@ import { WelcomeComponent } from './welcome/welcome.component';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { ConnectWalletComponent } from './connect-wallet/connect-wallet.component';
 import { SelectNetworkComponent } from './select-network/select-network.component';
-import { HttpClientModule } from '@angular/common/http';
+import { NgxsModule } from '@ngxs/store';
 
 @NgModule({
   declarations: [
@@ -29,7 +29,8 @@ import { HttpClientModule } from '@angular/common/http';
     FlexLayoutModule,
     ServiceWorkerModule.register('ngsw-worker.js', {enabled: environment.production}),
     BrowserAnimationsModule,
-    MatIconModule
+    MatIconModule,
+    NgxsModule.forRoot([ZooState]),
   ],
   providers: [],
   bootstrap: [AppComponent]
