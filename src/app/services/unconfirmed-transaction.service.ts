@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { PayNote, toHex, Tx } from 'zeropool-lib';
 import { ZeroPoolService } from './zero-pool.service';
-import { combineLatest, interval, Observable, timer } from 'rxjs';
-import { filter, map, mergeMap, take } from 'rxjs/operators';
+import { combineLatest, interval, Observable, of, timer } from 'rxjs';
+import { filter, map, mergeMap, take, tap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { environment } from '../../environments/environment';
 import { RelayerApiService } from './relayer.api.service';
@@ -77,9 +77,13 @@ export class UnconfirmedTransactionService {
       mergeMap(
         ([unconfirmedDeposit, gasTx]: [PayNote | undefined, [Tx<string>, string]]) => {
           if (!unconfirmedDeposit) {
-            throw new Error(`cannot find deposit ${depositZpTx.zpTxHash}`);
+            return of(`cannot find deposit ${depositZpTx.zpTxHash}`);
           }
-          return this.relayerApi.sendTx$(depositZpTx.tx, toHex(unconfirmedDeposit.blockNumber), gasTx[0]);
+          return this.relayerApi.sendTx$(depositZpTx.tx, toHex(unconfirmedDeposit.blockNumber), gasTx[0]).pipe(
+            tap(() => {
+              UnconfirmedTransactionService.deleteDepositTransaction();
+            })
+          );
         }
       )
     ).subscribe(
@@ -90,7 +94,8 @@ export class UnconfirmedTransactionService {
         UnconfirmedTransactionService.deleteDepositTransaction();
       },
       (e) => {
-        console.log('unconfirmed transaction failed: ', e.message);
+        UnconfirmedTransactionService.deleteDepositTransaction();
+        console.log('unconfirmed transaction failed: ', e.message || e);
       }
     );
 
