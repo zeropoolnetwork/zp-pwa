@@ -91,7 +91,6 @@ export class UnconfirmedTransactionService {
         console.log({
           unconfirmedDeposit: txData.transactionHash || txData
         });
-        UnconfirmedTransactionService.deleteDepositTransaction();
       },
       (e) => {
         UnconfirmedTransactionService.deleteDepositTransaction();
