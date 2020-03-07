@@ -1,6 +1,6 @@
-<h2>Deposit in progress</h2>
+<h2>{{title}}</h2>
 <div>
   <img [src]="imageSrc" width="240px">
 </div>
-<loaders-css loader="ball-beat" [color]="color" [scale]="1"></loaders-css>
+<loaders-css style="display: block" loader="ball-beat" [color]="color" [scale]="1"></loaders-css>
 <h3>{{progressMessageLineOne}}<br><span [ngClass]="{'bold': isLineTwoBold}">{{progressMessageLineTwo}}</span></h3>

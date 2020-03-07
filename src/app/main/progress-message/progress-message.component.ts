@@ -8,11 +8,11 @@ import { Component, Input, OnInit } from '@angular/core';
 export class ProgressMessageComponent implements OnInit {
 
   imageSrc = '/assets/images/guy-fawkes-cross-fingers.png';
+  title: string;
   progressMessageLineOne: string;
+  progressMessageLineTwo: string;
   isLineTwoBold: boolean;
   color = 'rgba(100, 100, 100, 0.5)';
-
-  progressMessageLineTwo: string;
 
   constructor() {
   }
@@ -20,13 +20,17 @@ export class ProgressMessageComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  showMessage() {
-    console.log('1')
-    debugger
+  showMessage(messages) {
+    console.log('1');
+    this.title = messages.title || '';
+    this.progressMessageLineOne = messages.lineOne || '';
+    this.progressMessageLineTwo = messages.lineTwo || '';
+    this.isLineTwoBold = !!messages.isLineTwoBold;
+    this.imageSrc = messages.image ? messages.image : this.imageSrc;
   }
 
   showErrorMessage() {
-    console.log('2')
+    console.log('2');
   }
 
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { fw, tw } from 'zeropool-lib';
 import { environment } from '../../../environments/environment';
@@ -7,6 +7,7 @@ import { catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { ValidateAddress } from '../../common/validateAddress';
+import { ProgressMessageComponent } from '../progress-message/progress-message.component';
 
 @Component({
   selector: 'app-transfer',
@@ -15,10 +16,6 @@ import { ValidateAddress } from '../../common/validateAddress';
 })
 export class TransferComponent implements OnInit {
 
-  progressMessageLineTwo: string;
-  progressMessageLineOne: string;
-  isLineTwoBold: boolean;
-
   transactionHash: string;
 
   myZpBalance: number;
@@ -26,6 +23,9 @@ export class TransferComponent implements OnInit {
   isDone = false;
   isDoneWithError = false;
   transferIsInProgress = false;
+
+  @ViewChild('progressDialog')
+  progressDialog: ProgressMessageComponent;
 
   public form: FormGroup = this.fb.group({
     toAmount: new FormControl('', [Validators.required]),
@@ -66,13 +66,19 @@ export class TransferComponent implements OnInit {
     const amount = tw(this.toAmount).toNumber();
     const progressCallback = (progressStep) => {
       if (progressStep === 'generate-zp-tx') {
-        this.progressMessageLineOne = 'Generating Zero Pool Transaction';
-        this.progressMessageLineTwo = 'It will take a bit';
-        // this.isLineTwoBold = true;
+        this.progressDialog.showMessage({
+          title: 'Transfer is in progress',
+          lineOne: 'Generating Zero Pool Transaction',
+          lineTwo: 'It will take a bit'
+          // isLineTwoBold: true
+        });
       } else if (progressStep === 'wait-for-zp-block') {
-        this.progressMessageLineOne = 'Transaction published';
-        this.progressMessageLineTwo = 'Wait for ZeroPool block';
-        this.isLineTwoBold = true;
+        this.progressDialog.showMessage({
+          title: 'Transfer is in progress',
+          lineOne: 'Transaction published',
+          lineTwo: 'Wait for ZeroPool block',
+          isLineTwoBold: true
+        });
       }
     };
 

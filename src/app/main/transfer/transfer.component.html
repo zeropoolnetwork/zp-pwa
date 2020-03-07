@@ -32,17 +32,8 @@
     </ng-container>
 
     <ng-container *ngIf="transferIsInProgress">
-      <h2>Transfer is in progress</h2>
-      <div>
-        <img src="/assets/images/guy-fawkes-cross-fingers.png" width="240px">
-      </div>
+      <app-progress-message #progressDialog></app-progress-message>
 
-      <loaders-css loader="ball-beat" [color]="'rgba(100, 100, 100, 0.5)'" [scale]="1"></loaders-css>
-      <h3>
-        {{progressMessageLineOne}}
-        <br>
-        <span [ngClass]="{'bold': isLineTwoBold}">{{progressMessageLineTwo}}</span>
-      </h3>
       <!--<h3>Waiting for transaction confirmation <br>-->
       <!--It will take several minutes</h3>-->
       <!--<div class="actions">-->

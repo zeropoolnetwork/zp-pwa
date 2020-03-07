@@ -24,10 +24,6 @@ export class DepositComponent implements AfterViewInit {
   isFinishedWithError = false;
 
   depositInProgress = false;
-  progressMessageLineOne = '';
-  progressMessageLineTwo = '';
-  isLineTwoBold = false;
-  color = 'rgba(100, 100, 100, 0.5)';
 
   @ViewChild('progressDialog')
   progressDialog: ProgressMessageComponent;
@@ -54,16 +50,22 @@ export class DepositComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     //debugger
     //setTimeout(() => {
-      this.progressDialog.showMessage();
+    //   this.progressDialog.showMessage({
+    //     title: 'Deposit in progress',
+    //     lineOne: ''
+    //   });
     //}, 1000)
 
   }
 
   onDepositClick(): void {
     this.depositInProgress = true;
-    this.progressMessageLineOne = 'Generate ZeroPool transaction';
-    this.progressMessageLineTwo = 'It might take some time';
-    this.isLineTwoBold = false;
+
+    this.progressDialog.showMessage({
+      title: 'Deposit in progress',
+      lineOne: 'Generate ZeroPool transaction',
+      lineTwo: 'It might take some time'
+    });
 
     const amount = tw(this.depositAmount).toNumber();
 
@@ -71,13 +73,19 @@ export class DepositComponent implements AfterViewInit {
 
     this.txService.deposit(environment.ethToken, amount, environment.relayerFee, (progressStep) => {
       if (progressStep === 'open-metamask') {
-        this.progressMessageLineOne = 'Transaction generated';
-        this.progressMessageLineTwo = 'Please check your metamask';
-        this.isLineTwoBold = true;
+        this.progressDialog.showMessage({
+          title: 'Deposit in progress',
+          lineOne: 'Transaction generated',
+          lineTwo: 'Please check your metamask',
+          isLineTwoBold: true
+        });
       } else if (progressStep === 'sending-transaction') {
-        this.progressMessageLineOne = 'Transaction published';
-        this.progressMessageLineTwo = 'Wait for ZeroPool block';
-        this.isLineTwoBold = true;
+        this.progressDialog.showMessage({
+          title: 'Deposit in progress',
+          lineOne: 'Transaction generated',
+          lineTwo: 'Wait for ZeroPool block',
+          isLineTwoBold: true
+        });
       }
 
     }).pipe(
