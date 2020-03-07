@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { PayNote, toHex, Tx } from 'zeropool-lib';
 import { ZeroPoolService } from './zero-pool.service';
-import { combineLatest, interval, Observable, of, timer } from 'rxjs';
+import { combineLatest, Observable, of, timer } from 'rxjs';
 import { filter, map, mergeMap, take, tap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { environment } from '../../environments/environment';
@@ -75,10 +75,13 @@ export class UnconfirmedTransactionService {
         return combineLatest([unconfirmedDeposit$, gasTx$]);
       }),
       mergeMap(
-        ([unconfirmedDeposit, gasTx]: [PayNote | undefined, [Tx<string>, string]]) => {
+        (x) => {
+          const [unconfirmedDeposit, gasTx]: [PayNote | undefined, [Tx<string>, string]] = x;
+
           if (!unconfirmedDeposit) {
             return of(`cannot find deposit ${depositZpTx.zpTxHash}`);
           }
+          console.log(unconfirmedDeposit)
           return this.relayerApi.sendTx$(depositZpTx.tx, toHex(unconfirmedDeposit.blockNumber), gasTx[0]).pipe(
             tap(() => {
               UnconfirmedTransactionService.deleteDepositTransaction();
@@ -87,10 +90,14 @@ export class UnconfirmedTransactionService {
         }
       )
     ).subscribe(
-      (txData: any) => {
-        console.log({
-          unconfirmedDeposit: txData.transactionHash || txData
-        });
+      (data: any) => {
+        if (data.transactionHash) {
+          console.log({
+            unconfirmedDeposit: data.transactionHash
+          });
+        }
+
+        console.log(data);
       },
       (e) => {
         UnconfirmedTransactionService.deleteDepositTransaction();
