@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { PayNote, toHex, Tx } from 'zeropool-lib';
 import { ZeroPoolService } from './zero-pool.service';
-import { combineLatest, Observable, of, timer } from 'rxjs';
-import { filter, map, mergeMap, take, tap } from 'rxjs/operators';
+import { combineLatest, defer, Observable, of } from 'rxjs';
+import { delay, filter, map, mergeMap, repeatWhen, take, takeWhile, tap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { environment } from '../../environments/environment';
 import { RelayerApiService } from './relayer.api.service';
@@ -64,45 +64,59 @@ export class UnconfirmedTransactionService {
             this.zpService.zpGas.prepareWithdraw(environment.ethToken, environment.relayerFee)
           );
         }
-      )
+      ),
     );
 
-    const tryEachMillisecond = 30000;
+    const tryEachMillisecond = 3000;
 
-    timer(0, tryEachMillisecond).pipe(
-      take(Math.ceil(timePassed / tryEachMillisecond)),
-      mergeMap(() => {
-        return combineLatest([unconfirmedDeposit$, gasTx$]);
+    const tryDeposit$ = combineLatest([unconfirmedDeposit$, gasTx$]).pipe(
+      take(1),
+      mergeMap((x: any) => {
+        const [unconfirmedDeposit, gasTx]: [PayNote | undefined, [Tx<string>, string]] = x;
+        return this.trySendTx(unconfirmedDeposit, gasTx[0], depositZpTx).pipe(
+          tap((data: any) => {
+            console.log({
+              unconfirmedDepositLog: data
+            });
+          })
+        );
       }),
-      mergeMap(
-        (x) => {
-          const [unconfirmedDeposit, gasTx]: [PayNote | undefined, [Tx<string>, string]] = x;
+    );
 
-          if (!unconfirmedDeposit) {
-            return of(`cannot find deposit ${depositZpTx.zpTxHash}`);
-          }
-          console.log(unconfirmedDeposit)
-          return this.relayerApi.sendTx$(depositZpTx.tx, toHex(unconfirmedDeposit.blockNumber), gasTx[0]).pipe(
-            tap(() => {
-              UnconfirmedTransactionService.deleteDepositTransaction();
-            })
-          );
-        }
-      )
+    defer(() => tryDeposit$).pipe(
+      repeatWhen(completed => completed.pipe(delay(tryEachMillisecond))),
+      takeWhile(() => {
+        return (
+          Date.now() - depositZpTx.timestamp < 60000 * dateExpiresInMinutes &&
+          !!this.getDepositTransaction()
+        );
+      }),
     ).subscribe(
-      (data: any) => {
-        if (data.transactionHash) {
-          console.log({
-            unconfirmedDeposit: data.transactionHash
-          });
-        }
-
-        console.log(data);
+      () => {
       },
       (e) => {
         UnconfirmedTransactionService.deleteDepositTransaction();
         console.log('unconfirmed transaction failed: ', e.message || e);
       }
+    );
+
+  }
+
+  trySendTx(
+    depositTx: PayNote,
+    gasTx: Tx<string>,
+    depositZpTx: ZpTransaction
+  ): Observable<string> {
+
+    if (!depositTx || !depositTx.blockNumber) {
+      return of(`cannot find deposit ${depositZpTx.zpTxHash}`);
+    }
+
+    return this.relayerApi.sendTx$(depositZpTx.tx, toHex(depositTx.blockNumber), gasTx).pipe(
+      map((txData: any): string => {
+        UnconfirmedTransactionService.deleteDepositTransaction();
+        return txData.transactionHash;
+      })
     );
 
   }
@@ -120,7 +134,8 @@ export class UnconfirmedTransactionService {
           return note.txHash === tx.zpTxHash;
         });
         return unconfirmedDeposit && unconfirmedDeposit[0];
-      })
+      }),
+      take(2)
     );
   }
 
