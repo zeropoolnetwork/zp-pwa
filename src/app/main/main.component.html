@@ -20,7 +20,7 @@
                  (click)="onAddressClick(addressTooltip, account)"
                  [matTooltip]="tooltipMessage"
                  class="address">
-              <p class="title">Your ZP address:</p>
+              <p class="title titleWithOutPadding">Your ZP address:</p>
               <p>{{account.zeropoolAddressPreview}}</p>
             </div>
 
@@ -65,7 +65,7 @@
              [ngStyle]="{'justify-content': history && history?.length !== 0 ? 'flex-start': 'center'} "
              style="overflow: hidden;">
           <!-- TODO: move history to separate component -->
-          <h4 class="title" *ngIf="history && history?.length !== 0">Transaction History</h4>
+          <h4 class="title titleWithOutPadding" *ngIf="history && history?.length !== 0">Transaction History</h4>
           <p *ngIf="!history || history?.length == 0">No transaction history yet</p>
           <div style="overflow-y: auto;  min-height: 1px">
             <div *ngFor="let tx of history">

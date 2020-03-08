@@ -179,16 +179,20 @@ button.arrow-back {
   padding-bottom: 40px;
 }
 
-.mb-20 {
-  margin-bottom: 20px;
+.m-0 {
+  margin: 0;
+}
+
+.mt-10 {
+  margin-top: 10px;
 }
 
 .mt-20 {
   margin-top: 20px;
 }
 
-.mt-10 {
-  margin-top: 10px;
+.mb-20 {
+  margin-bottom: 20px;
 }
 
 .mat-checkbox-layout {
@@ -218,4 +222,8 @@ input::-webkit-inner-spin-button {
 /* Firefox */
 input[type=number] {
   -moz-appearance: textfield;
+}
+
+.available-eth {
+  font-size: 0.7em;
 }

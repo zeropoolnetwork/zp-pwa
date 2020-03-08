@@ -6,7 +6,7 @@
       <h2>Deposit</h2>
       <p>ETH from your account will be deposited to your ZeroPool address via relayer</p>
       <ng-container *ngIf="availableEthAmount">
-        <div class="title" style="font-size: 0.7em">Available {{availableEthAmount}} ETH</div>
+        <div class="title titleWithOutPadding available-eth">Available {{availableEthAmount}} ETH</div>
       </ng-container>
 
       <ng-container>
@@ -42,23 +42,23 @@
   </ng-container>
 
   <ng-container *ngIf="isFinished">
-    <h2 class="title" style="padding: 10px">Deposit Successful!</h2>
+    <h2 class="title">Deposit Successful!</h2>
     <div>
       <img src="/assets/images/guy-fawkes-zip.png" width="240px">
     </div>
-    <h3 class="title" style="padding: 10px">From this moment no one wouldn't know what you do with you funds</h3>
+    <h3 class="title">From this moment no one wouldn't know what you do with you funds</h3>
     <div class="actions">
       <button mat-flat-button color="primary" routerLink="/main">Let's make transaction</button>
     </div>
   </ng-container>
 
   <ng-container *ngIf="isFinishedWithError">
-    <h2 class="title" style="padding: 10px">Oops!<br>something went wrong</h2>
+    <h2 class="title">Oops!<br>something went wrong</h2>
     <div>
       <!--      <img src="/assets/images/guy-fawkes-oh-no.png" width="240px">-->
       <img src="/assets/images/guy-fawkes-dont-know.png" width="240px">
     </div>
-    <h3 class="title" style="padding: 10px"></h3>
+    <h3 class="title"></h3>
     <div class="actions">
       <button mat-stroked-button routerLink="/main">Back</button>
     </div>
