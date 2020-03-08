@@ -10,15 +10,23 @@
       </ng-container>
 
       <ng-container>
-        <app-amount-input label="Enter amount of ETH" formControlName="amount"></app-amount-input>
-        <mat-hint>Maximum amount of deposit in BETA is: 0.1 ETH</mat-hint>
+        
+        <input matInput formControlName="toAmount" autocomplete="off" type="number">
+        <mat-error *ngIf="amount.hasError('min')">
+          Min amount of deposit {{minEth}}¬
+        </mat-error>
+        <mat-error *ngIf="amount.hasError('max')">
+          Maximum amount of deposit in BETA is: {{maxEth}} ETH
+        </mat-error>
+        <mat-error *ngIf="amount.hasError('notEnough')">
+          Don't have enough funds
+        </mat-error>
+
       </ng-container>
 
       <div class="actions mt-20">
         <button mat-stroked-button routerLink="/main">Back</button>
-        <button mat-flat-button color="accent" (click)="onDepositClick()"
-                [disabled]="depositAmount > this.availableEthAmount || !form.valid ||depositAmount > 0.1">Deposit
-        </button>
+        <button mat-flat-button color="accent" (click)="onDepositClick()" [disabled]="form.invalid">Deposit</button>
       </div>
     </ng-container>
 
@@ -29,12 +37,8 @@
       </div>
       <loaders-css loader="ball-beat" [color]="color" [scale]="1"></loaders-css>
       <h3>{{progressMessageLineOne}}<br><span [ngClass]="{'bold': isLineTwoBold}">{{progressMessageLineTwo}}</span></h3>
-      <!--
-      <div class="actions">
-        <button mat-stroked-button routerLink="/main">Back</button>
-      </div>
-      -->
     </ng-container>
+
   </ng-container>
 
   <ng-container *ngIf="isFinished">

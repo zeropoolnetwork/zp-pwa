@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { fw, tw } from 'zeropool-lib';
 import { environment } from '../../../environments/environment';
@@ -13,7 +13,7 @@ import { ValidateAddress } from '../../common/validateAddress';
   templateUrl: './transfer.component.html',
   styleUrls: ['./transfer.component.scss']
 })
-export class TransferComponent implements OnInit {
+export class TransferComponent implements AfterViewInit {
 
   progressMessageLineTwo: string;
   progressMessageLineOne: string;
@@ -28,7 +28,7 @@ export class TransferComponent implements OnInit {
   transferIsInProgress = false;
 
   public form: FormGroup = this.fb.group({
-    toAmount: new FormControl('', [Validators.required]),
+    amount: new FormControl('', [Validators.required]),
     toAddress: new FormControl('', [Validators.required, ValidateAddress]),
   });
 
@@ -45,19 +45,20 @@ export class TransferComponent implements OnInit {
     private txService: TransactionService,
     private zpService: ZeroPoolService
   ) {
+  }
+
+  ngAfterViewInit(): void {
+
     const ethAssetId = '0x0';
     this.myZpBalance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
 
+    // Adjust max value to validates
     this.form.get('toAmount').setValidators([
       Validators.required,
       Validators.min(0),
       Validators.max(this.myZpBalance)
     ]);
     this.form.get('toAmount').updateValueAndValidity();
-  }
-
-  ngOnInit(): void {
-    //
   }
 
   onSendClick(): void {

@@ -2,11 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { tw } from 'zeropool-lib';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { environment } from '../../../environments/environment';
 import { of } from 'rxjs';
 import { TransactionService } from '../../services/transaction.service';
 import { catchError, tap } from 'rxjs/operators';
+import { AmountValidatorParams, CustomValidators } from '../gas-deposit/custom-validators';
+import { Web3ProviderService } from '../../services/web3.provider.service';
 
 @Component({
   selector: 'app-deposit',
@@ -30,17 +32,33 @@ export class DepositComponent implements OnInit {
 
 
   public form: FormGroup = this.fb.group({
-    amount: [''],
+    amount: ['', Validators.max(0.1)], // Min, Balance
   });
 
-  get depositAmount(): number {
-    return this.form.get('amount').value;
+  get amount(): AbstractControl {
+    return this.form.get('amount');
+  }
+
+  get maxEth(): number {
+    return 0.1;
+  }
+
+  get minEth(): number {
+    return 0.00001;
+  }
+
+  get amountValidatorParams(): AmountValidatorParams {
+    return {
+      maxAmount: this.maxEth,
+      minAmount: this.minEth,
+    };
   }
 
   constructor(
     private location: Location,
     private zpService: ZeroPoolService,
     private txService: TransactionService,
+    private web3Service: Web3ProviderService,
     private fb: FormBuilder
   ) {
 
@@ -48,15 +66,29 @@ export class DepositComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    this.web3Service.getEthBalance().pipe(
+      tap((ethBalance: number) => {
+        const amountValidatorParams = {
+          ...this.amountValidatorParams,
+          availableAmount: ethBalance,
+        };
+
+        const amountValidator = CustomValidators.amount(amountValidatorParams);
+        this.amount.setValidators([Validators.required, amountValidator]);
+        this.form.get('amount').updateValueAndValidity();
+      })
+    ).subscribe();
   }
 
   onDepositClick(): void {
+
     this.depositInProgress = true;
     this.progressMessageLineOne = 'Generate ZeroPool transaction';
     this.progressMessageLineTwo = 'It might take some time';
     this.isLineTwoBold = false;
 
-    const amount = tw(this.depositAmount).toNumber();
+    const amount = tw(this.amount.value).toNumber();
 
     // Generate ZeroPool transaction
 

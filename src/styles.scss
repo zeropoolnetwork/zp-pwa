@@ -1,4 +1,3 @@
-
 // Custom Theming for Angular Material
 // For more information: https://material.angular.io/guide/theming
 @import '~@angular/material/theming';
@@ -35,9 +34,15 @@ $zp-pwa-theme: mat-light-theme($zp-pwa-primary, $zp-pwa-accent, $zp-pwa-warn);
 //}
 /* You can add global styles to this file, and also import other style files */
 
-* {box-sizing: border-box;}
+* {
+  box-sizing: border-box;
+}
 
-html, body { height: 100%; margin: 0;}
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
 //body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .notice-block-hidden {
@@ -105,9 +110,9 @@ html, body { height: 100%; margin: 0;}
     width: 350px;
     height: 515px;
     border-radius: 1em;
-    box-shadow: 0 15px 68px -18px rgba(0,0,0,0.75);
-    -webkit-box-shadow: 0 15px 68px -18px rgba(0,0,0,0.75);
-    -moz-box-shadow: 0 15px 68px -18px rgba(0,0,0,0.75);
+    box-shadow: 0 15px 68px -18px rgba(0, 0, 0, 0.75);
+    -webkit-box-shadow: 0 15px 68px -18px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 0 15px 68px -18px rgba(0, 0, 0, 0.75);
     padding: 1em;
   }
 
@@ -201,4 +206,16 @@ button.arrow-back {
   @media (min-width: 600px) {
     display: block;
   }
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
 }

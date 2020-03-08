@@ -5,14 +5,32 @@
     <p>Ethers that you donate will cover relayer gas fees. <b>This donation can't be returned back</b></p>
 
     <br>
-    <app-amount-input label="Enter amount of ETH" formControlName="toAmount"></app-amount-input>
+
+    <mat-form-field appearance="outline" class="field">
+      <mat-label>Enter amount of ETH</mat-label>
+      <input matInput formControlName="amount" autocomplete="off" type="number">
+
+      <!--
+        <mat-error *ngFor="let errorText of objectValues(amount.errors || {})">{{errorText}}</mat-error>
+      -->
+
+      <mat-error *ngIf="amount.hasError('min')">
+        Min amount of gas donation {{minEth}}
+      </mat-error>
+      <mat-error *ngIf="amount.hasError('max')">
+        Maximum amount of gas donation in BETA is: {{maxEth}} ETH
+      </mat-error>
+      <mat-error *ngIf="amount.hasError('notEnough')">
+        Don't have enough funds
+      </mat-error>
+
+    </mat-form-field>
+
     <br>
 
     <div class="actions button-box">
       <button mat-stroked-button routerLink="/main">Back</button>
-      <button mat-flat-button color="accent" class="next-btn"
-              [disabled]="!form.valid"
-              (click)="depositGas()">
+      <button mat-flat-button color="accent" class="next-btn" [disabled]="!form.valid" (click)="depositGas()">
         Make Gas Deposit
       </button>
     </div>

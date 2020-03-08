@@ -6,6 +6,7 @@ import { fromPromise } from 'rxjs/internal-compatibility';
 import { environment } from '../../environments/environment';
 import Web3 from 'web3';
 import { Router } from '@angular/router';
+import { fw } from 'zeropool-lib';
 
 // TODO: move declarations into polyfills
 declare let ethereum: any;
@@ -59,6 +60,19 @@ export class Web3ProviderService {
       takeUntil(this.isReady$)
     ).subscribe();
 
+  }
+
+  getEthBalance(): Observable<number> {
+
+    const web3 = new Web3(this.web3Provider);
+    const address = window.ethereum.selectedAddress;
+    const balance = web3.eth.getBalance(address).then(
+      (balance) => {
+        return fw(balance);
+      }
+    );
+
+    return fromPromise<number>(balance);
   }
 
   refreshWeb3ConnectionState(): void {

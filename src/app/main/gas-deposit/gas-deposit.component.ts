@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { tw } from 'zeropool-lib';
 import { TransactionService } from '../../services/transaction.service';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, switchMap, take, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { ZeroPoolService } from '../../services/zero-pool.service';
+import { AmountValidatorParams, CustomValidators } from './custom-validators';
+import { Web3ProviderService } from '../../services/web3.provider.service';
 
 @Component({
   selector: 'app-gas-deposit',
@@ -20,28 +23,72 @@ export class GasDepositComponent implements OnInit {
   progressMessageLineTwo: string;
   isLineTwoBold = true;
 
+  // objectValues = Object.values;
+
+  get maxEth(): number {
+    return 0.1;
+  }
+
+  get minEth(): number {
+    return 0.00001;
+  }
+
+  get amountValidatorParams(): AmountValidatorParams {
+    return {
+      maxAmount: this.maxEth,
+      minAmount: this.minEth,
+    };
+  }
+
   form: FormGroup = this.fb.group({
-    toAmount: [''],
-    // toAddress: ['']
+    amount: ['', [
+      Validators.required,
+      CustomValidators.amount(this.amountValidatorParams)]
+    ]
   });
 
-  get depositAmount(): number {
-    return this.form.get('toAmount').value;
+  get amount(): AbstractControl {
+    return this.form.get('amount');
   }
 
   constructor(
     private fb: FormBuilder,
-    private txService: TransactionService
+    private txService: TransactionService,
+    private zpService: ZeroPoolService,
+    private web3Service: Web3ProviderService
   ) {
+    //
   }
 
   ngOnInit(): void {
+
+    // It observable because it could be open when main isn't loaded yet
+    this.web3Service.isReady$.pipe(
+      switchMap(() => {
+        return this.web3Service.getEthBalance();
+      }),
+      tap(
+        (ethBalance: number) => {
+
+          // new validator
+          const amountValidatorParams = {
+            ...this.amountValidatorParams,
+            availableAmount: ethBalance,
+          };
+
+          const amountValidator = CustomValidators.amount(amountValidatorParams);
+          this.amount.setValidators([Validators.required, amountValidator]);
+          this.form.get('amount').updateValueAndValidity();
+        }
+      ),
+      take(1)
+    ).subscribe();
   }
 
   depositGas() {
     this.inProgress = true;
 
-    const amount = tw(this.depositAmount).toNumber();
+    const amount = tw(this.amount.value).toNumber();
 
     const progressCallback = (progressStep) => {
       if (progressStep === 'wait-for-zp-block') {
