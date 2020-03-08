@@ -9,6 +9,7 @@ import { TransactionService } from '../../services/transaction.service';
 import { catchError, tap } from 'rxjs/operators';
 import { AmountValidatorParams, CustomValidators } from '../gas-deposit/custom-validators';
 import { Web3ProviderService } from '../../services/web3.provider.service';
+import { UnconfirmedTransactionService } from '../../services/unconfirmed-transaction.service';
 
 @Component({
   selector: 'app-deposit',
@@ -82,7 +83,6 @@ export class DepositComponent implements OnInit {
   }
 
   onDepositClick(): void {
-
     this.depositInProgress = true;
     this.progressMessageLineOne = 'Generate ZeroPool transaction';
     this.progressMessageLineTwo = 'It might take some time';
@@ -110,11 +110,12 @@ export class DepositComponent implements OnInit {
         console.log({
           deposit: txHash
         });
+        UnconfirmedTransactionService.deleteDepositTransaction();
       }),
       catchError((e) => {
         this.depositInProgress = false;
         this.isFinishedWithError = true;
-
+        UnconfirmedTransactionService.deleteDepositTransaction();
         console.log(e);
         return of('');
       }),

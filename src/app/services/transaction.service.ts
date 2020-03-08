@@ -6,6 +6,7 @@ import { ZeroPoolService } from './zero-pool.service';
 import { RelayerApiService } from './relayer.api.service';
 import { PayNote, toHex, Tx } from 'zeropool-lib';
 import { environment } from '../../environments/environment';
+import { UnconfirmedTransactionService } from './unconfirmed-transaction.service';
 
 
 const waitBlocks = 1;
@@ -20,7 +21,7 @@ export class TransactionService {
 
   constructor(
     private zpService: ZeroPoolService,
-    private relayerApi: RelayerApiService
+    private relayerApi: RelayerApiService,
   ) {
   }
 
@@ -33,6 +34,10 @@ export class TransactionService {
       }),
       mergeMap(
         ([tx, txHash]: [Tx<string>, string]) => {
+          UnconfirmedTransactionService.saveDepositTransaction({
+            tx,
+            zpTxHash: txHash
+          });
           progressCallback('open-metamask');
           const depositBlockNumber$ = fromPromise(this.zpService.zp.deposit(token, amount, txHash));
           const gasTx$ = fromPromise(this.zpService.zpGas.prepareWithdraw(environment.ethToken, fee));
@@ -64,7 +69,7 @@ export class TransactionService {
         (address: string) => {
 
           const zpTxData$ = fromPromise(this.zpService.zpGas.prepareDeposit(environment.ethToken, amount));
-            // Check metamask
+          // Check metamask
           const p$ = this.zpService.zp.ZeroPool.web3Ethereum.sendTransaction(address, amount, undefined, waitBlocks);
           const txHash$ = fromPromise(p$).pipe(
             map((txData: any) => txData.transactionHash || txData)
