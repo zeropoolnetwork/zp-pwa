@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { tw } from 'zeropool-lib';
@@ -6,10 +6,11 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { environment } from '../../../environments/environment';
 import { of } from 'rxjs';
 import { TransactionService } from '../../services/transaction.service';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 import { AmountValidatorParams, CustomValidators } from '../gas-deposit/custom-validators';
 import { Web3ProviderService } from '../../services/web3.provider.service';
 import { UnconfirmedTransactionService } from '../../services/unconfirmed-transaction.service';
+import { ProgressMessageComponent } from '../progress-message/progress-message.component';
 
 @Component({
   selector: 'app-deposit',
@@ -26,10 +27,9 @@ export class DepositComponent implements OnInit {
   isFinishedWithError = false;
 
   depositInProgress = false;
-  progressMessageLineOne = '';
-  progressMessageLineTwo = '';
-  isLineTwoBold = false;
-  color = 'rgba(100, 100, 100, 0.5)';
+
+  @ViewChild('progressDialog')
+  progressDialog: ProgressMessageComponent;
 
 
   public form: FormGroup = this.fb.group({
@@ -68,7 +68,10 @@ export class DepositComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.web3Service.getEthBalance().pipe(
+    this.web3Service.isReady$.pipe(
+      switchMap(
+        () => this.web3Service.getEthBalance()
+      ),
       tap((ethBalance: number) => {
         const amountValidatorParams = {
           ...this.amountValidatorParams,
@@ -84,9 +87,12 @@ export class DepositComponent implements OnInit {
 
   onDepositClick(): void {
     this.depositInProgress = true;
-    this.progressMessageLineOne = 'Generate ZeroPool transaction';
-    this.progressMessageLineTwo = 'It might take some time';
-    this.isLineTwoBold = false;
+
+    this.progressDialog.showMessage({
+      title: 'Deposit in progress',
+      lineOne: 'Generate ZeroPool transaction',
+      lineTwo: 'It might take some time'
+    });
 
     const amount = tw(this.amount.value).toNumber();
 
@@ -94,13 +100,19 @@ export class DepositComponent implements OnInit {
 
     this.txService.deposit(environment.ethToken, amount, environment.relayerFee, (progressStep) => {
       if (progressStep === 'open-metamask') {
-        this.progressMessageLineOne = 'Transaction generated';
-        this.progressMessageLineTwo = 'Please check your metamask';
-        this.isLineTwoBold = true;
+        this.progressDialog.showMessage({
+          title: 'Deposit in progress',
+          lineOne: 'Transaction generated',
+          lineTwo: 'Please check your metamask',
+          isLineTwoBold: true
+        });
       } else if (progressStep === 'sending-transaction') {
-        this.progressMessageLineOne = 'Transaction published';
-        this.progressMessageLineTwo = 'Wait for ZeroPool block';
-        this.isLineTwoBold = true;
+        this.progressDialog.showMessage({
+          title: 'Deposit in progress',
+          lineOne: 'Transaction generated',
+          lineTwo: 'Wait for ZeroPool block',
+          isLineTwoBold: true
+        });
       }
 
     }).pipe(

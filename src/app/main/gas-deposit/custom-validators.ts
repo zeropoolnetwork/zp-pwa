@@ -24,9 +24,7 @@ export class CustomValidators {
       if (num > availableAmount) {
         return {'notEnough': true};
       }
-
-      console.log(availableAmount);
-
+      
       return null;
     };
   }

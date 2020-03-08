@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import { tw } from 'zeropool-lib';
 import { TransactionService } from '../../services/transaction.service';
 import { catchError, switchMap, take, tap } from 'rxjs/operators';
@@ -7,6 +7,7 @@ import { of } from 'rxjs';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { AmountValidatorParams, CustomValidators } from './custom-validators';
 import { Web3ProviderService } from '../../services/web3.provider.service';
+import {ProgressMessageComponent} from '../progress-message/progress-message.component';
 
 @Component({
   selector: 'app-gas-deposit',
@@ -19,9 +20,8 @@ export class GasDepositComponent implements OnInit {
   isDoneWithError = false;
   inProgress = false;
 
-  progressMessageLineOne: string;
-  progressMessageLineTwo: string;
-  isLineTwoBold = true;
+  @ViewChild('progressDialog')
+  progressDialog: ProgressMessageComponent;
 
   // objectValues = Object.values;
 
@@ -92,15 +92,20 @@ export class GasDepositComponent implements OnInit {
 
     const progressCallback = (progressStep) => {
       if (progressStep === 'wait-for-zp-block') {
-        this.progressMessageLineOne = 'Transaction published';
-        this.progressMessageLineTwo = 'Wait for ZeroPool block';
-        this.isLineTwoBold = false;
+        this.progressDialog.showMessage({
+          title: 'Gas deposit in progress',
+          lineOne: 'Transaction published',
+          lineTwo: 'Wait for ZeroPool block'
+        });
       }
     };
 
-    this.progressMessageLineOne = 'Transaction generated';
-    this.progressMessageLineTwo = 'Please check your metamask';
-    this.isLineTwoBold = true;
+    this.progressDialog.showMessage({
+      title: 'Gas deposit in progress',
+      lineOne: 'Transaction generated',
+      lineTwo: 'Please check your metamask',
+      isLineTwoBold: true
+    });
 
     // progressCallback
     this.txService.gasDeposit(amount, progressCallback).pipe(

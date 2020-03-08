@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { tw } from 'zeropool-lib';
 import { getEthAddressSafe } from '../../services/web3.provider.service';
@@ -6,6 +6,7 @@ import { environment } from '../../../environments/environment';
 import { TransactionService } from '../../services/transaction.service';
 import { catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { ProgressMessageComponent } from '../progress-message/progress-message.component';
 
 @Component({
   selector: 'app-withdraw',
@@ -14,17 +15,16 @@ import { of } from 'rxjs';
 })
 export class WithdrawComponent implements OnInit {
 
-  progressMessageLineTwo: string;
-  progressMessageLineOne: string;
-  isLineTwoBold: boolean;
-
   transactionHash: string;
 
   myZpBalance: number;
 
   isDone = false;
   isDoneWithError = false;
-  withdrawIsInProgress = false;
+  withdrawIsInProgress = true;
+
+  @ViewChild('progressDialog')
+  progressDialog: ProgressMessageComponent;
 
   public transferForm: FormGroup = this.fb.group({
     toAmount: [''],
@@ -60,13 +60,19 @@ export class WithdrawComponent implements OnInit {
 
     const progressCallback = (progressStep) => {
       if (progressStep === 'generate-zp-tx') {
-        this.progressMessageLineOne = 'Generating Zero Pool Transaction';
-        this.progressMessageLineTwo = 'It will take a bit';
-        // this.isLineTwoBold = true;
+        this.progressDialog.showMessage({
+          title: 'Withdraw in progress',
+          lineOne: 'Generating Zero Pool Transaction',
+          lineTwo: 'It will take a bit'
+          // isLineTwoBold: true
+        });
       } else if (progressStep === 'wait-for-zp-block') {
-        this.progressMessageLineOne = 'Transaction published';
-        this.progressMessageLineTwo = 'Wait for ZeroPool block';
-        this.isLineTwoBold = true;
+        this.progressDialog.showMessage({
+          title: 'Withdraw in progress',
+          lineOne: 'Transaction published',
+          lineTwo: 'Wait for ZeroPool block',
+          isLineTwoBold: true
+        });
       }
     };
 

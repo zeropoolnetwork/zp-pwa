@@ -63,7 +63,6 @@ export class Web3ProviderService {
   }
 
   getEthBalance(): Observable<number> {
-
     const web3 = new Web3(this.web3Provider);
     const address = window.ethereum.selectedAddress;
     const balance = web3.eth.getBalance(address).then(
