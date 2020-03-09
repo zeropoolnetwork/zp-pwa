@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { tw } from 'zeropool-lib';
 import { TransactionService } from '../../services/transaction.service';
 import { catchError, tap } from 'rxjs/operators';
@@ -21,7 +21,7 @@ export class GasDepositComponent implements OnInit {
   isLineTwoBold = true;
 
   form: FormGroup = this.fb.group({
-    toAmount: [''],
+    toAmount: ['', Validators.max(0.1)],
     // toAddress: ['']
   });
 
