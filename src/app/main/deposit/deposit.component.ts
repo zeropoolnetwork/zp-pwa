@@ -45,7 +45,7 @@ export class DepositComponent implements OnInit {
   }
 
   get minEth(): number {
-    return 0.00001;
+    return 10e-18;
   }
 
   get amountValidatorParams(): AmountValidatorParams {
@@ -111,6 +111,15 @@ export class DepositComponent implements OnInit {
           lineTwo: 'Wait for ZeroPool block',
           isLineTwoBold: true
         });
+      } else if (progressStep === 'queue') {
+        //
+        this.progressDialog.showMessage({
+          title: 'Deposit in progress',
+          lineOne: 'Wait until the last transactions are confirmed',
+          lineTwo: '',
+          isLineTwoBold: true
+        });
+
       }
     };
 

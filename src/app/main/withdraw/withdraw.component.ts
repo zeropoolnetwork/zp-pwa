@@ -1,5 +1,5 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { tw } from 'zeropool-lib';
 import { getEthAddressSafe } from '../../services/web3.provider.service';
 import { environment } from '../../../environments/environment';
@@ -7,6 +7,7 @@ import { catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ProgressMessageComponent } from '../progress-message/progress-message.component';
 import { TransactionService } from '../../services/transaction/transaction.service';
+import { ZeroPoolService } from '../../services/zero-pool.service';
 
 @Component({
   selector: 'app-withdraw',
@@ -21,13 +22,15 @@ export class WithdrawComponent implements OnInit {
 
   isDone = false;
   isDoneWithError = false;
-  withdrawIsInProgress = true;
+  withdrawIsInProgress = false;
+
+  challengeExpiresBlocks: number | string;
 
   @ViewChild('progressDialog')
   progressDialog: ProgressMessageComponent;
 
   public transferForm: FormGroup = this.fb.group({
-    toAmount: [''],
+    toAmount: ['', Validators.required],
     toAddress: new FormControl('', [
       // Validators.required,
       // ValidateMnemonic
@@ -44,8 +47,11 @@ export class WithdrawComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private txService: TransactionService
+    private txService: TransactionService,
+    private zpService: ZeroPoolService
   ) {
+
+    this.challengeExpiresBlocks = zpService.challengeExpiresBlocks;
   }
 
   ngOnInit(): void {
@@ -73,6 +79,15 @@ export class WithdrawComponent implements OnInit {
           lineTwo: 'Wait for ZeroPool block',
           isLineTwoBold: true
         });
+      } else if (progressStep === 'queue') {
+        //
+        this.progressDialog.showMessage({
+          title: 'Withdraw is in progress',
+          lineOne: 'Wait until the last transactions are confirmed',
+          lineTwo: '',
+          isLineTwoBold: true
+        });
+
       }
     };
 

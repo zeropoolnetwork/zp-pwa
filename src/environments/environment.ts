@@ -5,8 +5,8 @@
 export const environment = {
   production: false,
   chainId: '0xNaN',
-  contractAddress: '0x0Aa156F7d2e4651308142ac3449AF4c74ddA57b1',
-  sideChainAddress: '0xB5F25B9ff1E9C911265b885c8d3AaB5360551872',
+  contractAddress: '0x20656D3Aee9Cd3B4280840DE17EFE80d9487a948',
+  sideChainAddress: '0x567a47E3AE32CBbe95ac4eE67F735Fec317662ab',
   sideChainRpc: 'http://127.0.0.1:8545',
   relayerUrl: 'http://127.0.0.1:3000',
   // relayerUrl: 'https://testnet.relayer.zeropool.network',

@@ -21,8 +21,10 @@
       </div>
     </ng-container>
 
-    <ng-container *ngIf="withdrawIsInProgress">
-      <app-progress-message #progressDialog></app-progress-message>
+    <ng-container>
+      <app-progress-message
+        [hidden]="!withdrawIsInProgress"
+        #progressDialog></app-progress-message>
     </ng-container>
 
   </ng-container>

@@ -107,7 +107,17 @@ export class GasDepositComponent implements OnInit {
         // this.progressMessageLineOne = '';
         // this.progressMessageLineTwo = 'Wait for ZeroPool block';
         // this.isLineTwoBold = true;
+      } else if (progressStep === 'queue') {
+        //
+        this.progressDialog.showMessage({
+          title: ' Gas Deposit in progress',
+          lineOne: 'Wait until the last transactions are confirmed',
+          lineTwo: '',
+          isLineTwoBold: true
+        });
+
       }
+
     };
 
     this.progressDialog.showMessage({
@@ -122,7 +132,7 @@ export class GasDepositComponent implements OnInit {
       tap((txHash: string) => {
         this.inProgress = false;
         this.isDone = true;
-        console.log({gasDeposit: txHash});
+        console.log({ gasDeposit: txHash });
       }),
       catchError((e) => {
         this.inProgress = false;

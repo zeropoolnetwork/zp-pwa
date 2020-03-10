@@ -13,8 +13,20 @@
           <input matInput formControlName="toAddress" autocomplete="off">
         </mat-form-field>
 
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>Enter amount of ETH</mat-label>
+          <input matInput formControlName="toAmount" autocomplete="off">
+
+          <mat-error *ngIf="toAmount.hasError('min')">
+            Min amount is {{minAmount}} zpETH
+          </mat-error>
+          <mat-error *ngIf="toAmount.hasError('max')">
+            You have only {{myZpBalance}} zpETH
+          </mat-error>
+        </mat-form-field>
+
         <ng-container *ngIf="myZpBalance">
-          <div class="available-eth" style="margin-top: -15px;">Available {{myZpBalance}} zpETH</div>
+          <div class="available-eth" style="margin-top: 1px;">Available {{myZpBalance}} zpETH</div>
         </ng-container>
 
       </div>
@@ -25,8 +37,10 @@
       </div>
     </ng-container>
 
-    <ng-container *ngIf="transferIsInProgress">
-      <app-progress-message #progressDialog></app-progress-message>
+    <ng-container>
+      <app-progress-message
+        [hidden]="!transferIsInProgress"
+        #progressDialog></app-progress-message>
 
       <!--<h3>Waiting for transaction confirmation <br>-->
       <!--It will take several minutes</h3>-->

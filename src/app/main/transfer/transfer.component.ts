@@ -1,5 +1,5 @@
-import { AfterViewInit, Component, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { fw, tw } from 'zeropool-lib';
 import { environment } from '../../../environments/environment';
 import { TransactionService } from '../../services/transaction/transaction.service';
@@ -14,11 +14,12 @@ import { ProgressMessageComponent } from '../progress-message/progress-message.c
   templateUrl: './transfer.component.html',
   styleUrls: ['./transfer.component.scss']
 })
-export class TransferComponent implements AfterViewInit {
+export class TransferComponent implements OnInit {
 
   transactionHash: string;
 
   myZpBalance: number;
+  minAmount = 1e-18;
 
   isDone = false;
   isDoneWithError = false;
@@ -32,8 +33,8 @@ export class TransferComponent implements AfterViewInit {
     toAddress: new FormControl('', [Validators.required, ValidateAddress]),
   });
 
-  get toAmount(): number {
-    return this.form.get('toAmount').value;
+  get toAmount(): AbstractControl {
+    return this.form.get('toAmount');
   }
 
   get toAddress(): string {
@@ -45,26 +46,28 @@ export class TransferComponent implements AfterViewInit {
     private txService: TransactionService,
     private zpService: ZeroPoolService
   ) {
+
+
   }
 
-  ngAfterViewInit(): void {
-
+  ngOnInit(): void {
     const ethAssetId = environment.ethToken;
     this.myZpBalance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
 
     // Adjust max value to validates
     this.form.get('toAmount').setValidators([
       Validators.required,
-      Validators.min(0),
+      Validators.min(this.minAmount),
       Validators.max(this.myZpBalance)
     ]);
     this.form.get('toAmount').updateValueAndValidity();
+
   }
 
   onSendClick(): void {
     this.transferIsInProgress = true;
 
-    const amount = tw(this.toAmount).toNumber();
+    const amount = tw(this.toAmount.value).toNumber();
     const progressCallback = (progressStep) => {
       if (progressStep === 'generate-zp-tx') {
         //

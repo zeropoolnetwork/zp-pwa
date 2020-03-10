@@ -38,7 +38,7 @@
 
   <ng-container>
     <app-progress-message
-      [hidden]="!inProgress && (!isDone && !isDoneWithError)"
+      [hidden]="!(inProgress && !isDone && !isDoneWithError)"
       #progressDialog></app-progress-message>
     <!--
     <div class="actions">
