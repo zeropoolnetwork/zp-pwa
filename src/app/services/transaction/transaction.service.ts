@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { filter, map, mergeMap, shareReplay, take } from 'rxjs/operators';
-import { combineLatest, Observable, of } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { ZeroPoolService } from '../zero-pool.service';
 import { RelayerApiService } from '../relayer.api.service';
@@ -8,6 +8,7 @@ import { PayNote, toHex, Tx } from 'zeropool-lib';
 import { environment } from '../../../environments/environment';
 import { UnconfirmedTransactionService } from '../unconfirmed-transaction.service';
 import { TransactionSynchronizer } from './transaction-synchronizer';
+import { ObservableSynchronizer } from '../observable-synchronizer';
 
 
 const waitBlocks = 1;
@@ -26,7 +27,7 @@ export class TransactionService {
 
   private syncronizer$: Observable<SyncronizerPair> =
     this.zpService.isReady$.pipe(
-      filter((isReady: boolean) => isReady),
+      filter((isZpReady: boolean) => isZpReady),
       take(1),
       map(() => {
         return {
@@ -34,8 +35,10 @@ export class TransactionService {
           zpGas: new TransactionSynchronizer(this.zpService.zpGas),
         };
       }),
-      shareReplay(1)
+      shareReplay(1),
     );
+
+  private observableQueue = new ObservableSynchronizer();
 
   constructor(
     protected zpService: ZeroPoolService,
@@ -50,7 +53,7 @@ export class TransactionService {
     progressCallback: (msg) => void
   ): Observable<string> {
 
-    return this.syncronizer$.pipe(
+    const o$ = this.syncronizer$.pipe(
       mergeMap(({ zp, zpGas }) => {
         return zp.runTransaction({
           type: 'prepareDeposit',
@@ -82,14 +85,16 @@ export class TransactionService {
                 mergeMap(this.updateState$)
               );
             }
-          ),
+          )
         );
       })
     );
+
+    return this.observableQueue.execute<string>({ observable: o$, progressCallback });
   }
 
   public gasDeposit(amount: number, progressCallback: (msg) => void): Observable<string> {
-    return this.syncronizer$.pipe(
+    const o$ = this.syncronizer$.pipe(
       mergeMap(({ zp, zpGas }) => {
         return this.relayerApi.getRelayerAddress$().pipe(
           mergeMap(
@@ -123,6 +128,8 @@ export class TransactionService {
         );
       })
     );
+
+    return this.observableQueue.execute<string>({ observable: o$, progressCallback });
   }
 
   public transfer(
@@ -133,12 +140,10 @@ export class TransactionService {
     progressCallback?: (msg) => void
   ): Observable<string> {
 
-    return this.syncronizer$.pipe(
+    const o$ = this.syncronizer$.pipe(
       mergeMap(({ zp, zpGas }) => {
 
-        if (progressCallback) {
-          progressCallback('generate-zp-tx');
-        }
+        progressCallback && progressCallback('generate-zp-tx');
 
         const gasTx$ = zpGas.runTransaction({
           type: 'prepareWithdraw',
@@ -168,12 +173,15 @@ export class TransactionService {
             mergeMap(this.updateState$)
           );
         }
-      )
+      ),
+      take(1)
     );
+
+    return this.observableQueue.execute<string>({ observable: o$, progressCallback });
   }
 
   public prepareWithdraw(token: string, amount: number, fee: number, progressCallback?: (msg) => void): Observable<string> {
-    return this.syncronizer$.pipe(
+    const o$ = this.syncronizer$.pipe(
       mergeMap(({ zp, zpGas }) => {
         if (progressCallback) {
           progressCallback('generate-zp-tx');
@@ -206,6 +214,8 @@ export class TransactionService {
         }
       )
     );
+
+    return this.observableQueue.execute<string>({ observable: o$, progressCallback });
   }
 
   public withdraw(w: PayNote): Observable<string> {
@@ -255,7 +265,7 @@ export class TransactionService {
           return tx.transactionHash || tx;
         })
       );
-  };
+  }
 
 }
 

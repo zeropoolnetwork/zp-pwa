@@ -32,6 +32,18 @@ export class UnconfirmedTransactionService {
     this.delete('deposit');
   }
 
+  static saveGasDepositTransaction(tx: ZpTransaction): void {
+    this.save('gas-deposit', {
+      tx: tx.tx,
+      zpTxHash: tx.zpTxHash,
+      timestamp: Date.now()
+    });
+  }
+
+  static deleteGasDepositTransaction(): void {
+    this.delete('gas-deposit');
+  }
+
   private static save(key: string, item: any): void {
     localStorage.setItem(key, JSON.stringify(item));
   }
@@ -41,7 +53,12 @@ export class UnconfirmedTransactionService {
   }
 
   constructor(private zpService: ZeroPoolService, private relayerApi: RelayerApiService) {
+    this.tryMakeDeposit();
 
+
+  }
+
+  private tryMakeDeposit(): void {
     const depositZpTx = this.getDepositTransaction();
     if (!depositZpTx) {
       return;
@@ -99,7 +116,6 @@ export class UnconfirmedTransactionService {
         console.log('unconfirmed transaction failed: ', e.message || e);
       }
     );
-
   }
 
   trySendTx(
@@ -141,6 +157,10 @@ export class UnconfirmedTransactionService {
 
   getDepositTransaction(): ZpTransaction | undefined {
     return this.get<ZpTransaction>('deposit');
+  }
+
+  getGasDepositTransaction(): ZpTransaction | undefined {
+    return this.get<ZpTransaction>('gas-deposit');
   }
 
   private get<T>(key: string): T | undefined {

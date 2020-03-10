@@ -36,7 +36,7 @@ export class TransactionSynchronizer {
         this.queueTransactionCount += 1;
 
         if (this.queueTransactionCount > 1) {
-          tx.progressCallback('queue');
+          tx.progressCallback && tx.progressCallback('queue');
         }
       }),
       concatMap(
