@@ -2,7 +2,7 @@ import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { fw, tw } from 'zeropool-lib';
 import { environment } from '../../../environments/environment';
-import { TransactionService } from '../../services/transaction.service';
+import { TransactionService } from '../../services/transaction/transaction.service';
 import { catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ZeroPoolService } from '../../services/zero-pool.service';
@@ -67,19 +67,32 @@ export class TransferComponent implements AfterViewInit {
     const amount = tw(this.toAmount).toNumber();
     const progressCallback = (progressStep) => {
       if (progressStep === 'generate-zp-tx') {
+        //
         this.progressDialog.showMessage({
           title: 'Transfer is in progress',
           lineOne: 'Generating Zero Pool Transaction',
           lineTwo: 'It will take a bit'
           // isLineTwoBold: true
         });
+        //
       } else if (progressStep === 'wait-for-zp-block') {
+        //
         this.progressDialog.showMessage({
           title: 'Transfer is in progress',
           lineOne: 'Transaction published',
           lineTwo: 'Wait for ZeroPool block',
           isLineTwoBold: true
         });
+        //
+      } else if (progressStep === 'queue') {
+        //
+        this.progressDialog.showMessage({
+          title: 'Transfer is in progress',
+          lineOne: 'Wait until the last transactions are confirmed',
+          lineTwo: '',
+          isLineTwoBold: true
+        });
+        //s
       }
     };
 

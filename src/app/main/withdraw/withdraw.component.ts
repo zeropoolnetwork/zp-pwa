@@ -3,10 +3,10 @@ import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { tw } from 'zeropool-lib';
 import { getEthAddressSafe } from '../../services/web3.provider.service';
 import { environment } from '../../../environments/environment';
-import { TransactionService } from '../../services/transaction.service';
 import { catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ProgressMessageComponent } from '../progress-message/progress-message.component';
+import { TransactionService } from '../../services/transaction/transaction.service';
 
 @Component({
   selector: 'app-withdraw',

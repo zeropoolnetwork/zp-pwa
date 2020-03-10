@@ -1,16 +1,16 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { tw } from 'zeropool-lib';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { environment } from '../../../environments/environment';
 import { of } from 'rxjs';
-import { TransactionService } from '../../services/transaction.service';
 import { catchError, switchMap, tap } from 'rxjs/operators';
 import { AmountValidatorParams, CustomValidators } from '../gas-deposit/custom-validators';
 import { Web3ProviderService } from '../../services/web3.provider.service';
 import { UnconfirmedTransactionService } from '../../services/unconfirmed-transaction.service';
+import { TransactionService } from '../../services/transaction/transaction.service';
 import { ProgressMessageComponent } from '../progress-message/progress-message.component';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-deposit',
@@ -96,9 +96,7 @@ export class DepositComponent implements OnInit {
 
     const amount = tw(this.amount.value).toNumber();
 
-    // Generate ZeroPool transaction
-
-    this.txService.deposit(environment.ethToken, amount, environment.relayerFee, (progressStep) => {
+    const progressCallback = (progressStep) => {
       if (progressStep === 'open-metamask') {
         this.progressDialog.showMessage({
           title: 'Deposit in progress',
@@ -114,8 +112,11 @@ export class DepositComponent implements OnInit {
           isLineTwoBold: true
         });
       }
+    };
 
-    }).pipe(
+    // Generate ZeroPool transaction
+
+    this.txService.deposit(environment.ethToken, amount, environment.relayerFee, progressCallback).pipe(
       tap((txHash: any) => {
         this.depositInProgress = false;
         this.isFinished = true;

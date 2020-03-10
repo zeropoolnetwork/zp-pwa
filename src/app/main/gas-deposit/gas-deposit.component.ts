@@ -1,13 +1,13 @@
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import {Component, OnInit, ViewChild} from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { tw } from 'zeropool-lib';
-import { TransactionService } from '../../services/transaction.service';
 import { catchError, switchMap, take, tap } from 'rxjs/operators';
+import { TransactionService } from '../../services/transaction/transaction.service';
 import { of } from 'rxjs';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { AmountValidatorParams, CustomValidators } from './custom-validators';
 import { Web3ProviderService } from '../../services/web3.provider.service';
-import {ProgressMessageComponent} from '../progress-message/progress-message.component';
+import { ProgressMessageComponent } from '../progress-message/progress-message.component';
 
 @Component({
   selector: 'app-gas-deposit',
@@ -97,6 +97,16 @@ export class GasDepositComponent implements OnInit {
           lineOne: 'Transaction published',
           lineTwo: 'Wait for ZeroPool block'
         });
+      } else if (progressStep === 'queue') {
+        this.progressDialog.showMessage({
+          title: 'Gas deposit in progress',
+          lineOne: 'Wait until the last transactions are confirmed',
+          lineTwo: ''
+        });
+
+        // this.progressMessageLineOne = '';
+        // this.progressMessageLineTwo = 'Wait for ZeroPool block';
+        // this.isLineTwoBold = true;
       }
     };
 
