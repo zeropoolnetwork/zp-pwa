@@ -34,6 +34,7 @@ import { TransactionService } from '../services/transaction/transaction.service'
 import { AutoJoinUtxoService } from '../services/auto-join-utxo.service';
 import { ZeroPoolService } from '../services/zero-pool.service';
 import { UnconfirmedTransactionService } from '../services/unconfirmed-transaction.service';
+import { ProgressMessageComponent } from './progress-message/progress-message.component';
 import { TransactionSynchronizer } from '../services/transaction/transaction-synchronizer';
 
 @NgModule({
@@ -48,7 +49,8 @@ import { TransactionSynchronizer } from '../services/transaction/transaction-syn
     GasDepositComponent,
     ResetAccountComponent,
     DustProtectionComponent,
-    StringifyHistoryPipe
+    StringifyHistoryPipe,
+    ProgressMessageComponent,
   ],
   imports: [
     CommonModule,

@@ -10,31 +10,38 @@
       </ng-container>
 
       <ng-container>
-        <app-amount-input label="Enter amount of ETH" formControlName="amount"></app-amount-input>
-        <mat-hint>Maximum amount of deposit in BETA is: 0.1 ETH</mat-hint>
+
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>Enter amount of ETH</mat-label>
+          <input matInput formControlName="amount" autocomplete="off" type="number">
+          <mat-error *ngIf="amount.hasError('min')">
+            Min amount of deposit {{minEth}}
+          </mat-error>
+          <mat-error *ngIf="amount.hasError('max')">
+            Maximum amount of deposit in BETA is: {{maxEth}} ETH
+          </mat-error>
+          <mat-error *ngIf="amount.hasError('notEnough')">
+            Don't have enough funds
+          </mat-error>
+        </mat-form-field>
+
       </ng-container>
 
       <div class="actions mt-20">
         <button mat-stroked-button routerLink="/main">Back</button>
-        <button mat-flat-button color="accent" (click)="onDepositClick()"
-                [disabled]="depositAmount > this.availableEthAmount || !form.valid ||depositAmount > 0.1">Deposit
-        </button>
+        <button mat-flat-button color="accent" (click)="onDepositClick()" [disabled]="form.invalid">Deposit</button>
       </div>
     </ng-container>
 
-    <ng-container *ngIf="depositInProgress">
-      <h2>Deposit in progress</h2>
-      <div>
-        <img src="/assets/images/guy-fawkes-cross-fingers.png" width="240px">
-      </div>
-      <loaders-css loader="ball-beat" [color]="color" [scale]="1"></loaders-css>
-      <h3>{{progressMessageLineOne}}<br><span [ngClass]="{'bold': isLineTwoBold}">{{progressMessageLineTwo}}</span></h3>
+    <ng-container>
+      <app-progress-message #progressDialog [hidden]="! depositInProgress"></app-progress-message>
       <!--
       <div class="actions">
         <button mat-stroked-button routerLink="/main">Back</button>
       </div>
       -->
     </ng-container>
+
   </ng-container>
 
   <ng-container *ngIf="isFinished">

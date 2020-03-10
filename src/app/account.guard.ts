@@ -24,12 +24,6 @@ export class AccountGuard implements CanActivate {
       return;
     }
 
-
-    if (!getEthAddressSafe()) {
-      this.router.navigate(['connect-wallet']);
-      return;
-    }
-
     // if (!this.web3Service.isCorrectNetworkSelected()) {
     //   this.router.navigate(['select-network']);
     //   return;
