@@ -37,9 +37,8 @@ export class WithdrawalsListComponent {
   }
 
   checkZpEthBalance() {
-    const ethAssetId = '0x0';
     if (this.zpService.zpBalance) {
-      this.isAvailableNewWithdraw = !!this.zpService.zpBalance[ethAssetId];
+      this.isAvailableNewWithdraw = !!this.zpService.zpBalance[environment.ethToken];
     }
   }
 

@@ -46,7 +46,7 @@ export class TransferComponent implements OnInit {
     private txService: TransactionService,
     private zpService: ZeroPoolService
   ) {
-    const ethAssetId = '0x0';
+    const ethAssetId = environment.ethToken;
     this.myZpBalance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
 
     this.form.get('toAmount').setValidators([

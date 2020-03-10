@@ -44,7 +44,7 @@ export class AccountService {
 
         return account;
       }),
-      shareReplay()
+      shareReplay(1)
     );
   }
 

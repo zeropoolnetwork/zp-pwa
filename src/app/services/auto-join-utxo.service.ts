@@ -36,35 +36,26 @@ export class AutoJoinUtxoService {
       take(1)
     );
 
-    combineLatest([account$, isReady$]).subscribe(
-      ([account, isReady]: [IAccount, boolean]) => {
-        this.joinUtxo(account);
-      }
-    );
+    combineLatest([account$, isReady$]).pipe(
+      mergeMap(
+        (x: any) => {
 
-  }
+          const [account, isReady]: [IAccount, boolean] = x;
 
-  private joinUtxo(account: IAccount): void {
+          return defer(() => this.processJoinUtxo(account).pipe(
+            tap((data: any) => {
+              if (data !== '') {
+                console.log('join-utxo: ', data);
+              }
+            }),
+          )).pipe(
+            repeatWhen(completed => completed.pipe(delay(4000)))
+          );
 
-    defer(() => this.processJoinUtxo(account).pipe(
-      tap((data: any) => {
-        if (data !== '') {
-          console.log('join-utxo: ', data);
         }
-      }),
-    )).pipe(
-      repeatWhen(completed => completed.pipe(delay(4000))),
-    ).subscribe();
+      )
+    ).subscribe()
 
-    // const update$ = this.zpService.zpUpdates$.pipe(
-    //   take(1),
-    //   concatMap(() => {
-    //       return this.processJoinUtxo(account);
-    //     }
-    //   ),
-    // );
-    //
-    // update$.subscribe();
   }
 
   private processJoinUtxo(account: IAccount): Observable<any> {
@@ -84,7 +75,7 @@ export class AutoJoinUtxoService {
           }
 
           console.log('start join');
-          this.txService.transfer(environment.ethToken, myAddress, amountToJoin, environment.relayerFee).pipe(
+          return this.txService.transfer(environment.ethToken, myAddress, amountToJoin, environment.relayerFee).pipe(
             tap(() => {
               this.increaseFeeSpent();
             }),
@@ -147,7 +138,7 @@ export class AutoJoinUtxoService {
           return acc;
         }, 0) < environment.relayerFee
     ) {
-      console.log('nothing enough fee');
+      console.log('not enough fee');
       return { myAddress: '0', amountToJoin: 0 };
     }
 

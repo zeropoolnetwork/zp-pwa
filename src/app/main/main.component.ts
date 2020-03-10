@@ -10,6 +10,7 @@ import { Clipboard } from '@angular/cdk/clipboard';
 import { AutoJoinUtxoService } from '../services/auto-join-utxo.service';
 import { Router } from '@angular/router';
 import { UnconfirmedTransactionService } from '../services/unconfirmed-transaction.service';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-main',
@@ -84,16 +85,14 @@ export class MainComponent implements OnInit {
   }
 
   syncState() {
-    const ethAssetId = '0x0';
-
-    this.balance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
+    this.balance = fw(this.zpService.zpBalance[environment.ethToken]) || 0;
     this.history = this.zpService.zpHistory;
     this.zpGasBalance = fw(this.zpService.zpGasBalance);
 
     this.totalWithdrawals = this.zpService.activeWithdrawals.length;
 
     if (this.totalWithdrawals !== 0 && (typeof this.zpService.challengeExpiresBlocks == 'number')) {
-      //s
+      //
       this.hasWithdrawals = true;
       const readyBlock = this.zpService.currentBlockNumber - this.zpService.challengeExpiresBlocks;
       //

@@ -43,7 +43,7 @@ export class Web3ProviderService {
       }),
       map(() => getEthAddressSafe()),
       distinctUntilChanged(),
-      shareReplay()
+      shareReplay(1)
     );
 
     this.isReady$ = this.address$.pipe(

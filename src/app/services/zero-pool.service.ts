@@ -31,7 +31,7 @@ export interface ZpBalance {
 export class ZeroPoolService {
   private isReady: Subject<boolean> = new BehaviorSubject<boolean>(false);
   public isReady$: Observable<boolean> = this.isReady.asObservable().pipe(
-    shareReplay()
+    shareReplay(1)
   );
 
   public start$: Observable<any>;
@@ -148,7 +148,7 @@ export class ZeroPoolService {
         );
 
       }),
-      shareReplay()
+      shareReplay(1)
     );
 
   }
@@ -191,7 +191,7 @@ export class ZeroPoolService {
         this.activeWithdrawals = activeWithdrawals;
         this.currentBlockNumber = blockNumber;
 
-        this.zpGasBalance = gasBalance['0x0'] || 0;
+        this.zpGasBalance = gasBalance[environment.ethToken] || 0;
         this.ethBalance = fw(ethBalance);
 
       }),
@@ -225,7 +225,7 @@ export class ZeroPoolService {
             ethBalance,
           ]: [IMerkleTree, IMerkleTree, string] = x;
 
-          this.zpBalance = {'0x0': 0};
+          this.zpBalance = {'0x0000000000000000000000000000000000000000': 0};
           this.zpHistory = [];
           this.activeWithdrawals = [];
           this.currentBlockNumber = 0;

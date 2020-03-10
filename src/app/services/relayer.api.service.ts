@@ -50,7 +50,7 @@ export class RelayerApiService {
 
     const url = environment.relayerUrl + '/tx';
     return this.http.post<Transaction>(url, body).pipe(
-      delayedRetry(1000),
+      // delayedRetry(1000),
       map(response => {
         return response;
       }),
@@ -65,7 +65,7 @@ export class RelayerApiService {
 
     const url = environment.relayerUrl + '/tx/donation';
     return this.http.post<Transaction>(url, body).pipe(
-      delayedRetry(1000),
+      // delayedRetry(1000),
       map(response => {
         return response;
       }),

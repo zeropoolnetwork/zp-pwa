@@ -34,7 +34,7 @@ export class TransactionService {
           zpGas: new TransactionSynchronizer(this.zpService.zpGas),
         };
       }),
-      shareReplay()
+      shareReplay(1)
     );
 
   constructor(
