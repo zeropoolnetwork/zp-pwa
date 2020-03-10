@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { combineLatest, from, Observable, of } from 'rxjs';
-import { TransactionService } from './transaction.service';
+import { combineLatest, defer, Observable, of } from 'rxjs';
 import { StateStorageService } from './state.storage.service';
-import { catchError, concatMap, map, mergeMap, take, tap } from 'rxjs/operators';
+import { catchError, delay, filter, mergeMap, repeatWhen, take, tap } from 'rxjs/operators';
 import { MyUtxoState, Utxo } from 'zeropool-lib';
 import { AccountService, IAccount } from './account.service';
 import { environment } from '../../environments/environment';
 import { ZeroPoolService } from './zero-pool.service';
+import { TransactionService } from './transaction/transaction.service';
 
 export const defaultGasMaxFeeGwei = environment.relayerFee * 10;
 export const defaultMinUtxoSizeGwei = environment.relayerFee;
@@ -30,29 +30,41 @@ export class AutoJoinUtxoService {
     private zpService: ZeroPoolService
   ) {
 
-    this.accountService.account$.subscribe(
-      (account: IAccount) => {
+    const account$ = this.accountService.account$;
+    const isReady$ = this.zpService.isReady$.pipe(
+      filter((isReady: boolean) => isReady),
+      take(1)
+    );
+
+    combineLatest([account$, isReady$]).subscribe(
+      ([account, isReady]: [IAccount, boolean]) => {
         this.joinUtxo(account);
       }
     );
+
   }
 
   private joinUtxo(account: IAccount): void {
-    const update$ = this.zpService.zpUpdates$.pipe(
-      take(1),
-      concatMap(() => {
-          return this.processJoinUtxo(account);
-        }
-      ),
+
+    defer(() => this.processJoinUtxo(account).pipe(
       tap((data: any) => {
         if (data !== '') {
           console.log('join-utxo: ', data);
         }
       }),
-      take(1),
-    );
+    )).pipe(
+      repeatWhen(completed => completed.pipe(delay(4000))),
+    ).subscribe();
 
-    update$.subscribe();
+    // const update$ = this.zpService.zpUpdates$.pipe(
+    //   take(1),
+    //   concatMap(() => {
+    //       return this.processJoinUtxo(account);
+    //     }
+    //   ),
+    // );
+    //
+    // update$.subscribe();
   }
 
   private processJoinUtxo(account: IAccount): Observable<any> {
@@ -60,7 +72,6 @@ export class AutoJoinUtxoService {
       this.stateStorageService.getUtxoState(),
       this.stateStorageService.getGasUtxoState()
     ]).pipe(
-      take(1),
       mergeMap(
         (x) => {
 
@@ -73,7 +84,7 @@ export class AutoJoinUtxoService {
           }
 
           console.log('start join');
-          return this.txService.transfer(environment.ethToken, myAddress, amountToJoin, environment.relayerFee).pipe(
+          this.txService.transfer(environment.ethToken, myAddress, amountToJoin, environment.relayerFee).pipe(
             tap(() => {
               this.increaseFeeSpent();
             }),

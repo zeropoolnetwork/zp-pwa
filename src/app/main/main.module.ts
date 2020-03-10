@@ -30,10 +30,11 @@ import { GasDepositComponent } from './gas-deposit/gas-deposit.component';
 import { ResetAccountComponent } from './settings/reset-account/reset-account.component';
 import { DustProtectionComponent } from './settings/dust-protection/dust-protection.component';
 import { StringifyHistoryPipe } from '../history-item-stringify.pipe';
-import { TransactionService } from '../services/transaction.service';
+import { TransactionService } from '../services/transaction/transaction.service';
 import { AutoJoinUtxoService } from '../services/auto-join-utxo.service';
 import { ZeroPoolService } from '../services/zero-pool.service';
 import { UnconfirmedTransactionService } from '../services/unconfirmed-transaction.service';
+import { TransactionSynchronizer } from '../services/transaction/transaction-synchronizer';
 
 @NgModule({
   declarations: [

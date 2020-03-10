@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { tw } from 'zeropool-lib';
-import { TransactionService } from '../../services/transaction.service';
+import { TransactionService } from '../../services/transaction/transaction.service';
 import { catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { TransactionSynchronizer } from '../../services/transaction/transaction-synchronizer';
 
 @Component({
   selector: 'app-gas-deposit',
@@ -48,6 +50,10 @@ export class GasDepositComponent implements OnInit {
         this.progressMessageLineOne = 'Transaction published';
         this.progressMessageLineTwo = 'Wait for ZeroPool block';
         this.isLineTwoBold = false;
+      } else if (progressStep === 'queue') {
+        this.progressMessageLineOne = 'Wait until the last transactions are confirmed';
+        // this.progressMessageLineTwo = 'Wait for ZeroPool block';
+        // this.isLineTwoBold = true;
       }
     };
 

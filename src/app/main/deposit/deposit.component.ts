@@ -5,9 +5,10 @@ import { tw } from 'zeropool-lib';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { environment } from '../../../environments/environment';
 import { of } from 'rxjs';
-import { TransactionService } from '../../services/transaction.service';
 import { catchError, tap } from 'rxjs/operators';
 import { UnconfirmedTransactionService } from '../../services/unconfirmed-transaction.service';
+import { TransactionSynchronizer } from '../../services/transaction/transaction-synchronizer';
+import { TransactionService } from '../../services/transaction/transaction.service';
 
 @Component({
   selector: 'app-deposit',
@@ -59,9 +60,7 @@ export class DepositComponent implements OnInit {
 
     const amount = tw(this.depositAmount).toNumber();
 
-    // Generate ZeroPool transaction
-
-    this.txService.deposit(environment.ethToken, amount, environment.relayerFee, (progressStep) => {
+    const progressCallback = (progressStep) => {
       if (progressStep === 'open-metamask') {
         this.progressMessageLineOne = 'Transaction generated';
         this.progressMessageLineTwo = 'Please check your metamask';
@@ -70,9 +69,16 @@ export class DepositComponent implements OnInit {
         this.progressMessageLineOne = 'Transaction published';
         this.progressMessageLineTwo = 'Wait for ZeroPool block';
         this.isLineTwoBold = true;
+      } else if (progressStep === 'queue') {
+        this.progressMessageLineOne = 'Wait until the last transactions are confirmed';
+        // this.progressMessageLineTwo = 'Wait for ZeroPool block';
+        // this.isLineTwoBold = true;
       }
+    };
 
-    }).pipe(
+    // Generate ZeroPool transaction
+
+    this.txService.deposit(environment.ethToken, amount, environment.relayerFee, progressCallback).pipe(
       tap((txHash: any) => {
         this.depositInProgress = false;
         this.isFinished = true;

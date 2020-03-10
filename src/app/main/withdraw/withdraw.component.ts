@@ -3,9 +3,9 @@ import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { tw } from 'zeropool-lib';
 import { getEthAddressSafe } from '../../services/web3.provider.service';
 import { environment } from '../../../environments/environment';
-import { TransactionService } from '../../services/transaction.service';
 import { catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { TransactionService } from '../../services/transaction/transaction.service';
 
 @Component({
   selector: 'app-withdraw',
@@ -67,6 +67,10 @@ export class WithdrawComponent implements OnInit {
         this.progressMessageLineOne = 'Transaction published';
         this.progressMessageLineTwo = 'Wait for ZeroPool block';
         this.isLineTwoBold = true;
+      } else if (progressStep === 'queue') {
+        this.progressMessageLineOne = 'Wait until the last transactions are confirmed';
+        // this.progressMessageLineTwo = 'Wait for ZeroPool block';
+        // this.isLineTwoBold = true;
       }
     };
 

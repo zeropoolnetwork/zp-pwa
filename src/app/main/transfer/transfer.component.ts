@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { fw, tw } from 'zeropool-lib';
 import { environment } from '../../../environments/environment';
-import { TransactionService } from '../../services/transaction.service';
+import { TransactionService } from '../../services/transaction/transaction.service';
 import { catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { ValidateAddress } from '../../common/validateAddress';
+import { TransactionSynchronizer } from '../../services/transaction/transaction-synchronizer';
 
 @Component({
   selector: 'app-transfer',
@@ -73,6 +74,10 @@ export class TransferComponent implements OnInit {
         this.progressMessageLineOne = 'Transaction published';
         this.progressMessageLineTwo = 'Wait for ZeroPool block';
         this.isLineTwoBold = true;
+      } else if (progressStep === 'queue') {
+        this.progressMessageLineOne = 'Wait until the last transactions are confirmed';
+        // this.progressMessageLineTwo = 'Wait for ZeroPool block';
+        // this.isLineTwoBold = true;
       }
     };
 

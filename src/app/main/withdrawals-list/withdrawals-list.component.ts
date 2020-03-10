@@ -2,9 +2,10 @@ import { Component } from '@angular/core';
 import { fw, PayNote } from 'zeropool-lib';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { environment } from '../../../environments/environment';
-import { TransactionService } from '../../services/transaction.service';
 import { catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { TransactionSynchronizer } from '../../services/transaction/transaction-synchronizer';
+import { TransactionService } from '../../services/transaction/transaction.service';
 
 @Component({
   selector: 'app-withdrawals-list',
