@@ -69,8 +69,7 @@ export class TransactionService {
               const gasTx$ = zpGas.runTransaction({
                 type: 'prepareWithdraw',
                 token: environment.ethToken,
-                amount: fee,
-                progressCallback
+                amount: fee
               });
               const tx$ = of(tx);
               return combineLatest([tx$, depositBlockNumber$, gasTx$]);
@@ -79,14 +78,11 @@ export class TransactionService {
           mergeMap(
             ([tx, depositBlockNumber, gasTx]: [Tx<string>, number, TxContainer]) => {
               progressCallback('sending-transaction');
-              return this.relayerApi.sendTx$(tx, toHex(depositBlockNumber), gasTx[0]);
+              return this.relayerApi.sendTx$(tx, toHex(depositBlockNumber), gasTx[0]).pipe(
+                mergeMap(this.updateState$)
+              );
             }
           ),
-          map(
-            (tx: any) => {
-              return tx.transactionHash || tx;
-            }
-          )
         );
       })
     );
@@ -119,11 +115,10 @@ export class TransactionService {
               progressCallback('wait-for-zp-block');
 
               const [zpTxData, txHash] = x;
-              return this.relayerApi.gasDonation$(zpTxData[0], txHash);
+              return this.relayerApi.gasDonation$(zpTxData[0], txHash).pipe(
+                mergeMap(this.updateState$)
+              );
             }
-          ),
-          map(
-            (txData: any) => txData.transactionHash
           )
         );
       })
@@ -148,8 +143,7 @@ export class TransactionService {
         const gasTx$ = zpGas.runTransaction({
           type: 'prepareWithdraw',
           token: environment.ethToken,
-          amount: fee,
-          progressCallback
+          amount: fee
         });
 
         const tx$ = zp.runTransaction({
@@ -170,13 +164,9 @@ export class TransactionService {
           }
           // Transaction is sent,
           // Wait for ZeroPool block
-          return this.relayerApi.sendTx$(tx[0], '0x0', gasTx[0]);
-        }
-      ),
-      map(
-        (txData: any) => {
-          // Done
-          return txData.transactionHash || txData;
+          return this.relayerApi.sendTx$(tx[0], '0x0', gasTx[0]).pipe(
+            mergeMap(this.updateState$)
+          );
         }
       )
     );
@@ -199,8 +189,7 @@ export class TransactionService {
         const gasTx$ = zpGas.runTransaction({
           type: 'prepareWithdraw',
           token: environment.ethToken,
-          amount: fee,
-          progressCallback
+          amount: fee
         });
 
         return combineLatest([tx$, gasTx$]);
@@ -211,12 +200,9 @@ export class TransactionService {
             progressCallback('wait-for-zp-block');
           }
           // Wait for ZeroPool block
-          return this.relayerApi.sendTx$(tx[0], '0x0', gasTx[0]);
-        }
-      ),
-      map(
-        (txData: any) => {
-          return txData.transactionHash || txData;
+          return this.relayerApi.sendTx$(tx[0], '0x0', gasTx[0]).pipe(
+            mergeMap(this.updateState$)
+          );
         }
       )
     );
@@ -253,6 +239,23 @@ export class TransactionService {
       )
     );
   }
+
+  private updateState$ = (tx: any): Observable<string> => {
+    const updateZpBalance$ = fromPromise(
+      this.zpService.zp.getBalance()
+    );
+
+    const updateGasZpBalance = fromPromise(
+      this.zpService.zpGas.getBalance()
+    );
+
+    return combineLatest([updateZpBalance$, updateGasZpBalance])
+      .pipe(
+        map(() => {
+          return tx.transactionHash || tx;
+        })
+      );
+  };
 
 }
 

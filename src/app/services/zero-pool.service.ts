@@ -148,7 +148,7 @@ export class ZeroPoolService {
         );
 
       }),
-      shareReplay()
+      shareReplay(1)
     );
 
   }

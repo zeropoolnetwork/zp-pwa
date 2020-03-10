@@ -57,7 +57,7 @@ export class GasDepositComponent implements OnInit {
     private zpService: ZeroPoolService,
     private web3Service: Web3ProviderService
   ) {
-    //
+    this.zpService.start$.subscribe();
   }
 
   ngOnInit(): void {
