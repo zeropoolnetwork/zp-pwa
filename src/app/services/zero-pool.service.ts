@@ -31,7 +31,7 @@ export interface ZpBalance {
 export class ZeroPoolService {
   private isReady: Subject<boolean> = new BehaviorSubject<boolean>(false);
   public isReady$: Observable<boolean> = this.isReady.asObservable().pipe(
-    shareReplay()
+    shareReplay(1),
   );
 
   public start$: Observable<any>;
