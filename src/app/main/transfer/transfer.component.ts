@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { fw, tw } from 'zeropool-lib';
 import { environment } from '../../../environments/environment';
@@ -49,7 +49,7 @@ export class TransferComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
 
-    const ethAssetId = '0x0';
+    const ethAssetId = environment.ethToken;
     this.myZpBalance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
 
     // Adjust max value to validates
@@ -92,7 +92,7 @@ export class TransferComponent implements AfterViewInit {
           lineTwo: '',
           isLineTwoBold: true
         });
-        //s
+
       }
     };
 

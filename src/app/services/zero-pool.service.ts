@@ -191,7 +191,7 @@ export class ZeroPoolService {
         this.activeWithdrawals = activeWithdrawals;
         this.currentBlockNumber = blockNumber;
 
-        this.zpGasBalance = gasBalance['0x0'] || 0;
+        this.zpGasBalance = gasBalance[environment.ethToken] || 0;
         this.ethBalance = fw(ethBalance);
 
       }),

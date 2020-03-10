@@ -49,7 +49,7 @@ export class AutoJoinUtxoService {
               }
             }),
           )).pipe(
-            repeatWhen(completed => completed.pipe(delay(4000)))
+            repeatWhen(completed => completed.pipe(delay(5000)))
           );
 
         }
