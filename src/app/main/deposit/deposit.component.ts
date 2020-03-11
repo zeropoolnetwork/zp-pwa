@@ -133,14 +133,12 @@ export class DepositComponent implements AfterViewInit, OnDestroy {
           title: 'Deposit in progress',
           lineOne: 'Transaction generated',
           lineTwo: 'Please check your metamask',
-          isLineTwoBold: true
         });
       } else if (progressStep === 'sending-transaction') {
         this.progressDialog.showMessage({
           title: 'Deposit in progress',
           lineOne: 'Transaction generated',
           lineTwo: 'Verifying ZeroPool block',
-          isLineTwoBold: true
         });
       } else if (progressStep === 'receipt-tx-data') {
         //
@@ -148,7 +146,6 @@ export class DepositComponent implements AfterViewInit, OnDestroy {
           title: 'Deposit in progress',
           lineOne: 'Block successfully verified',
           lineTwo: 'Waiting for a transaction to be included in a block',
-          isLineTwoBold: true
         });
 
       } else if (progressStep === 'queue') {
@@ -157,7 +154,6 @@ export class DepositComponent implements AfterViewInit, OnDestroy {
           title: 'Deposit in progress',
           lineOne: 'Wait for the last transactions to be confirmed',
           lineTwo: '',
-          isLineTwoBold: true
         });
 
       }
