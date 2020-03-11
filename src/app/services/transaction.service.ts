@@ -229,13 +229,13 @@ export class TransactionService {
       tap(() => {
         progressCallback && progressCallback('transaction-confirmed');
       }),
-      mergeMap(() => {
+      exhaustMap(() => {
         const updateZpBalance$ = fromPromise(
           this.zpService.zp.getBalanceAndHistory()
         );
 
         const updateGasZpBalance = fromPromise(
-          this.zpService.zpGas.getBalance()
+          this.zpService.zpGas.getBalanceAndHistory()
         );
 
         return combineLatest([updateZpBalance$, updateGasZpBalance])
