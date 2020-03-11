@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { tw } from 'zeropool-lib';
@@ -17,7 +17,7 @@ import { environment } from '../../../environments/environment';
   templateUrl: './deposit.component.html',
   styleUrls: ['./deposit.component.scss']
 })
-export class DepositComponent implements OnInit, OnDestroy {
+export class DepositComponent implements AfterViewInit, OnDestroy {
 
   availableEthAmount: number;
 
@@ -67,7 +67,7 @@ export class DepositComponent implements OnInit, OnDestroy {
     this.availableEthAmount = this.zpService.ethBalance;
   }
 
-  ngOnInit(): void {
+  ngAfterViewInit(): void {
 
     // Ethereum balances
     this.subscription = this.web3Service.isReady$.pipe(
@@ -87,25 +87,29 @@ export class DepositComponent implements OnInit, OnDestroy {
     ).subscribe();
 
 
-    // Handling case when subscription is already in progress
-    if (UnconfirmedTransactionService.hasOngoingDepositTransaction) {
-      this.depositInProgress = true;
-      this.progressDialog.showMessage({
-        title: 'Deposit in progress',
-        lineOne: 'Transaction generated',
-        lineTwo: 'Wait for ZeroPool block',
-        isLineTwoBold: true
-      });
+    setTimeout( () => {
+      // Handling case when subscription is already in progress
+      if (UnconfirmedTransactionService.hasOngoingDepositTransaction()) {
 
-      const polling$ = interval(500).pipe(
-        tap(() => {
-          this.depositInProgress = false;
-          this.isFinished = true;
-        })
-      );
+        this.depositInProgress = true;
+        this.progressDialog.showMessage({
+          title: 'Deposit in progress',
+          lineOne: 'Transaction generated',
+          lineTwo: 'Wait for ZeroPool block',
+          isLineTwoBold: true
+        });
 
-      this.subscription.add(polling$.subscribe());
-    }
+        const polling$ = interval(500).pipe(
+          tap(() => {
+            this.depositInProgress = false;
+            this.isFinished = true;
+          })
+        );
+
+        this.subscription.add(polling$.subscribe());
+      }
+    });
+
   }
 
   ngOnDestroy(): void {

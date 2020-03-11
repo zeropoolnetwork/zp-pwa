@@ -1,5 +1,7 @@
 <div class="fixed-center widget-box">
 
+  <app-progress-message #progressDialog [hidden]="!depositInProgress"></app-progress-message>
+
   <ng-container *ngIf="!isFinished && !isFinishedWithError">
     <ng-container [formGroup]="form" *ngIf="!depositInProgress">
 
@@ -31,15 +33,6 @@
         <button mat-stroked-button routerLink="/main">Back</button>
         <button mat-flat-button color="accent" (click)="onDepositClick()" [disabled]="form.invalid">Deposit</button>
       </div>
-    </ng-container>
-
-    <ng-container>
-      <app-progress-message #progressDialog [hidden]="!depositInProgress"></app-progress-message>
-      <!--
-      <div class="actions">
-        <button mat-stroked-button routerLink="/main">Back</button>
-      </div>
-      -->
     </ng-container>
 
   </ng-container>

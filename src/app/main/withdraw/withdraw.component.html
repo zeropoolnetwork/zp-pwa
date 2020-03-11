@@ -1,13 +1,15 @@
 <div class="fixed-center widget-box">
+
   <ng-container *ngIf="!isDone && !isDoneWithError" [formGroup]="transferForm">
+
+    <app-progress-message [hidden]="!withdrawIsInProgress" #progressDialog></app-progress-message>
 
     <ng-container *ngIf="!withdrawIsInProgress">
       <h2>Place withdraw request</h2>
 
-      <p>Published withdraw requests will be available for the challenge during the next {{challengeExpiresBlocks}} blocks.<br> You will be
+      <p>Published withdraw requests will be available for the challenge during the next {{challengeExpiresBlocks}}
+        blocks.<br> You will be
         able to transfer funds to your account once that period is expired.</p>
-
-      <!--      <app-zp-address-input label="Enter receivers ethereum address" formControlName="toAddress" disabled="true"></app-zp-address-input>-->
 
       <mat-form-field appearance="outline" class="field">
         <mat-label>Enter amount of ETH</mat-label>
@@ -29,12 +31,6 @@
         <button mat-stroked-button routerLink="/main">Back</button>
         <button mat-flat-button color="accent" [disabled]="!transferForm.valid" (click)="onSendClick()">Send</button>
       </div>
-    </ng-container>
-
-    <ng-container>
-      <app-progress-message
-        [hidden]="!withdrawIsInProgress"
-        #progressDialog></app-progress-message>
     </ng-container>
 
   </ng-container>

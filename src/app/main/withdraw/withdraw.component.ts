@@ -32,10 +32,7 @@ export class WithdrawComponent implements OnInit {
 
   public transferForm: FormGroup = this.fb.group({
     toAmount: ['', Validators.required],
-    toAddress: new FormControl('', [
-      // Validators.required,
-      // ValidateMnemonic
-    ])
+    toAddress: new FormControl('', [Validators.required])
   });
 
   get toAmount(): AbstractControl {

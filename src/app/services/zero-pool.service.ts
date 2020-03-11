@@ -118,7 +118,6 @@ export class ZeroPoolService {
 
         this.listenHistoryStateUpdates$(zp, this.stateStorageService.saveHistory).subscribe();
         this.listenUtxoStateUpdates$(zp, this.stateStorageService.saveUtxo).subscribe();
-
         this.listenUtxoStateUpdates$(zpGas, this.stateStorageService.saveGasUtxo).subscribe();
 
         this.zp = zp;
