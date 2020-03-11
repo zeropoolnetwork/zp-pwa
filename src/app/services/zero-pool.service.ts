@@ -13,10 +13,10 @@ import {
   stringifyUtxoState,
   ZeroPoolNetwork
 } from 'zeropool-lib';
-import { concatMap, filter, map, mergeMap, shareReplay, tap, timeout } from 'rxjs/operators';
+import { concatMap, filter, map, mergeMap, shareReplay, tap } from 'rxjs/operators';
 import { AccountService } from './account.service';
 import { environment } from '../../environments/environment';
-import { BehaviorSubject, combineLatest, interval, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, combineLatest, interval, Observable, of, Subject } from 'rxjs';
 import { Web3ProviderService } from './web3.provider.service';
 import { StateStorageService } from './state.storage.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
@@ -73,14 +73,17 @@ export class ZeroPoolService {
       filter((isReady: boolean) => isReady),
     );
 
-    this.start$ = combineLatest([
-      circomLoaded$,
-      web3Loaded$,
-      this.accountService.account$,
-      this.stateStorageService.getUtxoState(),
-      this.stateStorageService.getHistoryState(),
-      this.stateStorageService.getGasUtxoState(),
-    ]).pipe(
+    this.start$ = this.checkOldContracts().pipe(
+      mergeMap(() => {
+        return combineLatest([
+          circomLoaded$,
+          web3Loaded$,
+          this.accountService.account$,
+          this.stateStorageService.getUtxoState(),
+          this.stateStorageService.getHistoryState(),
+          this.stateStorageService.getGasUtxoState(),
+        ]);
+      }),
       mergeMap((x) => {
 
         const [
@@ -128,8 +131,8 @@ export class ZeroPoolService {
             }),
             mergeMap((blocksNum) => {
               this.challengeExpiresBlocks = +blocksNum;
-              this.isReady.next(true);
               this.zpUpdatesSubject.next(true);
+              this.isReady.next(true);
               return this.pushUpdates$(zp, zpGas);
             }),
           );
@@ -141,8 +144,8 @@ export class ZeroPoolService {
           }),
           mergeMap((blocksNum) => {
             this.challengeExpiresBlocks = +blocksNum;
-            this.isReady.next(true);
             this.zpUpdatesSubject.next(true);
+            this.isReady.next(true);
             return this.pushUpdates$(zp, zpGas);
           }),
         );
@@ -225,7 +228,7 @@ export class ZeroPoolService {
             ethBalance,
           ]: [IMerkleTree, IMerkleTree, string] = x;
 
-          this.zpBalance = {'0x0000000000000000000000000000000000000000': 0};
+          this.zpBalance = { '0x0000000000000000000000000000000000000000': 0 };
           this.zpHistory = [];
           this.activeWithdrawals = [];
           this.currentBlockNumber = 0;
@@ -277,6 +280,21 @@ export class ZeroPoolService {
         this.zpUpdatesSubject.next(true);
       }),
     );
+  }
+
+  private checkOldContracts(): Observable<any> {
+    if (
+      environment.contractAddress !== localStorage.getItem('contract-address') ||
+      environment.sideChainAddress !== localStorage.getItem('sidechain-contract-address')
+    ) {
+      localStorage.setItem('contract-address', environment.contractAddress);
+      localStorage.setItem('sidechain-contract-address', environment.sideChainAddress);
+      return this.stateStorageService.resetStorage().pipe(tap(() => {
+        location.reload();
+      }));
+    }
+
+    return of('');
   }
 
 

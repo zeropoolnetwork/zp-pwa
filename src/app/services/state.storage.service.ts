@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HistoryState, MyUtxoState } from 'zeropool-lib';
 import { StorageMap } from '@ngx-pwa/local-storage';
-import { Observable, Subject } from 'rxjs';
+import { Observable } from 'rxjs';
 
 export type MyUtxoStateHex = MyUtxoState<string>;
 export type MyUtxoStateInt = MyUtxoState<bigint>;
