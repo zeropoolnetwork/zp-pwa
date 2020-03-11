@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { exhaustMap, filter, map, mergeMap, shareReplay, take } from 'rxjs/operators';
-import { combineLatest, Observable, of, timer } from 'rxjs';
+import { combineLatest, Observable, of, Subject, timer } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { ZeroPoolService } from './zero-pool.service';
 import { RelayerApiService } from './relayer.api.service';
@@ -8,7 +8,7 @@ import { PayNote, toHex, Tx } from 'zeropool-lib';
 import { environment } from '../../environments/environment';
 import { UnconfirmedTransactionService } from './unconfirmed-transaction.service';
 import { TransactionSyncronizer } from './observable-synchronizer';
-import { Transaction, TransactionReceipt } from 'web3-core';
+import { TransactionReceipt } from 'web3-core';
 
 const waitBlocks = 1;
 
@@ -230,24 +230,33 @@ export class TransactionService {
 
   private waitForTx(txHash: string): Observable<string> {
 
-    const waitTx$ = fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransactionReceipt(txHash)).pipe(
-      map((tx: TransactionReceipt): string => {
+    const txReceipt = new Subject();
+    const txReceipt$ = txReceipt.asObservable();
 
-        if (!tx || !tx.blockNumber) {
-          return undefined;
-        }
-        return tx.transactionHash;
-      }),
-      take(1)
-    );
+    const onTxReceipt = (err: any, tx: TransactionReceipt) => {
 
-    // let x = 0;
+      if (err) {
+        console.log(err);
+      }
 
-    return timer(0, 5000).pipe(
+      if (tx && tx.blockNumber) {
+        txReceipt.next(tx);
+      }
+
+    };
+
+    const waitTx$ = fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransactionReceipt(txHash, onTxReceipt));
+
+    timer(0, 5000).pipe(
       exhaustMap(() => {
-        return waitTx$;
+        return waitTx$.pipe(take(1));
       }),
-      // take(1)
+    ).subscribe();
+
+    return txReceipt$.pipe(
+      map((tx: TransactionReceipt) => {
+        return tx.transactionHash;
+      })
     );
 
   }
