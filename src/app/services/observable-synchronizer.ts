@@ -1,15 +1,16 @@
-import { Observable, Subject } from 'rxjs';
-import { concatMap, filter, map, take, tap } from 'rxjs/operators';
+import { Observable, of, Subject, throwError } from 'rxjs';
+import { catchError, concatMap, filter, map, take, tap } from 'rxjs/operators';
 import { v4 as uuidv4 } from 'uuid';
 
-export interface ScheduledObservable {
+export interface IMyWrappedObservable {
   observable: Observable<any>;
   progressCallback?: (msg) => void;
   id?: string;
 }
 
-interface DoneObservable {
+interface IWrappedResult {
   result: any;
+  error?: any;
   id: string;
 }
 
@@ -17,16 +18,16 @@ class ObservableSynchronizer {
 
   private queueCount = 0;
 
-  private queue: Subject<ScheduledObservable> = new Subject<ScheduledObservable>();
-  private queue$: Observable<ScheduledObservable> = this.queue.asObservable();
+  private executionQueueSubject: Subject<IMyWrappedObservable> = new Subject<IMyWrappedObservable>();
+  private executionQueue$: Observable<IMyWrappedObservable> = this.executionQueueSubject.asObservable();
 
-  private doneObservable: Subject<DoneObservable> = new Subject();
-  private doneObservable$: Observable<DoneObservable> = this.doneObservable.asObservable();
+  private resultsSubject: Subject<IWrappedResult> = new Subject();
+  private results$: Observable<IWrappedResult> = this.resultsSubject.asObservable();
 
   constructor() {
 
-    this.queue$.pipe(
-      tap((o: ScheduledObservable) => {
+    this.executionQueue$.pipe(
+      tap((o: IMyWrappedObservable) => {
         this.queueCount += 1;
 
         if (this.queueCount > 1) {
@@ -34,36 +35,47 @@ class ObservableSynchronizer {
         }
       }),
       concatMap(
-        (o: ScheduledObservable) => {
+        (o: IMyWrappedObservable) => {
 
           return o.observable.pipe(
-            map((result: any): DoneObservable => {
-              return { result, id: o.id };
+            map((result: any): IWrappedResult => {
+              return {result, id: o.id};
             }),
-            take(1)
+            catchError((e: any) => {
+              return of({
+                result: '',
+                id: o.id,
+                error: e
+              });
+            }),
+
+            take(1) // TODO: Be careful - source observable should decide on completeness, so we might need to replace this with last operator
           );
         }
       )
-    ).subscribe((doneObservable: DoneObservable) => {
+    ).subscribe((doneObservable: IWrappedResult) => {
       this.queueCount -= 1;
-      this.doneObservable.next(doneObservable);
+      this.resultsSubject.next(doneObservable);
     });
 
   }
 
-  public execute<T>(o: ScheduledObservable): Observable<T> {
+  public execute<T>(o: IMyWrappedObservable): Observable<T> {
     const id = uuidv4();
     o.id = id;
-    this.queue.next(o);
+    this.executionQueueSubject.next(o);
 
-    return this.doneObservable$.pipe(
-      filter((doneObservable: DoneObservable) => doneObservable.id === id),
-      map((doneObservable: DoneObservable): T => {
-        return doneObservable.result;
+    return this.results$.pipe(
+      filter((doneObservable: IWrappedResult) => doneObservable.id === id),
+      map((wResult: IWrappedResult): T => {
+        if (wResult.error) {
+          throwError(wResult.error);
+        }
+        return wResult.result;
       }),
     );
   }
 
 }
 
-export const TransactionSyncronizer = new ObservableSynchronizer();
+export const TransactionSynchronizer = new ObservableSynchronizer();

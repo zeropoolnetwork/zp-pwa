@@ -7,7 +7,7 @@ import { RelayerApiService } from './relayer.api.service';
 import { PayNote, toHex, Tx, ZeroPoolNetwork } from 'zeropool-lib';
 import { environment } from '../../environments/environment';
 import { UnconfirmedTransactionService } from './unconfirmed-transaction.service';
-import { TransactionSyncronizer } from './observable-synchronizer';
+import { TransactionSynchronizer } from './observable-synchronizer';
 import { TransactionReceipt } from 'web3-core';
 
 const waitBlocks = 1;
@@ -66,7 +66,7 @@ export class TransactionService {
       )
     );
 
-    return TransactionSyncronizer.execute<string>({ observable: o$, progressCallback });
+    return TransactionSynchronizer.execute<string>({ observable: o$, progressCallback });
   }
 
   public gasDeposit(amount: number, progressCallback: (msg) => void): Observable<string> {
@@ -115,7 +115,7 @@ export class TransactionService {
         })
     );
 
-    return TransactionSyncronizer.execute<string>({ observable: o$, progressCallback });
+    return TransactionSynchronizer.execute<string>({ observable: o$, progressCallback });
   }
 
   public transfer(
@@ -155,7 +155,7 @@ export class TransactionService {
       take(1)
     );
 
-    return TransactionSyncronizer.execute<string>({ observable: o$, progressCallback });
+    return TransactionSynchronizer.execute<string>({ observable: o$, progressCallback });
   }
 
   public prepareWithdraw(token: string, amount: number, fee: number, progressCallback?: (msg) => void): Observable<string> {
@@ -186,7 +186,7 @@ export class TransactionService {
       )
     );
 
-    return TransactionSyncronizer.execute<string>({ observable: o$, progressCallback });
+    return TransactionSynchronizer.execute<string>({ observable: o$, progressCallback });
   }
 
   public withdraw(w: PayNote): Observable<string> {
