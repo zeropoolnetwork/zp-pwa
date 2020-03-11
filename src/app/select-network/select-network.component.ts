@@ -49,7 +49,7 @@ export class SelectNetworkComponent {
 
   constructor(router: Router, web3Service: Web3ProviderService) {
     this.networkName = networkId2Name(environment.chainId);
-    interval(500).pipe(
+    interval(100).pipe(
       map( () => {
         return web3Service.isCorrectNetworkSelected();
       }),
