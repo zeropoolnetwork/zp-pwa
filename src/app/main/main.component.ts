@@ -4,12 +4,12 @@ import { ZeroPoolService } from '../services/zero-pool.service';
 import { interval, Observable, Subscription, timer } from 'rxjs';
 import { fw, HistoryItem, PayNote } from 'zeropool-lib';
 import { MatTooltip } from '@angular/material/tooltip';
-import { delay, filter, tap } from 'rxjs/operators';
+import { delay, tap } from 'rxjs/operators';
 import { Web3ProviderService } from '../services/web3.provider.service';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { AutoJoinUtxoService } from '../services/auto-join-utxo.service';
 import { Router } from '@angular/router';
-import { UnconfirmedTransactionService } from '../services/unconfirmed-transaction.service';
+import { depositProgress, depositProgress$, UnconfirmedTransactionService } from '../services/unconfirmed-transaction.service';
 import { environment } from '../../environments/environment';
 
 @Component({
@@ -70,11 +70,18 @@ export class MainComponent implements OnInit {
       }
     ));
 
+    if (!depositProgress.value) {
+      this.hasDepositInProgress = true;
+    }
+
     // Poling of deposit
-    const ongoingDepositsPoling$ = interval(500).pipe();
-    this.subscription.add(ongoingDepositsPoling$.subscribe(
-      () => {
-        this.hasDepositInProgress = UnconfirmedTransactionService.hasOngoingDepositTransaction();
+    this.subscription.add(depositProgress$.subscribe(
+      (progress) => {
+        this.hasDepositInProgress = progress && true;
+      }, () => {
+
+      }, () => {
+        this.hasDepositInProgress = false;
       }
     ));
 

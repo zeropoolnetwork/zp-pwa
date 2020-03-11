@@ -6,8 +6,8 @@
 export const environment = {
   production: false,
   chainId: '0x4',
-  contractAddress: '0x3Af56F0d68470A1c53c5f300e840FBf7D132729a',
-  sideChainAddress: '0x64e0CCE64d5418462b3cD74da880e4d1D6f84aCe',
+  contractAddress: '0x27964b5704f656033a1864da29A740661626aE69',
+  sideChainAddress: '0x3408A71430C88243Cd3D53A66B59EBCBB93b04D3',
   sideChainRpc: 'https://kovan.infura.io/v3/826fec4cbd954dfd89c714eabf4611c4',
   relayerUrl: 'http://127.0.0.1:3000',
   // relayerUrl: 'https://testnet.relayer.zeropool.network',

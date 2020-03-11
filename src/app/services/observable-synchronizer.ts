@@ -39,7 +39,7 @@ class ObservableSynchronizer {
 
           return o.observable.pipe(
             map((result: any): IWrappedResult => {
-              return {result, id: o.id};
+              return { result, id: o.id };
             }),
             catchError((e: any) => {
               return of({

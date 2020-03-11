@@ -9,13 +9,16 @@ import { RelayerApiService } from './relayer.api.service';
 import { TransactionSynchronizer } from './observable-synchronizer';
 import { TransactionReceipt } from 'web3-core';
 
+export const depositProgress: BehaviorSubject<string> = new BehaviorSubject(undefined);
+export const depositProgress$: Observable<string> = depositProgress.asObservable();
+
 export interface ZpTransaction {
   tx: Tx<string>;
   txHash: string;
   timestamp?: number;
 }
 
-const dateExpiresInMinutes = 1;
+const dateExpiresInMinutes = 10;
 
 @Injectable({
   providedIn: 'root'
@@ -153,6 +156,7 @@ export class UnconfirmedTransactionService {
       take(1),
       mergeMap((x: any) => {
         const [unconfirmedDeposit, gasTx]: [PayNote | undefined, [Tx<string>, string]] = x;
+
         return this.trySendTx(unconfirmedDeposit, gasTx[0], depositZpTx).pipe(
           tap((data: any) => {
             console.log({
@@ -215,6 +219,10 @@ export class UnconfirmedTransactionService {
     depositZpTx: ZpTransaction
   ): Observable<string> {
 
+    if (depositTx && !depositTx.blockNumber) {
+      depositProgress.next('unconfirmed-deposit-start');
+    }
+
     if (!depositTx || !depositTx.blockNumber) {
       const timePassed = Date.now() - depositZpTx.timestamp;
 
@@ -226,15 +234,22 @@ export class UnconfirmedTransactionService {
       return of(`cannot find deposit ${depositZpTx.txHash}`);
     }
 
+
+    depositProgress.next('sending-transaction');
+
     return this.relayerApi.sendTx$(depositZpTx.tx, toHex(depositTx.blockNumber), gasTx).pipe(
       tap(() => {
         UnconfirmedTransactionService.deleteDepositTransaction();
       }),
       mergeMap((txData: any) => {
+        depositProgress.next('receipt-tx-data');
+
         return this.waitForTx(this.zpService.zp, txData.transactionHash || txData).pipe(
           filter(x => !!x),
           take(1),
           map(() => {
+            depositProgress.complete();
+
             return txData.transactionHash || txData;
           })
         );
