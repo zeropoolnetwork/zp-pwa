@@ -115,8 +115,8 @@ export class DepositComponent implements OnInit {
         //
         this.progressDialog.showMessage({
           title: 'Deposit in progress',
-          lineOne: 'Waiting for a transaction to be included in a block',
-          lineTwo: '',
+          lineOne: 'Block successfully verified',
+          lineTwo: 'Waiting for a transaction to be included in a block',
           isLineTwoBold: true
         });
 

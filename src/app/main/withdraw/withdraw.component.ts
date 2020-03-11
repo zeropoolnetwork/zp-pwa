@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { tw } from 'zeropool-lib';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { fw, tw } from 'zeropool-lib';
 import { getEthAddressSafe } from '../../services/web3.provider.service';
 import { environment } from '../../../environments/environment';
 import { catchError, tap } from 'rxjs/operators';
@@ -19,6 +19,7 @@ export class WithdrawComponent implements OnInit {
   transactionHash: string;
 
   myZpBalance: number;
+  minAmount = 1e-18;
 
   isDone = false;
   isDoneWithError = false;
@@ -37,8 +38,8 @@ export class WithdrawComponent implements OnInit {
     ])
   });
 
-  get toAmount(): number {
-    return this.transferForm.get('toAmount').value;
+  get toAmount(): AbstractControl {
+    return this.transferForm.get('toAmount');
   }
 
   get toAddress(): string {
@@ -57,12 +58,24 @@ export class WithdrawComponent implements OnInit {
   ngOnInit(): void {
     const a = getEthAddressSafe();
     this.transferForm.get('toAddress').setValue(a.replace('0x', ''));
+
+    const ethAssetId = environment.ethToken;
+    this.myZpBalance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
+
+    // Adjust max value to validates
+    this.transferForm.get('toAmount').setValidators([
+      Validators.required,
+      Validators.min(this.minAmount),
+      Validators.max(this.myZpBalance)
+    ]);
+    this.transferForm.get('toAmount').updateValueAndValidity();
+
   }
 
   onSendClick(): void {
     this.withdrawIsInProgress = true;
 
-    const amount = tw(this.toAmount).toNumber();
+    const amount = tw(this.toAmount.value).toNumber();
 
     const progressCallback = (progressStep) => {
       if (progressStep === 'generate-zp-tx') {

@@ -146,7 +146,7 @@ export class TransactionService {
           // Wait for ZeroPool block
           return this.relayerApi.sendTx$(tx[0], '0x0', gasTx[0]).pipe(
             mergeMap((txData: any) => {
-              progressCallback('receipt-tx-data');
+              progressCallback && progressCallback('receipt-tx-data');
               return this.updateState$(this.zpService.zp, txData, progressCallback);
             })
           );
@@ -178,7 +178,7 @@ export class TransactionService {
           // Wait for ZeroPool block
           return this.relayerApi.sendTx$(tx[0], '0x0', gasTx[0]).pipe(
             mergeMap((txData: any) => {
-              progressCallback('receipt-tx-data');
+              progressCallback && progressCallback('receipt-tx-data');
               return this.updateState$(this.zpService.zp, txData, progressCallback);
             })
           );

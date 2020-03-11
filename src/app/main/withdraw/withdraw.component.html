@@ -1,10 +1,6 @@
 <div class="fixed-center widget-box">
   <ng-container *ngIf="!isDone && !isDoneWithError" [formGroup]="transferForm">
 
-    <ng-container *ngIf="myZpBalance">
-      <div class="available-eth">Available {{myZpBalance}} zpETH</div>
-    </ng-container>
-
     <ng-container *ngIf="!withdrawIsInProgress">
       <h2>Place withdraw request</h2>
 
@@ -13,7 +9,21 @@
 
       <!--      <app-zp-address-input label="Enter receivers ethereum address" formControlName="toAddress" disabled="true"></app-zp-address-input>-->
 
-      <app-amount-input label="Enter amount of ETH" formControlName="toAmount"></app-amount-input>
+      <mat-form-field appearance="outline" class="field">
+        <mat-label>Enter amount of ETH</mat-label>
+        <input matInput formControlName="toAmount" autocomplete="off">
+
+        <mat-error *ngIf="toAmount.hasError('min')">
+          Min amount is {{minAmount}} zpETH
+        </mat-error>
+        <mat-error *ngIf="toAmount.hasError('max')">
+          You have only {{myZpBalance}} zpETH
+        </mat-error>
+      </mat-form-field>
+
+      <ng-container *ngIf="myZpBalance">
+        <div class="available-eth" style="margin-top: 1px;">Available {{myZpBalance}} zpETH</div>
+      </ng-container>
 
       <div class="actions">
         <button mat-stroked-button routerLink="/main">Back</button>

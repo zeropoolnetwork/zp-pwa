@@ -313,7 +313,6 @@ export class UnconfirmedTransactionService {
     return txReceipt$.pipe(
       filter(x => !!x),
       tap((tx: TransactionReceipt) => {
-          debugger
           if (takeWhileFunc && !takeWhileFunc()) {
             timer$.unsubscribe();
           }
