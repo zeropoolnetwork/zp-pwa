@@ -8,7 +8,7 @@ import { PayNote, toHex, Tx } from 'zeropool-lib';
 import { environment } from '../../environments/environment';
 import { UnconfirmedTransactionService } from './unconfirmed-transaction.service';
 import { TransactionSyncronizer } from './observable-synchronizer';
-import { Transaction } from 'web3-core';
+import { Transaction, TransactionReceipt } from 'web3-core';
 
 const waitBlocks = 1;
 
@@ -230,13 +230,13 @@ export class TransactionService {
 
   private waitForTx(txHash: string): Observable<string> {
 
-    const waitTx$ = fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransaction(txHash)).pipe(
-      map((tx: Transaction): string => {
+    const waitTx$ = fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransactionReceipt(txHash)).pipe(
+      map((tx: TransactionReceipt): string => {
 
         if (!tx || !tx.blockNumber) {
           return undefined;
         }
-        return tx.hash;
+        return tx.transactionHash;
       }),
       take(1)
     );

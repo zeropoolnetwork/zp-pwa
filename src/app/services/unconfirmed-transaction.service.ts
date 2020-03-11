@@ -7,7 +7,7 @@ import { fromPromise } from 'rxjs/internal-compatibility';
 import { environment } from '../../environments/environment';
 import { RelayerApiService } from './relayer.api.service';
 import { TransactionSyncronizer } from './observable-synchronizer';
-import { Transaction } from 'web3-core';
+import { Transaction, TransactionReceipt } from 'web3-core';
 
 export interface ZpTransaction {
   tx: Tx<string>;
@@ -271,12 +271,13 @@ export class UnconfirmedTransactionService {
   }
 
   private waitForTx(txHash: string, takeWhileFunc: () => boolean): Observable<string> {
-    const waitTx$ = fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransaction(txHash)).pipe(
-      map((tx: Transaction): string => {
+    const waitTx$ = fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransactionReceipt(txHash)).pipe(
+      map((tx: TransactionReceipt): string => {
+
         if (!tx || !tx.blockNumber) {
           return undefined;
         }
-        return tx.hash;
+        return tx.transactionHash;
       }),
       take(1)
     );
