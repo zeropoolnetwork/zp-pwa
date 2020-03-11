@@ -94,9 +94,7 @@ export class TransactionService {
                   txHash
                 });
 
-                return this.waitForTx(txHash).pipe(
-                  filter(x => !!x),
-                );
+                return this.waitForTx(txHash);
               }
             ),
             mergeMap((txHash: string) => {
@@ -249,18 +247,13 @@ export class TransactionService {
       exhaustMap(() => {
         return fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransactionReceipt(txHash, onTxReceipt))
           .pipe(take(1));
-      }),
-      tap(
-        () => {
-          if (txReceipt.value !== undefined) {
-            timer$.unsubscribe();
-          }
-        }
-      )
+      })
     ).subscribe();
 
     return txReceipt$.pipe(
+      filter(x => !!x),
       map((tx: TransactionReceipt) => {
+        timer$.unsubscribe();
         return tx.transactionHash;
       })
     );
