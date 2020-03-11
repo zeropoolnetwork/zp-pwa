@@ -6,7 +6,7 @@ import { BehaviorSubject, combineLatest, defer, Observable, of, timer } from 'rx
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { environment } from '../../environments/environment';
 import { RelayerApiService } from './relayer.api.service';
-import { TransactionSyncronizer } from './observable-synchronizer';
+import { TransactionSynchronizer } from './observable-synchronizer';
 import { TransactionReceipt } from 'web3-core';
 
 export interface ZpTransaction {
@@ -191,7 +191,7 @@ export class UnconfirmedTransactionService {
   ): void {
 
     const scheduledTxFunc = () => {
-      return TransactionSyncronizer.execute({
+      return TransactionSynchronizer.execute({
         observable: executeTx$
       }).pipe(take(1));
     };
