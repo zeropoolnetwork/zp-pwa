@@ -228,7 +228,7 @@ export class TransactionService {
   private waitForTx(txHash: string): Observable<string> {
     const waitTx$ = fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransaction(txHash)).pipe(
       map((tx: Transaction): string => {
-        if (!tx) {
+        if (!tx || !tx.blockNumber) {
           return undefined;
         }
         return tx.hash;
