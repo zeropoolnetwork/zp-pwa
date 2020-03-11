@@ -16,8 +16,14 @@ const routes: Routes = [
     path: 'account-setup',
     loadChildren: () => import('./account-setup/account-setup.module').then(m => m.AccountSetupModule)
   },
-  {path: 'connect-wallet', component: ConnectWalletComponent}, // TODO: guard not connected or move to account setup guard
-  {path: 'select-network', component: SelectNetworkComponent}, // TODO: guard not connected or move to account setup guard
+  {
+    path: 'connect-wallet',
+    component: ConnectWalletComponent
+  }, // TODO: guard not connected or move to account setup guard
+  {
+    path: 'select-network',
+    component: SelectNetworkComponent
+  }, // TODO: guard not connected or move to account setup guard
   {
     path: 'main',
     canActivate: [AccountGuard],

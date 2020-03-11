@@ -55,11 +55,12 @@ class ObservableSynchronizer {
     const id = uuidv4();
     o.id = id;
     this.queue.next(o);
+
     return this.doneObservable$.pipe(
       filter((doneObservable: DoneObservable) => doneObservable.id === id),
       map((doneObservable: DoneObservable): T => {
         return doneObservable.result;
-      })
+      }),
     );
   }
 

@@ -98,7 +98,7 @@ export class GasDepositComponent implements OnInit {
           lineOne: 'Transaction published',
           lineTwo: 'Verifying ZeroPool block'
         });
-      }  else if (progressStep === 'queue') {
+      } else if (progressStep === 'queue') {
         //
         this.progressDialog.showMessage({
           title: 'Gas Deposit in progress',
@@ -133,11 +133,8 @@ export class GasDepositComponent implements OnInit {
           lineTwo: 'Please check your metamask',
           isLineTwoBold: true
         });
-
       }
-
     };
-
 
 
     // progressCallback
@@ -145,7 +142,7 @@ export class GasDepositComponent implements OnInit {
       tap((txHash: string) => {
         this.inProgress = false;
         this.isDone = true;
-        console.log({ gasDeposit: txHash });
+        console.log({gasDeposit: txHash});
         UnconfirmedTransactionService.deleteGasDepositTransaction();
       }),
       catchError((e) => {

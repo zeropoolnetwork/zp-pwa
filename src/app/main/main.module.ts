@@ -18,7 +18,6 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { RelayerApiService } from '../services/relayer.api.service';
 import { HttpClientModule } from '@angular/common/http';
 import { InputAmountModule } from '../common/input-amount/input-amount.module';
-import { InputZpAddressModule } from '../common/input-zp-address/input-zp-address.module';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { GasIsNeededComponent } from './gas-is-needed/gas-is-needed.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -70,7 +69,6 @@ import { ProgressMessageComponent } from './progress-message/progress-message.co
 
     HttpClientModule,
     InputAmountModule,
-    InputZpAddressModule,
     MatBadgeModule
   ],
   providers: [

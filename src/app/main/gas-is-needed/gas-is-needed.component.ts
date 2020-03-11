@@ -15,9 +15,6 @@ export class GasIsNeededComponent implements OnInit {
   availableEthAmount: number;
 
   transactionHash: string;
-
-  isDone = false;
-  depositInProgress = false;
   color = 'rgba(100, 100, 100, 0.5)';
 
 

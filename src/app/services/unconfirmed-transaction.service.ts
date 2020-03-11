@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { PayNote, toHex, Tx, ZeroPoolNetwork } from 'zeropool-lib';
 import { ZeroPoolService } from './zero-pool.service';
-import { BehaviorSubject, combineLatest, defer, Observable, of, timer } from 'rxjs';
 import { delay, exhaustMap, filter, map, mergeMap, repeatWhen, take, takeWhile, tap } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, defer, Observable, of, timer } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { environment } from '../../environments/environment';
 import { RelayerApiService } from './relayer.api.service';
@@ -34,12 +34,20 @@ export class UnconfirmedTransactionService {
     this.delete('deposit');
   }
 
+  static hasOngoingDepositTransaction(): boolean {
+    return !!localStorage.getItem('deposit');
+  }
+
   static saveGasDepositTransaction(tx: ZpTransaction): void {
     this.save('gas-deposit', {
       tx: tx.tx,
       txHash: tx.txHash,
       timestamp: Date.now()
     });
+  }
+
+  static hasGasDepositTransaction(): boolean {
+    return !!localStorage.getItem('gas-deposit');
   }
 
   static deleteGasDepositTransaction(): void {

@@ -1,9 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { tw } from 'zeropool-lib';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { of } from 'rxjs';
+import { interval, of, Subscription } from 'rxjs';
 import { catchError, switchMap, tap } from 'rxjs/operators';
 import { AmountValidatorParams, CustomValidators } from '../gas-deposit/custom-validators';
 import { Web3ProviderService } from '../../services/web3.provider.service';
@@ -17,7 +17,7 @@ import { environment } from '../../../environments/environment';
   templateUrl: './deposit.component.html',
   styleUrls: ['./deposit.component.scss']
 })
-export class DepositComponent implements OnInit {
+export class DepositComponent implements OnInit, OnDestroy {
 
   availableEthAmount: number;
 
@@ -28,9 +28,10 @@ export class DepositComponent implements OnInit {
 
   depositInProgress = false;
 
+  subscription: Subscription;
+
   @ViewChild('progressDialog')
   progressDialog: ProgressMessageComponent;
-
 
   public form: FormGroup = this.fb.group({
     amount: ['', Validators.max(0.1)], // Min, Balance
@@ -62,13 +63,14 @@ export class DepositComponent implements OnInit {
     private web3Service: Web3ProviderService,
     private fb: FormBuilder
   ) {
-
+    // Показывать что в процессе если уже зашел тудаы
     this.availableEthAmount = this.zpService.ethBalance;
   }
 
   ngOnInit(): void {
 
-    this.web3Service.isReady$.pipe(
+    // Ethereum balances
+    this.subscription = this.web3Service.isReady$.pipe(
       switchMap(
         () => this.web3Service.getEthBalance()
       ),
@@ -83,6 +85,31 @@ export class DepositComponent implements OnInit {
         this.form.get('amount').updateValueAndValidity();
       })
     ).subscribe();
+
+
+    // Handling case when subscription is already in progress
+    if (UnconfirmedTransactionService.hasOngoingDepositTransaction) {
+      this.depositInProgress = true;
+      this.progressDialog.showMessage({
+        title: 'Deposit in progress',
+        lineOne: 'Transaction generated',
+        lineTwo: 'Wait for ZeroPool block',
+        isLineTwoBold: true
+      });
+
+      const polling$ = interval(500).pipe(
+        tap(() => {
+          this.depositInProgress = false;
+          this.isFinished = true;
+        })
+      );
+
+      this.subscription.add(polling$.subscribe());
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.subscription && this.subscription.unsubscribe();
   }
 
   onDepositClick(): void {
@@ -138,9 +165,12 @@ export class DepositComponent implements OnInit {
       tap((txHash: any) => {
         this.depositInProgress = false;
         this.isFinished = true;
+
         console.log({
           deposit: txHash
         });
+
+        // TODO: check with Kiril shell we call delete from component code
         UnconfirmedTransactionService.deleteDepositTransaction();
       }),
       catchError((e) => {
@@ -154,3 +184,4 @@ export class DepositComponent implements OnInit {
   }
 
 }
+

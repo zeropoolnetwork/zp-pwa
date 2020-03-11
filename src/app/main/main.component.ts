@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountService, IAccount } from '../services/account.service';
 import { ZeroPoolService } from '../services/zero-pool.service';
-import { Observable, timer } from 'rxjs';
+import { interval, Observable, Subscription, timer } from 'rxjs';
 import { fw, HistoryItem, PayNote } from 'zeropool-lib';
 import { MatTooltip } from '@angular/material/tooltip';
 import { delay, filter, tap } from 'rxjs/operators';
@@ -23,8 +23,6 @@ export class MainComponent implements OnInit {
 
   account$: Observable<IAccount>;
 
-  isConnectedEthereum: boolean;
-
   zpGasBalance: number;
   balance: number;
 
@@ -33,11 +31,17 @@ export class MainComponent implements OnInit {
 
   // amountOfPendingWithdrawals = 1;
   // amountOfVerifiedWithdrawals = 3;
+
+  hasDepositInProgress = false;
+  hasGasDepositInProgress = false;
+
   totalWithdrawals = 0;
   hasWithdrawals = false;
   hasVerifiedWithdrawals = true;
 
   color = 'rgba(100, 100, 100, 0.5)';
+
+  subscription: Subscription;
 
   constructor(
     private accountSvc: AccountService,
@@ -49,34 +53,29 @@ export class MainComponent implements OnInit {
     private router: Router
   ) {
 
-    this.zpService.start$.subscribe();
-
-    // TODO: fix problem and use ?. operator
-    this.isConnectedEthereum = !!(zpService.zp && zpService.zp.ZeroPool.web3Ethereum.ethAddress);
-
-    web3Service.isReady$.pipe(
-      filter(x => !!x)
-    ).subscribe(
-      () => {
-        this.isConnectedEthereum = true;
-      }
-    );
-
     this.account$ = this.accountSvc.account$;
+    this.zpService.start$.subscribe(); // Unsubscribe ?? - Обсудить с Кириллом
 
-    this.zpService.balanceProgressNotificator$
-      .subscribe((update) => {
-        console.log(update);
-      });
-
-    if (this.zpService.zpBalance) {
-      this.syncState();
-    }
-
-    this.zpService.zpUpdates$.subscribe(() => {
+    this.subscription = this.zpService.zpUpdates$.subscribe(() => {
       this.accountSvc.deleteNewAccountFlag();
-      this.syncState();
+      this.updateUiState();
     });
+
+    // Poling of gasDeposit
+    const ongoingGasDepositsPoling$ = interval(500).pipe();
+    this.subscription.add(ongoingGasDepositsPoling$.subscribe(
+      () => {
+        this.hasGasDepositInProgress = UnconfirmedTransactionService.hasGasDepositTransaction()
+      }
+    ));
+
+    // Poling of deposit
+    const ongoingDepositsPoling$ = interval(500).pipe();
+    this.subscription.add(ongoingDepositsPoling$.subscribe(
+      () => {
+        this.hasDepositInProgress = UnconfirmedTransactionService.hasOngoingDepositTransaction()
+      }
+    ));
 
   }
 
@@ -84,7 +83,7 @@ export class MainComponent implements OnInit {
     this.web3Service.connectWeb3();
   }
 
-  syncState() {
+  updateUiState() {
     this.balance = fw(this.zpService.zpBalance[environment.ethToken]) || 0;
     this.history = this.zpService.zpHistory;
     this.zpGasBalance = fw(this.zpService.zpGasBalance);
@@ -109,7 +108,9 @@ export class MainComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
+    if (this.zpService.zpBalance) {
+      this.updateUiState();
+    }
   }
 
   // TODO: move to separate component or directive
