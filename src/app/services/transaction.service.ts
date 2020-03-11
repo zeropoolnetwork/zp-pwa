@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { exhaustMap, filter, map, mergeMap, shareReplay, take } from 'rxjs/operators';
-import { combineLatest, Observable, of, Subject, timer } from 'rxjs';
+import { exhaustMap, filter, map, mergeMap, shareReplay, take, tap } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, Observable, of, timer } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { ZeroPoolService } from './zero-pool.service';
 import { RelayerApiService } from './relayer.api.service';
@@ -230,7 +230,7 @@ export class TransactionService {
 
   private waitForTx(txHash: string): Observable<string> {
 
-    const txReceipt = new Subject();
+    const txReceipt = new BehaviorSubject(undefined);
     const txReceipt$ = txReceipt.asObservable();
 
     const onTxReceipt = (err: any, tx: TransactionReceipt) => {
@@ -245,11 +245,18 @@ export class TransactionService {
 
     };
 
-    timer(0, 5000).pipe(
+    const timer$ = timer(0, 5000).pipe(
       exhaustMap(() => {
         return fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransactionReceipt(txHash, onTxReceipt))
           .pipe(take(1));
       }),
+      tap(
+        () => {
+          if (txReceipt.value !== undefined) {
+            timer$.unsubscribe();
+          }
+        }
+      )
     ).subscribe();
 
     return txReceipt$.pipe(

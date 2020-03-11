@@ -98,17 +98,7 @@ export class GasDepositComponent implements OnInit {
           lineOne: 'Transaction published',
           lineTwo: 'Wait for ZeroPool block'
         });
-      } else if (progressStep === 'queue') {
-        this.progressDialog.showMessage({
-          title: 'Gas deposit in progress',
-          lineOne: 'Wait until the last transactions are confirmed',
-          lineTwo: ''
-        });
-
-        // this.progressMessageLineOne = '';
-        // this.progressMessageLineTwo = 'Wait for ZeroPool block';
-        // this.isLineTwoBold = true;
-      } else if (progressStep === 'queue') {
+      }  else if (progressStep === 'queue') {
         //
         this.progressDialog.showMessage({
           title: 'Gas Deposit in progress',
