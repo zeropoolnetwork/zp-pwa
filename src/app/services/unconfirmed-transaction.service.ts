@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
 import { PayNote, toHex, Tx, ZeroPoolNetwork } from 'zeropool-lib';
 import { ZeroPoolService } from './zero-pool.service';
-import { combineLatest, defer, Observable, of, timer } from 'rxjs';
-import { catchError, delay, exhaustMap, filter, map, mergeMap, repeatWhen, take, takeWhile, tap } from 'rxjs/operators';
-import { BehaviorSubject, combineLatest, defer, Observable, of, timer } from 'rxjs';
 import { delay, exhaustMap, filter, map, mergeMap, repeatWhen, take, takeWhile, tap } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, defer, Observable, of, timer } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { environment } from '../../environments/environment';
 import { RelayerApiService } from './relayer.api.service';
