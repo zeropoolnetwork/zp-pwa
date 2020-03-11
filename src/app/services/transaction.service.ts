@@ -245,11 +245,10 @@ export class TransactionService {
 
     };
 
-    const waitTx$ = fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransactionReceipt(txHash, onTxReceipt));
-
     timer(0, 5000).pipe(
       exhaustMap(() => {
-        return waitTx$.pipe(take(1));
+        return fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransactionReceipt(txHash, onTxReceipt))
+          .pipe(take(1));
       }),
     ).subscribe();
 
