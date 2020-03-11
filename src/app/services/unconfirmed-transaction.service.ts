@@ -67,6 +67,7 @@ export class UnconfirmedTransactionService {
 
     const txHash$ = this.zpService.isReady$.pipe(
       filter((isReady: boolean) => isReady),
+      take(1),
       mergeMap(() => {
         return this.waitForTx(depositZpTx.txHash, () => {
           const timePassed = Date.now() - depositZpTx.timestamp;
@@ -286,7 +287,6 @@ export class UnconfirmedTransactionService {
       }),
       takeWhile(takeWhileFunc),
       filter(x => !!x),
-      take(1)
     );
 
   }

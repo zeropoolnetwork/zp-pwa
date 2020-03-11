@@ -91,7 +91,7 @@ export class TransferComponent implements OnInit {
         //
         this.progressDialog.showMessage({
           title: 'Transfer is in progress',
-          lineOne: 'Wait until the last transactions are confirmed',
+          lineOne: 'Wait for the last transactions to be confirmed',
           lineTwo: '',
           isLineTwoBold: true
         });

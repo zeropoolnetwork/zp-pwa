@@ -83,7 +83,7 @@ export class WithdrawComponent implements OnInit {
         //
         this.progressDialog.showMessage({
           title: 'Withdraw is in progress',
-          lineOne: 'Wait until the last transactions are confirmed',
+          lineOne: 'Wait for the last transactions to be confirmed',
           lineTwo: '',
           isLineTwoBold: true
         });

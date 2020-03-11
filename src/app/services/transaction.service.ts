@@ -94,7 +94,9 @@ export class TransactionService {
                   txHash
                 });
 
-                return this.waitForTx(txHash);
+                return this.waitForTx(txHash).pipe(
+                  filter(x => !!x),
+                );
               }
             ),
             mergeMap((txHash: string) => {
@@ -225,7 +227,9 @@ export class TransactionService {
       );
   };
 
+
   private waitForTx(txHash: string): Observable<string> {
+
     const waitTx$ = fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransaction(txHash)).pipe(
       map((tx: Transaction): string => {
         if (!tx || !tx.blockNumber) {
@@ -242,8 +246,7 @@ export class TransactionService {
       switchMap(() => {
         return waitTx$;
       }),
-      filter(x => !!x),
-      take(1)
+      // take(1)
     );
 
   }
