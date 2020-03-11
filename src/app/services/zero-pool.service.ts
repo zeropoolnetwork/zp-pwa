@@ -73,6 +73,7 @@ export class ZeroPoolService {
       filter((isReady: boolean) => isReady),
     );
 
+    // TODO: Есть нюанс - обсудить с Кириллом
     this.start$ = combineLatest([
       circomLoaded$,
       web3Loaded$,

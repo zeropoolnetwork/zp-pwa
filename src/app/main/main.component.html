@@ -15,7 +15,6 @@
               <img class="icon-settings" src="../../assets/icons/settings.png">
             </button>
 
-
             <div #addressTooltip="matTooltip"
                  (click)="onAddressClick(addressTooltip, account)"
                  [matTooltip]="tooltipMessage"
@@ -32,9 +31,20 @@
       <ng-container *ngIf="!isNeedToShowLoader">
 
         <div class="balance-block">
+
           <ng-container *ngIf="!balance">
             <h1 class="balance-zero">{{balance || 0}} zpETH</h1>
-            <p *ngIf="zpGasBalance" style="margin-top: .2em" class="balance-gas">Gas {{zpGasBalance || 0}}</p>
+
+            <p *ngIf="zpGasBalance" class="balance-gas"
+               style="margin-top: .2em" >Gas {{zpGasBalance || 0}}</p>
+
+            <p *ngIf="hasGasDepositInProgress" class="balance-gas"
+               style="margin-top: .2em" >Gas top up in progress</p>
+            <!--
+            <p *ngIf="!zpGasBalance && !hasGasDepositInProgress" class="balance-gas"
+               style="margin-top: .2em" >Don't have gas</p>
+            -->
+
           </ng-container>
 
           <ng-container *ngIf="balance">
@@ -44,12 +54,19 @@
               <p class="balance-gas">Gas {{zpGasBalance || 0}}</p>
             </h1>
           </ng-container>
+
         </div>
 
         <div class="button-block">
           <div class="actions mb-20">
-            <button mat-stroked-button routerLink="./deposit">Deposit</button>
+            <button mat-stroked-button routerLink="./deposit"
+                    matBadgePosition="above before"
+                    matBadge="1"
+                    matBadgeColor="accent"
+                    [matBadgeHidden]="!hasDepositInProgress">Deposit</button>
+
             <button mat-stroked-button routerLink="./transfer" [disabled]="!balance">Transfer</button>
+
             <button mat-stroked-button
                     [disabled]="!balance && !hasWithdrawals"
                     [routerLink]="hasWithdrawals ? 'withdrawals-list' :'./withdraw'"
@@ -95,21 +112,6 @@
 
     </div>
   </div>
-
-  <!--
-  <div *ngIf="!isConnectedEthereum">
-    <div class="fixed-center widget-box">
-      <img style="margin-top: 1em; margin-left: auto; margin-right: auto" src="/assets/images/zeropool-logo.jpeg" width="100px">
-      <h1>Connect Wallet</h1>
-      <h5 style="margin-top: -1.5em">To start using ZeroPool</h5>
-      <div class="">
-        <button mat-stroked-button (click)="connectWallet()">
-          <img style="padding-bottom: 1em; padding-top: 1em;" src="/assets/images/metamask.png" width="100px">
-        </button>
-      </div>
-    </div>
-  </div>
-  -->
 
 </ng-container>
 

@@ -11,7 +11,7 @@ export class ProgressMessageComponent implements OnInit {
   title: string;
   progressMessageLineOne: string;
   progressMessageLineTwo: string;
-  isLineTwoBold: boolean;
+  // isLineTwoBold: boolean;
   color = 'rgba(100, 100, 100, 0.5)';
 
   constructor() {
@@ -24,9 +24,17 @@ export class ProgressMessageComponent implements OnInit {
     this.title = messages.title || '';
     this.progressMessageLineOne = messages.lineOne || '';
     this.progressMessageLineTwo = messages.lineTwo || '';
-    this.isLineTwoBold = !!messages.isLineTwoBold;
     this.imageSrc = messages.image ? messages.image : this.imageSrc;
+    // this.isLineTwoBold = !!messages.isLineTwoBold;
   }
+
+  // updateMessage(messages) {
+  //   this.title = messages.title || '';
+  //   this.progressMessageLineOne = messages.lineOne || '';
+  //   this.progressMessageLineTwo = messages.lineTwo || '';
+  //   this.imageSrc = messages.image ? messages.image : this.imageSrc;
+  //   // this.isLineTwoBold = !!messages.isLineTwoBold;
+  // }
 
   showErrorMessage() {
     // console.log('2');

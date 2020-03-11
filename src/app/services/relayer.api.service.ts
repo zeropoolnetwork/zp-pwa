@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { delay, map, mergeMap, retryWhen } from 'rxjs/operators';
+import { catchError, delay, map, mergeMap, retryWhen } from 'rxjs/operators';
 import { Observable, of, throwError } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Tx } from 'zeropool-lib';
