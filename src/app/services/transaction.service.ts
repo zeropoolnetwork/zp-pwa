@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { delay, expand, filter, map, mapTo, mergeMap, shareReplay, take } from 'rxjs/operators';
-import { combineLatest, Observable, of } from 'rxjs';
+import { filter, map, mergeMap, shareReplay, switchMap, take } from 'rxjs/operators';
+import { combineLatest, Observable, of, timer } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { ZeroPoolService } from './zero-pool.service';
 import { RelayerApiService } from './relayer.api.service';
@@ -91,7 +91,7 @@ export class TransactionService {
               (txHash: string) => {
                 UnconfirmedTransactionService.saveGasDepositTransaction({
                   tx: zpTxData[0],
-                  txHash: txHash
+                  txHash
                 });
 
                 return this.waitForTx(txHash);
@@ -228,7 +228,7 @@ export class TransactionService {
   private waitForTx(txHash: string): Observable<string> {
     const waitTx$ = fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransaction(txHash)).pipe(
       map((tx: Transaction): string => {
-        if (!tx || !tx.blockNumber) {
+        if (!tx) {
           return undefined;
         }
         return tx.hash;
@@ -236,9 +236,14 @@ export class TransactionService {
       take(1)
     );
 
-    return waitTx$.pipe(
-      expand(result => result ? of(undefined) : waitTx$.pipe(delay(5000))),
-      filter(x => !!x)
+    // let x = 0;
+
+    return timer(0, 5000).pipe(
+      switchMap(() => {
+        return waitTx$;
+      }),
+      filter(x => !!x),
+      take(1)
     );
 
   }

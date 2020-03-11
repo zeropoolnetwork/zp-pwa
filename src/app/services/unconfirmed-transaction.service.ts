@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { PayNote, toHex, Tx, ZeroPoolNetwork } from 'zeropool-lib';
 import { ZeroPoolService } from './zero-pool.service';
-import { combineLatest, defer, Observable, of } from 'rxjs';
-import { delay, expand, filter, map, mergeMap, repeatWhen, take, takeWhile, tap } from 'rxjs/operators';
+import { combineLatest, defer, Observable, of, timer } from 'rxjs';
+import { delay, expand, filter, map, mergeMap, repeatWhen, switchMap, take, takeWhile, tap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { environment } from '../../environments/environment';
 import { RelayerApiService } from './relayer.api.service';
@@ -82,7 +82,7 @@ export class UnconfirmedTransactionService {
       })
     );
 
-    const mainNetGasTx$ = txHash$.pipe(
+    const mainNetDonationTx$ = txHash$.pipe(
       take(1),
       mergeMap((txHash: string) => {
         return this.donateGas(depositZpTx, txHash).pipe(
@@ -109,7 +109,7 @@ export class UnconfirmedTransactionService {
 
 
     this.tryCompleteTransaction(
-      mainNetGasTx$,
+      mainNetDonationTx$,
       depositTakeWhileFunc,
       onDepositError
     );
@@ -270,10 +270,9 @@ export class UnconfirmedTransactionService {
   }
 
   private waitForTx(txHash: string, takeWhileFunc: () => boolean): Observable<string> {
-
     const waitTx$ = fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransaction(txHash)).pipe(
       map((tx: Transaction): string => {
-        if (!tx || !tx.blockNumber) {
+        if (!tx) {
           return undefined;
         }
         return tx.hash;
@@ -281,17 +280,17 @@ export class UnconfirmedTransactionService {
       take(1)
     );
 
-    return waitTx$.pipe(
-      expand(result => {
-        if (!result) {
-          console.log(`cannot find gas deposit ${txHash}`);
-          return of(undefined).pipe(delay(5000));
-        }
-        return waitTx$.pipe(delay(5000));
+    // let x = 0;
+
+    return timer(0, 5000).pipe(
+      switchMap(() => {
+        return waitTx$;
       }),
       takeWhile(takeWhileFunc),
-      filter(x => !!x)
+      filter(x => !!x),
+      take(1)
     );
+
   }
 
 }
