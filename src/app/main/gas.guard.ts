@@ -3,6 +3,7 @@ import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTr
 import { Observable } from 'rxjs';
 import { ZeroPoolService } from '../services/zero-pool.service';
 import { map } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -19,11 +20,10 @@ export class GasGuard implements CanActivate {
 
     return this.zpService.isReady$.pipe(
       map((isReady) => {
-
         let url = '';
         if (!isReady) {
           url = '/main';
-        } else if (!this.zpService.zpGasBalance) {
+        } else if (this.zpService.zpGasBalance < environment.relayerFee) {
           url = '/main/gas-is-needed';
         }
 
