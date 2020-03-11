@@ -107,16 +107,29 @@ export class GasDepositComponent implements OnInit {
           isLineTwoBold: true
         });
 
+      } else if (progressStep === 'generate-transaction') {
+        //
+        this.progressDialog.showMessage({
+          title: 'Gas Deposit in progress',
+          lineOne: 'Generate Gas Deposit Transaction',
+          lineTwo: '',
+          isLineTwoBold: true
+        });
+
+      } else if (progressStep === 'open-metamask') {
+        //
+        this.progressDialog.showMessage({
+          title: 'Gas deposit in progress',
+          lineOne: 'Transaction generated',
+          lineTwo: 'Please check your metamask',
+          isLineTwoBold: true
+        });
+
       }
 
     };
 
-    this.progressDialog.showMessage({
-      title: 'Gas deposit in progress',
-      lineOne: 'Transaction generated',
-      lineTwo: 'Please check your metamask',
-      isLineTwoBold: true
-    });
+
 
     // progressCallback
     this.txService.gasDeposit(amount, progressCallback).pipe(

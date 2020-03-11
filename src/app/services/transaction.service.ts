@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { exhaustMap, filter, map, mergeMap, shareReplay, take, tap } from 'rxjs/operators';
+import { exhaustMap, filter, map, mergeMap, shareReplay, take } from 'rxjs/operators';
 import { BehaviorSubject, combineLatest, Observable, of, timer } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { ZeroPoolService } from './zero-pool.service';
@@ -72,6 +72,7 @@ export class TransactionService {
   public gasDeposit(amount: number, progressCallback: (msg) => void): Observable<string> {
     const o$ = this.isReady$.pipe(
       mergeMap(() => {
+        progressCallback('generate-transaction');
         return fromPromise(this.zpService.zpGas.prepareDeposit(environment.ethToken, amount, progressCallback));
       }),
       mergeMap(
@@ -80,6 +81,7 @@ export class TransactionService {
             mergeMap(
               (address: string) => {
 
+                progressCallback('open-metamask');
                 const tx$ = this.zpService.zp.ZeroPool.web3Ethereum.sendTransaction(address, amount, undefined, 0);
                 return fromPromise(tx$).pipe(
                   map((txData: any) => txData.transactionHash || txData)
@@ -97,6 +99,8 @@ export class TransactionService {
                 return this.waitForTx(txHash);
               }
             ),
+            filter(x => !!x),
+            take(1),
             mergeMap((txHash: string) => {
               progressCallback('wait-for-zp-block');
 
