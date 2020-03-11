@@ -13,7 +13,7 @@ interface DoneObservable {
   id: string;
 }
 
-export class ObservableSynchronizer {
+class ObservableSynchronizer {
 
   private queueCount = 0;
 
@@ -64,3 +64,5 @@ export class ObservableSynchronizer {
   }
 
 }
+
+export const TransactionSyncronizer = new ObservableSynchronizer();

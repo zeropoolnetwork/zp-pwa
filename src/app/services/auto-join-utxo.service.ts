@@ -6,7 +6,7 @@ import { MyUtxoState, Utxo } from 'zeropool-lib';
 import { AccountService, IAccount } from './account.service';
 import { environment } from '../../environments/environment';
 import { ZeroPoolService } from './zero-pool.service';
-import { TransactionService } from './transaction/transaction.service';
+import { TransactionService } from './transaction.service';
 
 export const defaultGasMaxFeeGwei = environment.relayerFee * 10;
 export const defaultMinUtxoSizeGwei = environment.relayerFee;

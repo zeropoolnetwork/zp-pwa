@@ -2,12 +2,13 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { tw } from 'zeropool-lib';
 import { catchError, switchMap, take, tap } from 'rxjs/operators';
-import { TransactionService } from '../../services/transaction/transaction.service';
+import { TransactionService } from '../../services/transaction.service';
 import { of } from 'rxjs';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { AmountValidatorParams, CustomValidators } from './custom-validators';
 import { Web3ProviderService } from '../../services/web3.provider.service';
 import { ProgressMessageComponent } from '../progress-message/progress-message.component';
+import { UnconfirmedTransactionService } from '../../services/unconfirmed-transaction.service';
 
 @Component({
   selector: 'app-gas-deposit',
@@ -110,7 +111,7 @@ export class GasDepositComponent implements OnInit {
       } else if (progressStep === 'queue') {
         //
         this.progressDialog.showMessage({
-          title: ' Gas Deposit in progress',
+          title: 'Gas Deposit in progress',
           lineOne: 'Wait until the last transactions are confirmed',
           lineTwo: '',
           isLineTwoBold: true
@@ -133,11 +134,13 @@ export class GasDepositComponent implements OnInit {
         this.inProgress = false;
         this.isDone = true;
         console.log({ gasDeposit: txHash });
+        UnconfirmedTransactionService.deleteGasDepositTransaction();
       }),
       catchError((e) => {
         this.inProgress = false;
         this.isDoneWithError = true;
         console.log(e);
+        UnconfirmedTransactionService.deleteGasDepositTransaction();
         return of(e);
       })
     ).subscribe();

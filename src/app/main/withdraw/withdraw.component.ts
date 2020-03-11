@@ -6,7 +6,7 @@ import { environment } from '../../../environments/environment';
 import { catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ProgressMessageComponent } from '../progress-message/progress-message.component';
-import { TransactionService } from '../../services/transaction/transaction.service';
+import { TransactionService } from '../../services/transaction.service';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 
 @Component({

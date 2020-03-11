@@ -1,19 +1,21 @@
 import { Injectable } from '@angular/core';
-import { PayNote, toHex, Tx } from 'zeropool-lib';
+import { PayNote, toHex, Tx, ZeroPoolNetwork } from 'zeropool-lib';
 import { ZeroPoolService } from './zero-pool.service';
 import { combineLatest, defer, Observable, of } from 'rxjs';
-import { delay, filter, map, mergeMap, repeatWhen, take, takeWhile, tap } from 'rxjs/operators';
+import { delay, expand, filter, map, mergeMap, repeatWhen, take, takeWhile, tap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { environment } from '../../environments/environment';
 import { RelayerApiService } from './relayer.api.service';
+import { TransactionSyncronizer } from './observable-synchronizer';
+import { Transaction } from 'web3-core';
 
 export interface ZpTransaction {
   tx: Tx<string>;
-  zpTxHash: string;
+  txHash: string;
   timestamp?: number;
 }
 
-const dateExpiresInMinutes = 5;
+const dateExpiresInMinutes = 1;
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +25,7 @@ export class UnconfirmedTransactionService {
   static saveDepositTransaction(tx: ZpTransaction): void {
     this.save('deposit', {
       tx: tx.tx,
-      zpTxHash: tx.zpTxHash,
+      txHash: tx.txHash,
       timestamp: Date.now()
     });
   }
@@ -35,7 +37,7 @@ export class UnconfirmedTransactionService {
   static saveGasDepositTransaction(tx: ZpTransaction): void {
     this.save('gas-deposit', {
       tx: tx.tx,
-      zpTxHash: tx.zpTxHash,
+      txHash: tx.txHash,
       timestamp: Date.now()
     });
   }
@@ -53,26 +55,79 @@ export class UnconfirmedTransactionService {
   }
 
   constructor(private zpService: ZeroPoolService, private relayerApi: RelayerApiService) {
-    this.tryMakeDeposit();
+    this.tryDeposit();
+    this.tryGasDeposit();
+  }
 
+  private tryGasDeposit(): void {
+    const depositZpTx = this.getGasDepositTransaction();
+    if (!depositZpTx) {
+      return;
+    }
+
+    const txHash$ = this.zpService.isReady$.pipe(
+      mergeMap(() => {
+        return this.waitForTx(depositZpTx.txHash, () => {
+          const timePassed = Date.now() - depositZpTx.timestamp;
+
+          if (timePassed > 60000 * dateExpiresInMinutes) {
+            console.log('unconfirmed gas deposit transaction time expired');
+            UnconfirmedTransactionService.deleteGasDepositTransaction();
+            return false;
+          }
+
+          return true;
+        });
+      })
+    );
+
+    const mainNetGasTx$ = txHash$.pipe(
+      take(1),
+      mergeMap((txHash: string) => {
+        return this.donateGas(depositZpTx, txHash).pipe(
+          tap((data: any) => {
+            console.log({
+              unconfirmedGasDepositLog: data
+            });
+          })
+        );
+      }),
+    );
+
+    const depositTakeWhileFunc = () => {
+      return (
+        Date.now() - depositZpTx.timestamp < 60000 * dateExpiresInMinutes &&
+        !!this.getGasDepositTransaction()
+      );
+    };
+
+    const onDepositError = (e) => {
+      UnconfirmedTransactionService.deleteGasDepositTransaction();
+      console.log('unconfirmed transaction failed: ', e.message || e);
+    };
+
+
+    this.tryCompleteTransaction(
+      mainNetGasTx$,
+      depositTakeWhileFunc,
+      onDepositError
+    );
 
   }
 
-  private tryMakeDeposit(): void {
+  private tryDeposit(): void {
     const depositZpTx = this.getDepositTransaction();
     if (!depositZpTx) {
       return;
     }
 
-    const timePassed = Date.now() - depositZpTx.timestamp;
+    const unconfirmedDeposit$ = this.zpService.isReady$.pipe(
+      filter((isReady: boolean) => isReady),
+      mergeMap(() => {
+        return this.getUnconfirmedDeposit(this.zpService.zp, depositZpTx);
+      })
+    );
 
-    if (timePassed > 60000 * dateExpiresInMinutes) {
-      console.log('unconfirmed deposit transaction time expired');
-      UnconfirmedTransactionService.deleteDepositTransaction();
-      return;
-    }
-
-    const unconfirmedDeposit$ = this.getUnconfirmedDeposit(depositZpTx);
     const gasTx$ = this.zpService.isReady$.pipe(
       filter((isReady: boolean) => isReady),
       mergeMap(
@@ -83,8 +138,6 @@ export class UnconfirmedTransactionService {
         }
       ),
     );
-
-    const tryEachMillisecond = 3000;
 
     const tryDeposit$ = combineLatest([unconfirmedDeposit$, gasTx$]).pipe(
       take(1),
@@ -100,32 +153,67 @@ export class UnconfirmedTransactionService {
       }),
     );
 
-    defer(() => tryDeposit$).pipe(
+    const depositTakeWhileFunc = () => {
+      return (
+        Date.now() - depositZpTx.timestamp < 60000 * dateExpiresInMinutes &&
+        !!this.getDepositTransaction()
+      );
+    };
+
+    const onDepositError = (e) => {
+      UnconfirmedTransactionService.deleteDepositTransaction();
+      console.log('unconfirmed transaction failed: ', e.message || e);
+    };
+
+
+    this.tryCompleteTransaction(
+      tryDeposit$,
+      depositTakeWhileFunc,
+      onDepositError
+    );
+
+  }
+
+  private tryCompleteTransaction(
+    executeTx$: Observable<any>,
+    takeWhileFunc: () => boolean,
+    onError: (err: any) => void
+  ): void {
+
+    const scheduledTxFunc = () => {
+      return TransactionSyncronizer.execute({
+        observable: executeTx$
+      }).pipe(take(1));
+    };
+
+    const tryEachMillisecond = 3000;
+
+    defer(scheduledTxFunc).pipe(
       repeatWhen(completed => completed.pipe(delay(tryEachMillisecond))),
-      takeWhile(() => {
-        return (
-          Date.now() - depositZpTx.timestamp < 60000 * dateExpiresInMinutes &&
-          !!this.getDepositTransaction()
-        );
-      }),
+      takeWhile(takeWhileFunc),
     ).subscribe(
       () => {
       },
-      (e) => {
-        UnconfirmedTransactionService.deleteDepositTransaction();
-        console.log('unconfirmed transaction failed: ', e.message || e);
-      }
+      onError
     );
+
   }
 
-  trySendTx(
+  private trySendTx(
     depositTx: PayNote,
     gasTx: Tx<string>,
     depositZpTx: ZpTransaction
   ): Observable<string> {
 
     if (!depositTx || !depositTx.blockNumber) {
-      return of(`cannot find deposit ${depositZpTx.zpTxHash}`);
+      const timePassed = Date.now() - depositZpTx.timestamp;
+
+      if (timePassed > 60000 * dateExpiresInMinutes) {
+        UnconfirmedTransactionService.deleteDepositTransaction();
+        console.log('unconfirmed deposit transaction time expired');
+      }
+
+      return of(`cannot find deposit ${depositZpTx.txHash}`);
     }
 
     return this.relayerApi.sendTx$(depositZpTx.tx, toHex(depositTx.blockNumber), gasTx).pipe(
@@ -137,17 +225,25 @@ export class UnconfirmedTransactionService {
 
   }
 
-  getUnconfirmedDeposit(tx: ZpTransaction): Observable<PayNote | undefined> {
-    return this.zpService.isReady$.pipe(
-      filter((isReady: boolean) => isReady),
-      mergeMap(() => {
-        return fromPromise(
-          this.zpService.zp.getUncompleteDeposits()
-        );
-      }),
+  private donateGas(
+    depositZpTx: ZpTransaction,
+    ethTxHash: string
+  ): Observable<string> {
+
+    return this.relayerApi.gasDonation$(depositZpTx.tx, ethTxHash).pipe(
+      map((txData: any): string => {
+        UnconfirmedTransactionService.deleteGasDepositTransaction();
+        return txData.transactionHash;
+      })
+    );
+
+  }
+
+  private getUnconfirmedDeposit(zp: ZeroPoolNetwork, tx: ZpTransaction): Observable<PayNote | undefined> {
+    return fromPromise(zp.getUncompleteDeposits()).pipe(
       map((payNoteList: PayNote[]) => {
         const unconfirmedDeposit = payNoteList.filter((note) => {
-          return note.txHash === tx.zpTxHash;
+          return note.txHash === tx.txHash;
         });
         return unconfirmedDeposit && unconfirmedDeposit[0];
       }),
@@ -155,11 +251,11 @@ export class UnconfirmedTransactionService {
     );
   }
 
-  getDepositTransaction(): ZpTransaction | undefined {
+  private getDepositTransaction(): ZpTransaction | undefined {
     return this.get<ZpTransaction>('deposit');
   }
 
-  getGasDepositTransaction(): ZpTransaction | undefined {
+  private getGasDepositTransaction(): ZpTransaction | undefined {
     return this.get<ZpTransaction>('gas-deposit');
   }
 
@@ -170,6 +266,31 @@ export class UnconfirmedTransactionService {
     } catch (e) {
       return undefined;
     }
+  }
+
+  private waitForTx(txHash: string, takeWhileFunc: () => boolean): Observable<string> {
+
+    const waitTx$ = fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransaction(txHash)).pipe(
+      map((tx: Transaction): string => {
+        if (!tx || !tx.blockNumber) {
+          return undefined;
+        }
+        return tx.hash;
+      }),
+      take(1)
+    );
+
+    return waitTx$.pipe(
+      expand(result => {
+        if (!result) {
+          console.log(`cannot find gas deposit ${txHash}`);
+          return of(undefined).pipe(delay(5000));
+        }
+        return waitTx$.pipe(delay(5000));
+      }),
+      takeWhile(takeWhileFunc),
+      filter(x => !!x)
+    );
   }
 
 }

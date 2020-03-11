@@ -8,7 +8,7 @@ import { catchError, switchMap, tap } from 'rxjs/operators';
 import { AmountValidatorParams, CustomValidators } from '../gas-deposit/custom-validators';
 import { Web3ProviderService } from '../../services/web3.provider.service';
 import { UnconfirmedTransactionService } from '../../services/unconfirmed-transaction.service';
-import { TransactionService } from '../../services/transaction/transaction.service';
+import { TransactionService } from '../../services/transaction.service';
 import { ProgressMessageComponent } from '../progress-message/progress-message.component';
 import { environment } from '../../../environments/environment';
 

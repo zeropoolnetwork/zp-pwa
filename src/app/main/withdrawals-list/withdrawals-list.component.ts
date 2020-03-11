@@ -4,7 +4,7 @@ import { ZeroPoolService } from '../../services/zero-pool.service';
 import { environment } from '../../../environments/environment';
 import { catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { TransactionService } from '../../services/transaction/transaction.service';
+import { TransactionService } from '../../services/transaction.service';
 
 @Component({
   selector: 'app-withdrawals-list',

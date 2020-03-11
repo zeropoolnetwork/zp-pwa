@@ -2,7 +2,7 @@ import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { fw, tw } from 'zeropool-lib';
 import { environment } from '../../../environments/environment';
-import { TransactionService } from '../../services/transaction/transaction.service';
+import { TransactionService } from '../../services/transaction.service';
 import { catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ZeroPoolService } from '../../services/zero-pool.service';
