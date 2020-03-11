@@ -15,6 +15,8 @@ export class ResetAccountComponent {
 
   resetAccount() {
     localStorage.removeItem('mnemonic');
+    localStorage.removeItem('deposit');
+    localStorage.removeItem('gas-deposit');
     this.stateService.resetStorage()
       .subscribe(() => {
         location.reload();
