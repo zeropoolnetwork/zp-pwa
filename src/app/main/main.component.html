@@ -62,14 +62,14 @@
             <button mat-stroked-button routerLink="./deposit"
                     matBadgePosition="above before"
                     matBadge="1"
-                    matBadgeColor="accent"
+                    matBadgeColor="primary"
                     [matBadgeHidden]="!hasDepositInProgress">Deposit</button>
 
             <button mat-stroked-button routerLink="./transfer" [disabled]="!balance">Transfer</button>
 
             <button mat-stroked-button
                     [disabled]="!balance && !hasWithdrawals"
-                    [routerLink]="hasWithdrawals ? 'withdrawals-list' :'./withdraw'"
+                    [routerLink]="totalWithdrawals > 0 ? 'withdrawals-list' :'./withdraw'"
                     matBadgePosition="top after"
                     [matBadge]="totalWithdrawals"
                     [matBadgeColor]="hasVerifiedWithdrawals ? 'accent' : 'primary'"

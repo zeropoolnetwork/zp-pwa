@@ -29,15 +29,16 @@ export class MainComponent implements OnInit {
   history: HistoryItem[];
   tooltipMessage = 'Copy to clipboard';
 
-  // amountOfPendingWithdrawals = 1;
-  // amountOfVerifiedWithdrawals = 3;
-
   hasDepositInProgress = false;
   hasGasDepositInProgress = false;
 
   totalWithdrawals = 0;
-  hasWithdrawals = false;
-  hasVerifiedWithdrawals = true;
+
+  get hasWithdrawals() {
+    return this.totalWithdrawals > 0;
+  };
+
+  hasVerifiedWithdrawals = false;
 
   color = 'rgba(100, 100, 100, 0.5)';
 
@@ -65,7 +66,7 @@ export class MainComponent implements OnInit {
     const ongoingGasDepositsPoling$ = interval(500).pipe();
     this.subscription.add(ongoingGasDepositsPoling$.subscribe(
       () => {
-        this.hasGasDepositInProgress = UnconfirmedTransactionService.hasGasDepositTransaction()
+        this.hasGasDepositInProgress = UnconfirmedTransactionService.hasGasDepositTransaction();
       }
     ));
 
@@ -73,7 +74,7 @@ export class MainComponent implements OnInit {
     const ongoingDepositsPoling$ = interval(500).pipe();
     this.subscription.add(ongoingDepositsPoling$.subscribe(
       () => {
-        this.hasDepositInProgress = UnconfirmedTransactionService.hasOngoingDepositTransaction()
+        this.hasDepositInProgress = UnconfirmedTransactionService.hasOngoingDepositTransaction();
       }
     ));
 
@@ -92,7 +93,7 @@ export class MainComponent implements OnInit {
 
     if (this.totalWithdrawals !== 0 && (typeof this.zpService.challengeExpiresBlocks == 'number')) {
       //
-      this.hasWithdrawals = true;
+      //this.hasWithdrawals = true;
       const readyBlock = this.zpService.currentBlockNumber - this.zpService.challengeExpiresBlocks;
       //
       this.zpService.activeWithdrawals.forEach(
