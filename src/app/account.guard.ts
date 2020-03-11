@@ -3,6 +3,38 @@ import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Rout
 import { Observable } from 'rxjs';
 import { getEthAddressSafe, Web3ProviderService } from './services/web3.provider.service';
 
+
+@Injectable({
+  providedIn: 'root'
+})
+export class EmptyAccountGuard implements CanActivate {
+
+  constructor(private router: Router, private web3Service: Web3ProviderService) {
+  }
+
+  canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+    return localStorage.getItem('mnemonic')
+      ? this.router.parseUrl('/main')
+      : true;
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ConnectWalletGuard implements CanActivate {
+
+  constructor(private router: Router, private web3Service: Web3ProviderService) {
+  }
+
+  canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+    return localStorage.getItem('mnemonic')
+      ? this.router.parseUrl('/welcome')
+      : true;
+  }
+}
+
+
 @Injectable({
   providedIn: 'root'
 })
