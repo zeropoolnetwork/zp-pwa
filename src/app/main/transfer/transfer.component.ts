@@ -83,10 +83,19 @@ export class TransferComponent implements OnInit {
         this.progressDialog.showMessage({
           title: 'Transfer is in progress',
           lineOne: 'Transaction published',
-          lineTwo: 'Wait for ZeroPool block',
+          lineTwo: 'Verifying ZeroPool block',
           isLineTwoBold: true
         });
         //
+      } else if (progressStep === 'receipt-tx-data') {
+        //
+        this.progressDialog.showMessage({
+          title: 'Transfer is in progress',
+          lineOne: 'Block successfully verified',
+          lineTwo: 'Waiting for a transaction to be included in a block',
+          isLineTwoBold: true
+        });
+
       } else if (progressStep === 'queue') {
         //
         this.progressDialog.showMessage({

@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { PayNote, toHex, Tx, ZeroPoolNetwork } from 'zeropool-lib';
 import { ZeroPoolService } from './zero-pool.service';
-import { combineLatest, defer, Observable, of, timer } from 'rxjs';
+import { BehaviorSubject, combineLatest, defer, Observable, of, timer } from 'rxjs';
 import { delay, exhaustMap, filter, map, mergeMap, repeatWhen, take, takeWhile, tap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { environment } from '../../environments/environment';
 import { RelayerApiService } from './relayer.api.service';
 import { TransactionSyncronizer } from './observable-synchronizer';
-import { Transaction, TransactionReceipt } from 'web3-core';
+import { TransactionReceipt } from 'web3-core';
 
 export interface ZpTransaction {
   tx: Tx<string>;
@@ -69,16 +69,16 @@ export class UnconfirmedTransactionService {
       filter((isReady: boolean) => isReady),
       take(1),
       mergeMap(() => {
-        return this.waitForTx(depositZpTx.txHash, () => {
-          const timePassed = Date.now() - depositZpTx.timestamp;
+        return this.waitForTx(this.zpService.zp, depositZpTx.txHash, () => {
 
-          if (timePassed > 60000 * dateExpiresInMinutes) {
+          const timePassed = Date.now() - depositZpTx.timestamp;
+          const isExpired = !(timePassed <= 60000 * dateExpiresInMinutes);
+          if (isExpired) {
             console.log('unconfirmed gas deposit transaction time expired');
             UnconfirmedTransactionService.deleteGasDepositTransaction();
-            return false;
           }
 
-          return true;
+          return !isExpired && !!this.getGasDepositTransaction();
         }).pipe(filter(x => !!x), take(1));
       })
     );
@@ -219,9 +219,17 @@ export class UnconfirmedTransactionService {
     }
 
     return this.relayerApi.sendTx$(depositZpTx.tx, toHex(depositTx.blockNumber), gasTx).pipe(
-      map((txData: any): string => {
+      tap(() => {
         UnconfirmedTransactionService.deleteDepositTransaction();
-        return txData.transactionHash;
+      }),
+      mergeMap((txData: any) => {
+        return this.waitForTx(this.zpService.zp, txData.transactionHash || txData).pipe(
+          filter(x => !!x),
+          take(1),
+          map(() => {
+            return txData.transactionHash || txData;
+          })
+        );
       })
     );
 
@@ -233,9 +241,17 @@ export class UnconfirmedTransactionService {
   ): Observable<string> {
 
     return this.relayerApi.gasDonation$(depositZpTx.tx, ethTxHash).pipe(
-      map((txData: any): string => {
+      tap(() => {
         UnconfirmedTransactionService.deleteGasDepositTransaction();
-        return txData.transactionHash;
+      }),
+      mergeMap((txData: any) => {
+        return this.waitForTx(this.zpService.zpGas, txData.transactionHash || txData).pipe(
+          filter(x => !!x),
+          take(1),
+          map(() => {
+            return txData.transactionHash || txData;
+          })
+        );
       })
     );
 
@@ -270,23 +286,43 @@ export class UnconfirmedTransactionService {
     }
   }
 
-  private waitForTx(txHash: string, takeWhileFunc: () => boolean): Observable<string> {
-    const waitTx$ = fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransactionReceipt(txHash)).pipe(
-      map((tx: TransactionReceipt): string => {
+  private waitForTx(zp: ZeroPoolNetwork, txHash: string, takeWhileFunc?: () => boolean): Observable<string> {
 
-        if (!tx || !tx.blockNumber) {
-          return undefined;
-        }
-        return tx.transactionHash;
-      }),
-      take(1)
-    );
+    const txReceipt = new BehaviorSubject(undefined);
+    const txReceipt$ = txReceipt.asObservable();
 
-    return timer(0, 5000).pipe(
+    const onTxReceipt = (err: any, tx: TransactionReceipt) => {
+
+      if (err) {
+        console.log(err);
+      }
+
+      if (tx && tx.blockNumber) {
+        txReceipt.next(tx);
+      }
+
+    };
+
+    const timer$ = timer(0, 5000).pipe(
       exhaustMap(() => {
-        return waitTx$;
-      }),
-      takeWhile(takeWhileFunc),
+        return fromPromise(zp.ZeroPool.web3Ethereum.getTransactionReceipt(txHash, onTxReceipt))
+          .pipe(take(1));
+      })
+    ).subscribe();
+
+    return txReceipt$.pipe(
+      filter(x => !!x),
+      tap((tx: TransactionReceipt) => {
+          debugger
+          if (takeWhileFunc && !takeWhileFunc()) {
+            timer$.unsubscribe();
+          }
+        }
+      ),
+      map((tx: TransactionReceipt) => {
+        timer$.unsubscribe();
+        return tx.transactionHash;
+      })
     );
 
   }

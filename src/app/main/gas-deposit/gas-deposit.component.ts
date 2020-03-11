@@ -96,7 +96,7 @@ export class GasDepositComponent implements OnInit {
         this.progressDialog.showMessage({
           title: 'Gas deposit in progress',
           lineOne: 'Transaction published',
-          lineTwo: 'Wait for ZeroPool block'
+          lineTwo: 'Verifying ZeroPool block'
         });
       }  else if (progressStep === 'queue') {
         //
@@ -113,6 +113,15 @@ export class GasDepositComponent implements OnInit {
           title: 'Gas Deposit in progress',
           lineOne: 'Generate Gas Deposit Transaction',
           lineTwo: '',
+          isLineTwoBold: true
+        });
+
+      } else if (progressStep === 'receipt-tx-data') {
+        //
+        this.progressDialog.showMessage({
+          title: 'Gas Deposit in progress',
+          lineOne: 'Block successfully verified',
+          lineTwo: 'Waiting for a transaction to be included in a block',
           isLineTwoBold: true
         });
 

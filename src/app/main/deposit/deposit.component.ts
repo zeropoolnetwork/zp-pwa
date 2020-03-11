@@ -108,9 +108,18 @@ export class DepositComponent implements OnInit {
         this.progressDialog.showMessage({
           title: 'Deposit in progress',
           lineOne: 'Transaction generated',
-          lineTwo: 'Wait for ZeroPool block',
+          lineTwo: 'Verifying ZeroPool block',
           isLineTwoBold: true
         });
+      } else if (progressStep === 'receipt-tx-data') {
+        //
+        this.progressDialog.showMessage({
+          title: 'Deposit in progress',
+          lineOne: 'Waiting for a transaction to be included in a block',
+          lineTwo: '',
+          isLineTwoBold: true
+        });
+
       } else if (progressStep === 'queue') {
         //
         this.progressDialog.showMessage({

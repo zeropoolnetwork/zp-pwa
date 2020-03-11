@@ -2,7 +2,20 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
+
 export const environment = {
+  production: false,
+  chainId: '0x4',
+  contractAddress: '0x33641D753c965E9f789C4f2E439C12DeF2fe21d7',
+  sideChainAddress: '0x85d2f0F6BF0E80e5eCB4F840C10Df76120a5C4eC',
+  sideChainRpc: 'https://kovan.infura.io/v3/826fec4cbd954dfd89c714eabf4611c4',
+  relayerUrl: 'http://127.0.0.1:3000',
+  // relayerUrl: 'https://testnet.relayer.zeropool.network',
+  ethToken: '0x0000000000000000000000000000000000000000',
+  relayerFee: 320 * (10 ** 9)
+};
+
+export const environment1 = {
   production: false,
   chainId: '0xNaN',
   contractAddress: '0x20656D3Aee9Cd3B4280840DE17EFE80d9487a948',

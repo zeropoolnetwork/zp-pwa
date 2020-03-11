@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { exhaustMap, filter, map, mergeMap, shareReplay, take } from 'rxjs/operators';
+import { exhaustMap, filter, map, mergeMap, shareReplay, take, tap } from 'rxjs/operators';
 import { BehaviorSubject, combineLatest, Observable, of, timer } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { ZeroPoolService } from './zero-pool.service';
 import { RelayerApiService } from './relayer.api.service';
-import { PayNote, toHex, Tx } from 'zeropool-lib';
+import { PayNote, toHex, Tx, ZeroPoolNetwork } from 'zeropool-lib';
 import { environment } from '../../environments/environment';
 import { UnconfirmedTransactionService } from './unconfirmed-transaction.service';
 import { TransactionSyncronizer } from './observable-synchronizer';
@@ -45,10 +45,7 @@ export class TransactionService {
       }),
       mergeMap(
         ([tx, txHash]: [Tx<string>, string]) => {
-          UnconfirmedTransactionService.saveDepositTransaction({
-            tx,
-            txHash: txHash
-          });
+          UnconfirmedTransactionService.saveDepositTransaction({ tx, txHash });
           progressCallback('open-metamask');
           const depositBlockNumber$ = fromPromise(this.zpService.zp.deposit(token, amount, txHash));
           const gasTx$ = fromPromise(this.zpService.zpGas.prepareWithdraw(environment.ethToken, fee));
@@ -60,7 +57,10 @@ export class TransactionService {
         ([tx, depositBlockNumber, gasTx]: [Tx<string>, number, TxContainer]) => {
           progressCallback('sending-transaction');
           return this.relayerApi.sendTx$(tx, toHex(depositBlockNumber), gasTx[0]).pipe(
-            mergeMap(this.updateState$)
+            mergeMap((txData: any) => {
+              progressCallback('receipt-tx-data');
+              return this.updateState$(this.zpService.zp, txData, progressCallback);
+            })
           );
         }
       )
@@ -96,7 +96,7 @@ export class TransactionService {
                   txHash
                 });
 
-                return this.waitForTx(txHash);
+                return this.waitForTx(this.zpService.zp, txHash);
               }
             ),
             filter(x => !!x),
@@ -105,7 +105,10 @@ export class TransactionService {
               progressCallback('wait-for-zp-block');
 
               return this.relayerApi.gasDonation$(zpTxData[0], txHash).pipe(
-                mergeMap(this.updateState$)
+                mergeMap((txData: any) => {
+                  progressCallback('receipt-tx-data');
+                  return this.updateState$(this.zpService.zpGas, txData, progressCallback);
+                })
               );
             })
           );
@@ -142,7 +145,10 @@ export class TransactionService {
           // Transaction is sent,
           // Wait for ZeroPool block
           return this.relayerApi.sendTx$(tx[0], '0x0', gasTx[0]).pipe(
-            mergeMap(this.updateState$)
+            mergeMap((txData: any) => {
+              progressCallback('receipt-tx-data');
+              return this.updateState$(this.zpService.zp, txData, progressCallback);
+            })
           );
         }
       ),
@@ -171,7 +177,10 @@ export class TransactionService {
           }
           // Wait for ZeroPool block
           return this.relayerApi.sendTx$(tx[0], '0x0', gasTx[0]).pipe(
-            mergeMap(this.updateState$)
+            mergeMap((txData: any) => {
+              progressCallback('receipt-tx-data');
+              return this.updateState$(this.zpService.zp, txData, progressCallback);
+            })
           );
         }
       )
@@ -212,25 +221,36 @@ export class TransactionService {
     );
   }
 
-  private updateState$ = (tx: any): Observable<string> => {
-    const updateZpBalance$ = fromPromise(
-      this.zpService.zp.getBalance()
+  private updateState$ = (zp: ZeroPoolNetwork, tx: any, progressCallback?: (msg: any) => void): Observable<string> => {
+
+    return this.waitForTx(zp, tx.transactionHash || tx).pipe(
+      filter(x => !!x),
+      take(1),
+      tap(() => {
+        progressCallback && progressCallback('transaction-confirmed');
+      }),
+      mergeMap(() => {
+        const updateZpBalance$ = fromPromise(
+          this.zpService.zp.getBalanceAndHistory()
+        );
+
+        const updateGasZpBalance = fromPromise(
+          this.zpService.zpGas.getBalance()
+        );
+
+        return combineLatest([updateZpBalance$, updateGasZpBalance])
+          .pipe(
+            map(() => {
+              return tx.transactionHash || tx;
+            })
+          );
+      })
     );
 
-    const updateGasZpBalance = fromPromise(
-      this.zpService.zpGas.getBalance()
-    );
-
-    return combineLatest([updateZpBalance$, updateGasZpBalance])
-      .pipe(
-        map(() => {
-          return tx.transactionHash || tx;
-        })
-      );
   };
 
 
-  private waitForTx(txHash: string): Observable<string> {
+  private waitForTx(zp: ZeroPoolNetwork, txHash: string): Observable<string> {
 
     const txReceipt = new BehaviorSubject(undefined);
     const txReceipt$ = txReceipt.asObservable();
@@ -249,7 +269,7 @@ export class TransactionService {
 
     const timer$ = timer(0, 5000).pipe(
       exhaustMap(() => {
-        return fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransactionReceipt(txHash, onTxReceipt))
+        return fromPromise(zp.ZeroPool.web3Ethereum.getTransactionReceipt(txHash, onTxReceipt))
           .pipe(take(1));
       })
     ).subscribe();
