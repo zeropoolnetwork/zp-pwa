@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { filter, map, mergeMap, shareReplay, switchMap, take } from 'rxjs/operators';
+import { exhaustMap, filter, map, mergeMap, shareReplay, take } from 'rxjs/operators';
 import { combineLatest, Observable, of, timer } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { ZeroPoolService } from './zero-pool.service';
@@ -232,6 +232,7 @@ export class TransactionService {
 
     const waitTx$ = fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransaction(txHash)).pipe(
       map((tx: Transaction): string => {
+
         if (!tx || !tx.blockNumber) {
           return undefined;
         }
@@ -243,7 +244,7 @@ export class TransactionService {
     // let x = 0;
 
     return timer(0, 5000).pipe(
-      switchMap(() => {
+      exhaustMap(() => {
         return waitTx$;
       }),
       // take(1)

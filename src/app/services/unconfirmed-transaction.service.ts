@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { PayNote, toHex, Tx, ZeroPoolNetwork } from 'zeropool-lib';
 import { ZeroPoolService } from './zero-pool.service';
 import { combineLatest, defer, Observable, of, timer } from 'rxjs';
-import { delay, filter, map, mergeMap, repeatWhen, switchMap, take, takeWhile, tap } from 'rxjs/operators';
+import { delay, exhaustMap, filter, map, mergeMap, repeatWhen, take, takeWhile, tap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { environment } from '../../environments/environment';
 import { RelayerApiService } from './relayer.api.service';
@@ -79,19 +79,19 @@ export class UnconfirmedTransactionService {
           }
 
           return true;
-        });
+        }).pipe(filter(x => !!x), take(1));
       })
     );
 
     const mainNetDonationTx$ = txHash$.pipe(
-      take(1),
       mergeMap((txHash: string) => {
         return this.donateGas(depositZpTx, txHash).pipe(
           tap((data: any) => {
             console.log({
               unconfirmedGasDepositLog: data
             });
-          })
+          }),
+          take(1)
         );
       }),
     );
@@ -282,11 +282,10 @@ export class UnconfirmedTransactionService {
     );
 
     return timer(0, 5000).pipe(
-      switchMap(() => {
+      exhaustMap(() => {
         return waitTx$;
       }),
       takeWhile(takeWhileFunc),
-      filter(x => !!x),
     );
 
   }
