@@ -13,13 +13,14 @@ import {
   stringifyUtxoState,
   ZeroPoolNetwork
 } from 'zeropool-lib';
-import { concatMap, filter, map, mergeMap, shareReplay, tap } from 'rxjs/operators';
+import { concatMap, exhaustMap, filter, map, mergeMap, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { AccountService } from './account.service';
 import { environment } from '../../environments/environment';
 import { BehaviorSubject, combineLatest, interval, Observable, of, Subject } from 'rxjs';
 import { Web3ProviderService } from './web3.provider.service';
 import { StateStorageService } from './state.storage.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
+import { TransactionBlockerService } from './transaction-blocker.service';
 
 export interface ZpBalance {
   [key: string]: number;
@@ -60,7 +61,8 @@ export class ZeroPoolService {
     private circomService: CircomLoaderService,
     private accountService: AccountService,
     private web3ProviderService: Web3ProviderService,
-    private stateStorageService: StateStorageService
+    private stateStorageService: StateStorageService,
+    public transactionBlocker: TransactionBlockerService
   ) {
 
     // see: prepareWithdraw / prepareWithdraw-list components
@@ -116,9 +118,37 @@ export class ZeroPoolService {
           gasUtxoState,
         );
 
-        this.listenHistoryStateUpdates$(zp, this.stateStorageService.saveHistory).subscribe();
-        this.listenUtxoStateUpdates$(zp, this.stateStorageService.saveUtxo).subscribe();
-        this.listenUtxoStateUpdates$(zpGas, this.stateStorageService.saveGasUtxo).subscribe();
+        const listenAndSaveState$ = listenUtxoStateUpdates$(zp).pipe(
+          switchMap(
+            (state: MyUtxoState<string>) => {
+              return this.stateStorageService.saveUtxo(state);
+            }
+          )
+        );
+
+        const listenAndSaveGasState$ = listenUtxoStateUpdates$(zpGas).pipe(
+          switchMap(
+            (state: MyUtxoState<string>) => {
+              return this.stateStorageService.saveGasUtxo(state);
+            }
+          )
+        );
+
+        combineLatest([listenAndSaveState$, listenAndSaveGasState$])
+          .subscribe(
+            () => {
+              // allow to send next transactions
+              this.transactionBlocker.unlockTransactionSend();
+            }
+          );
+
+        listenHistoryStateUpdates$(zp).pipe(
+          switchMap(
+            (state: HistoryState<string>) => {
+              return this.stateStorageService.saveHistory(state);
+            }
+          )
+        ).subscribe();
 
         this.zp = zp;
         this.zpGas = zpGas;
@@ -164,7 +194,7 @@ export class ZeroPoolService {
     const getBalanceAndHistory$ = fromPromise(zp.getBalanceAndHistory());
     const getActiveWithdrawals$ = fromPromise(zp.getActiveWithdrawals());
     const getBlockNumber = fromPromise(zp.ZeroPool.web3Ethereum.getBlockNumber());
-    const getGasBalance = fromPromise(zpGas.getBalance());
+    const getGasBalance = fromPromise(zpGas.getBalanceAndHistory());
     const getEthBalance = fromPromise(
       // @ts-ignore todo: fix it
       zp.ZeroPool.web3Ethereum.getBalance(window.ethereum.selectedAddress)
@@ -181,19 +211,19 @@ export class ZeroPoolService {
     ).pipe(
       tap((x) => {
         const [
-          balancesAndhistory,
+          balancesAndHistory,
           activeWithdrawals,
           blockNumber,
-          gasBalance,
+          gasBalancesAndHistory,
           ethBalance
-        ]: [HistoryAndBalances, PayNote[], number, ZpBalance, string] = x;
+        ]: [HistoryAndBalances, PayNote[], number, HistoryAndBalances, string] = x;
 
-        this.zpBalance = balancesAndhistory.balances;
-        this.zpHistory = balancesAndhistory.historyItems;
+        this.zpBalance = balancesAndHistory.balances;
+        this.zpHistory = balancesAndHistory.historyItems;
         this.activeWithdrawals = activeWithdrawals;
         this.currentBlockNumber = blockNumber;
 
-        this.zpGasBalance = gasBalance[environment.ethToken] || 0;
+        this.zpGasBalance = gasBalancesAndHistory.balances[environment.ethToken] || 0;
         this.ethBalance = fw(ethBalance);
 
       }),
@@ -244,35 +274,10 @@ export class ZeroPoolService {
 
   }
 
-  private listenHistoryStateUpdates$(zp: ZeroPoolNetwork, saveHistory: (val: HistoryState<string>) => void): Observable<any> {
-
-    return zp.zpHistoryState$.pipe(
-      tap((historyState: HistoryState<bigint>) => {
-        // TODO: think on switchMap here
-        const hexified = stringifyUtxoHistoryState(historyState);
-        saveHistory(hexified);
-      }),
-    );
-
-  }
-
-  private listenUtxoStateUpdates$(zp: ZeroPoolNetwork, saveUtxo: (val: MyUtxoState<string>) => void): Observable<any> {
-
-    return zp.utxoState$.pipe(
-      tap((utxoState: MyUtxoState<bigint>) => {
-        // TODO: think on switchMap here
-        const hexified = stringifyUtxoState(utxoState);
-        saveUtxo(hexified);
-      })
-    );
-
-  }
-
-
   // todo: catch error
   private pushUpdates$(zp: ZeroPoolNetwork, gasZp: ZeroPoolNetwork): Observable<any> {
-    return interval(10000).pipe(
-      concatMap(() => {
+    return interval(5000).pipe(
+      exhaustMap(() => {
         return this.updateStates$(zp, gasZp);
       }),
       tap(() => {
@@ -299,3 +304,22 @@ export class ZeroPoolService {
 
 }
 
+function listenUtxoStateUpdates$(zp: ZeroPoolNetwork): Observable<MyUtxoState<string>> {
+
+  return zp.utxoState$.pipe(
+    map((utxoState: MyUtxoState<bigint>) => {
+      return stringifyUtxoState(utxoState);
+    })
+  );
+
+}
+
+function listenHistoryStateUpdates$(zp: ZeroPoolNetwork): Observable<HistoryState<string>> {
+
+  return zp.zpHistoryState$.pipe(
+    map((historyState: HistoryState<bigint>) => {
+      return stringifyUtxoHistoryState(historyState);
+    }),
+  );
+
+}

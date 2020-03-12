@@ -88,20 +88,26 @@ export class GasDepositComponent implements OnInit {
     ).subscribe();
   }
 
+  private setProgressState(progressStep: StepList, txHash?: string) {
+    if (txHash) {
+      txHash = progressStep === StepList.START_ETH_TRANSACTION
+        ? environment.etherscanPrefix + txHash
+        : environment.etherscanSideChainPrefix + txHash;
+    }
+
+    const action = ActionList.GAS_DEPOSIT;
+    this.progressDialog.showMessage(action, progressStep, txHash);
+  }
+
   depositGas() {
     this.inProgress = true;
+
+    this.setProgressState(StepList.GENERATE_TRANSACTION);
 
     const amount = tw(this.amount.value).toNumber();
 
     const progressCallback = (progressStep: StepList, txHash?: string) => {
-      if (txHash) {
-        txHash = progressStep === StepList.START_ETH_TRANSACTION
-          ? environment.etherscanPrefix + txHash
-          : environment.etherscanSideChainPrefix + txHash;
-      }
-
-      const action = ActionList.GAS_DEPOSIT;
-      this.progressDialog.showMessage(action, progressStep, txHash);
+      this.setProgressState(progressStep, txHash);
     };
 
     // progressCallback

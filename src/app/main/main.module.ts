@@ -33,6 +33,7 @@ import { TransactionService } from '../services/transaction.service';
 import { AutoJoinUtxoService } from '../services/auto-join-utxo.service';
 import { UnconfirmedTransactionService } from '../services/unconfirmed-transaction.service';
 import { ProgressMessageComponent } from './progress-message/progress-message.component';
+import { TransactionBlockerService } from '../services/transaction-blocker.service';
 
 @NgModule({
   declarations: [
@@ -75,7 +76,8 @@ import { ProgressMessageComponent } from './progress-message/progress-message.co
     RelayerApiService,
     TransactionService,
     AutoJoinUtxoService,
-    UnconfirmedTransactionService
+    UnconfirmedTransactionService,
+    TransactionBlockerService
   ]
 })
 export class MainModule {

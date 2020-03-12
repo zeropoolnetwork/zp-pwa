@@ -70,18 +70,24 @@ export class WithdrawComponent implements OnInit {
 
   }
 
+  private setProgressState(progressStep: StepList, txHash?: string) {
+    if (txHash) {
+      txHash = environment.etherscanPrefix + txHash;
+    }
+
+    const action = ActionList.WITHDRAW;
+    this.progressDialog.showMessage(action, progressStep, txHash);
+  }
+
   onSendClick(): void {
     this.withdrawIsInProgress = true;
+
+    this.setProgressState(StepList.GENERATE_TRANSACTION);
 
     const amount = tw(this.toAmount.value).toNumber();
 
     const progressCallback = (progressStep: StepList, txHash?: string) => {
-      if (txHash) {
-        txHash = environment.etherscanPrefix + txHash;
-      }
-
-      const action = ActionList.WITHDRAW;
-      this.progressDialog.showMessage(action, progressStep, txHash);
+      this.setProgressState(progressStep, txHash);
     };
 
     this.txService.prepareWithdraw(environment.ethToken, amount, environment.relayerFee, progressCallback).pipe(

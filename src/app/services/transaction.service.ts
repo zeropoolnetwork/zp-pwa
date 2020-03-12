@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { exhaustMap, filter, map, mergeMap, shareReplay, take } from 'rxjs/operators';
+import { exhaustMap, filter, map, mergeMap, shareReplay, take, tap } from 'rxjs/operators';
 import { BehaviorSubject, combineLatest, Observable, of, timer } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { ZeroPoolService } from './zero-pool.service';
@@ -25,6 +25,14 @@ export class TransactionService {
       filter((isZpReady: boolean) => isZpReady),
       take(1),
       shareReplay(1),
+      mergeMap(() => {
+        return this.zpService.transactionBlocker.transactionLock$;
+      }),
+      tap((a) => {
+        console.log('isAllowed', !a);
+      }),
+      filter((isBlocked: boolean) => !isBlocked),
+      take(1),
     );
 
   constructor(
@@ -48,8 +56,8 @@ export class TransactionService {
         ([tx, txHash]: [Tx<string>, string]) => {
           UnconfirmedTransactionService.saveDepositTransaction({ tx, txHash });
           progressCallback(StepList.CONFIRM_TRANSACTION);
-          const depositBlockNumber$ = fromPromise(this.zpService.zp.deposit(token, amount, txHash, (txHash: string) => {
-            progressCallback(StepList.START_ETH_TRANSACTION, txHash);
+          const depositBlockNumber$ = fromPromise(this.zpService.zp.deposit(token, amount, txHash, (hash: string) => {
+            progressCallback(StepList.START_ETH_TRANSACTION, hash);
           }));
           const gasTx$ = fromPromise(this.zpService.zpGas.prepareWithdraw(environment.ethToken, fee));
           const tx$ = of(tx);
@@ -236,9 +244,10 @@ export class TransactionService {
     return this.waitForTx(zp, tx.transactionHash || tx).pipe(
       filter(x => !!x),
       take(1),
-      // tap(() => {
-      //   progressCallback && progressCallback(StepList.TRANSACTION_CONFIRMED);
-      // }),
+      tap(() => {
+        // block until new state
+        this.zpService.transactionBlocker.lockTransactionSend();
+      }),
       exhaustMap(() => {
         const updateZpBalance$ = fromPromise(
           this.zpService.zp.getBalanceAndHistory()
@@ -254,7 +263,7 @@ export class TransactionService {
               return tx.transactionHash || tx;
             })
           );
-      })
+      }),
     );
 
   };

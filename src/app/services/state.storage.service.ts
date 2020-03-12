@@ -21,41 +21,30 @@ export class StateStorageService {
   storageResetWasCalled = false;
 
   constructor(private storage: StorageMap) {
-    this.getHistoryState = this.getHistoryState.bind(this);
-    this.saveHistory = this.saveHistory.bind(this);
-    this.getGasHistoryState = this.getGasHistoryState.bind(this);
-    this.saveGasHistory = this.saveGasHistory.bind(this);
-    this.getUtxoState = this.getUtxoState.bind(this);
-    this.saveUtxo = this.saveUtxo.bind(this);
-    this.getGasUtxoState = this.getGasUtxoState.bind(this);
-    this.saveGasUtxo = this.saveGasUtxo.bind(this);
-    this.resetStorage = this.resetStorage.bind(this);
   }
 
   getHistoryState(): Observable<HistoryState<string>> {
     return this.storage.get<HistoryState<string>>('history-state') as Observable<HistoryState<string>>;
   }
 
-  saveHistory(val: HistoryState<string>): void {
+  saveHistory(val: HistoryState<string>): Observable<undefined> {
     if (this.storageResetWasCalled) {
       return;
     }
 
-    this.storage.set('history-state', val).subscribe(() => {
-    });
+    return this.storage.set('history-state', val);
   }
 
   getGasHistoryState(): Observable<HistoryState<string>> {
     return this.storage.get<HistoryState<string>>('gas-history-state') as Observable<HistoryState<string>>;
   }
 
-  saveGasHistory(val: HistoryState<string>): void {
+  saveGasHistory(val: HistoryState<string>): Observable<undefined> {
     if (this.storageResetWasCalled) {
       return;
     }
 
-    this.storage.set('gas-history-state', val).subscribe(() => {
-    });
+    return this.storage.set('gas-history-state', val);
   }
 
   getUtxoState(): Observable<MyUtxoStateHex> {
@@ -63,13 +52,12 @@ export class StateStorageService {
     return result$ as Observable<MyUtxoStateHex>;
   }
 
-  saveUtxo(val: MyUtxoStateHex): void {
+  saveUtxo(val: MyUtxoStateHex): Observable<undefined> {
     if (this.storageResetWasCalled) {
       return;
     }
 
-    this.storage.set('utxo-state', val).subscribe(() => {
-    });
+    return this.storage.set('utxo-state', val);
   }
 
   getGasUtxoState(): Observable<MyUtxoStateHex> {
@@ -77,13 +65,12 @@ export class StateStorageService {
     return result$ as Observable<MyUtxoStateHex>;
   }
 
-  saveGasUtxo(val: MyUtxoStateHex): void {
+  saveGasUtxo(val: MyUtxoStateHex): Observable<undefined> {
     if (this.storageResetWasCalled) {
       return;
     }
 
-    this.storage.set('gas-utxo-state', val).subscribe(() => {
-    });
+    return this.storage.set('gas-utxo-state', val);
   }
 
   resetStorage(): Observable<undefined> {

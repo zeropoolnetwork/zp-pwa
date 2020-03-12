@@ -65,17 +65,23 @@ export class TransferComponent implements OnInit {
 
   }
 
+  private setProgressState(progressStep: StepList, txHash?: string) {
+    if (txHash) {
+      txHash = environment.etherscanPrefix + txHash;
+    }
+
+    const action = ActionList.TRANSFER;
+    this.progressDialog.showMessage(action, progressStep, txHash);
+  }
+
   onSendClick(): void {
     this.transferIsInProgress = true;
 
+    this.setProgressState(StepList.GENERATE_TRANSACTION);
+
     const amount = tw(this.toAmount.value).toNumber();
     const progressCallback = (progressStep: StepList, txHash?: string) => {
-      if (txHash) {
-        txHash = environment.etherscanPrefix + txHash;
-      }
-
-      const action = ActionList.TRANSFER;
-      this.progressDialog.showMessage(action, progressStep, txHash);
+      this.setProgressState(progressStep, txHash);
     };
 
     this.txService.transfer(environment.ethToken, this.toAddress, amount, environment.relayerFee, progressCallback).pipe(
