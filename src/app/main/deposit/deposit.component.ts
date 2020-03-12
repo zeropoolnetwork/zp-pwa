@@ -116,6 +116,12 @@ export class DepositComponent implements AfterViewInit, OnDestroy {
   }
 
   private setProgressState(progressStep: StepList, txHash?: string) {
+    if (progressStep === StepList.FAILED) {
+      this.depositInProgress = false;
+      this.isFinishedWithError = true;
+      return;
+    }
+
     if (txHash) {
       txHash = environment.etherscanPrefix + txHash;
     }

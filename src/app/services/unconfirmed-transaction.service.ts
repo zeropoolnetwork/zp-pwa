@@ -7,7 +7,7 @@ import { fromPromise } from 'rxjs/internal-compatibility';
 import { environment } from '../../environments/environment';
 import { RelayerApiService } from './relayer.api.service';
 import { TransactionSynchronizer } from './observable-synchronizer';
-import { TransactionReceipt } from 'web3-core';
+import { Transaction, TransactionReceipt } from 'web3-core';
 import { StepList } from '../main/progress-message/transaction-progress';
 
 export const depositProgress: BehaviorSubject<StepList> = new BehaviorSubject(undefined);
@@ -117,6 +117,7 @@ export class UnconfirmedTransactionService {
 
     const onDepositError = (e) => {
       UnconfirmedTransactionService.deleteGasDepositTransaction();
+      depositProgress.next(StepList.FAILED);
       console.log('unconfirmed transaction failed: ', e.message || e);
     };
 
@@ -144,11 +145,21 @@ export class UnconfirmedTransactionService {
 
     const gasTx$ = this.zpService.isReady$.pipe(
       filter((isReady: boolean) => isReady),
+      take(1),
+      mergeMap(() => {
+        return this.zpService.transactionBlocker.transactionLock$;
+      }),
+      filter((isAllowed: boolean) => !isAllowed),
+      take(1),
       mergeMap(
         () => {
+
+          this.zpService.transactionBlocker.lockTransactionSend();
+
           return fromPromise(
             this.zpService.zpGas.prepareWithdraw(environment.ethToken, environment.relayerFee)
           );
+
         }
       ),
     );
@@ -177,6 +188,7 @@ export class UnconfirmedTransactionService {
 
     const onDepositError = (e) => {
       UnconfirmedTransactionService.deleteDepositTransaction();
+      depositProgress.next(StepList.FAILED);
       console.log('unconfirmed transaction failed: ', e.message || e);
     };
 
@@ -231,6 +243,8 @@ export class UnconfirmedTransactionService {
         UnconfirmedTransactionService.deleteDepositTransaction();
         console.log('unconfirmed deposit transaction time expired');
       }
+
+      this.zpService.transactionBlocker.unlockTransactionSend();
 
       return of(`cannot find deposit ${depositZpTx.txHash}`);
     }
@@ -348,6 +362,10 @@ export class UnconfirmedTransactionService {
       })
     );
 
+  }
+
+  private isTxExists$(zp: ZeroPoolNetwork, txHash: string): Observable<Transaction> {
+    return fromPromise(zp.ZeroPool.web3Ethereum.getTransaction(txHash));
   }
 
 }
