@@ -1,4 +1,4 @@
-import { Observable, of, Subject, throwError } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
 import { catchError, concatMap, filter, map, take, tap } from 'rxjs/operators';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -69,7 +69,7 @@ class ObservableSynchronizer {
       filter((doneObservable: IWrappedResult) => doneObservable.id === id),
       map((wResult: IWrappedResult): T => {
         if (wResult.error) {
-          throwError(wResult.error);
+          throw(wResult.error);
         }
         return wResult.result;
       }),

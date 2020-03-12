@@ -183,23 +183,23 @@ export class DepositComponent implements AfterViewInit, OnDestroy {
 
     this.txService.deposit(environment.ethToken, amount, environment.relayerFee, progressCallback).pipe(
       tap((txHash: any) => {
-        this.depositInProgress = false;
         this.isFinished = true;
 
         console.log({
           deposit: txHash
         });
 
-        // TODO: check with Kiril shell we call delete from component code
-        UnconfirmedTransactionService.deleteDepositTransaction();
       }),
       catchError((e) => {
-        this.depositInProgress = false;
         this.isFinishedWithError = true;
-        UnconfirmedTransactionService.deleteDepositTransaction();
         console.log(e);
         return of('');
       }),
+      tap(() => {
+        this.depositInProgress = false;
+        UnconfirmedTransactionService.deleteDepositTransaction();
+
+      })
     ).subscribe();
   }
 
