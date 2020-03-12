@@ -28,9 +28,6 @@ export class TransactionService {
       mergeMap(() => {
         return this.zpService.transactionBlocker.transactionLock$;
       }),
-      tap((a) => {
-        console.log('isAllowed', !a);
-      }),
       filter((isBlocked: boolean) => !isBlocked),
       take(1),
     );

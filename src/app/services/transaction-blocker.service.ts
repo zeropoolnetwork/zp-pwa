@@ -21,12 +21,10 @@ export class TransactionBlockerService {
   }
 
   lockTransactionSend(): void {
-    console.log('block')
     this.transactionLock.next(true);
   }
 
   unlockTransactionSend(): void {
-    console.log('unblock')
     this.transactionLock.next(false);
   }
 
