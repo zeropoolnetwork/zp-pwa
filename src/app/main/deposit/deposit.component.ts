@@ -115,9 +115,13 @@ export class DepositComponent implements AfterViewInit, OnDestroy {
 
   }
 
-  private setProgressState(progressStep: StepList) {
+  private setProgressState(progressStep: StepList, txHash?: string) {
+    if (txHash) {
+      txHash = environment.etherscanPrefix + txHash;
+    }
+
     const action = ActionList.DEPOSIT;
-    this.progressDialog.showMessage(action, progressStep);
+    this.progressDialog.showMessage(action, progressStep, txHash);
   }
 
   ngOnDestroy(): void {
@@ -131,8 +135,8 @@ export class DepositComponent implements AfterViewInit, OnDestroy {
 
     const amount = tw(this.amount.value).toNumber();
 
-    const progressCallback = (progressStep) => {
-      this.setProgressState(progressStep);
+    const progressCallback = (progressStep, txHash) => {
+      this.setProgressState(progressStep, txHash);
     };
 
     // Generate ZeroPool transaction

@@ -7,5 +7,7 @@ export const environment = {
   // relayerUrl: 'http://127.0.0.1:3000',
   relayerUrl: 'https://relayer.zeropool.network',
   ethToken: '0x0000000000000000000000000000000000000000',
-  relayerFee: 320 * (10 ** 9)
+  relayerFee: 320 * (10 ** 9),
+  etherscanPrefix: 'https://etherscan.io/tx/',
+  etherscanSideChainPrefix: 'https://kovan.etherscan.io/tx/'
 };

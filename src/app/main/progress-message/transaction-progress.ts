@@ -36,6 +36,7 @@ export function resolveProgressMessage(action: ActionList, step: StepList): IPro
       break;
     case StepList.VERIFYING_ZP_BLOCK:
       progressMessage.lineOne = 'Transaction generated';
+
       progressMessage.lineTwo = 'Verifying ZeroPool block';
       break;
     case StepList.CONFIRM_TRANSACTION:

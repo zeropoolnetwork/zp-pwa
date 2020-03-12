@@ -13,12 +13,13 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { ConnectWalletComponent } from './connect-wallet/connect-wallet.component';
 import { SelectNetworkComponent } from './select-network/select-network.component';
 
+
 @NgModule({
   declarations: [
     AppComponent,
     WelcomeComponent,
     ConnectWalletComponent,
-    SelectNetworkComponent,
+    SelectNetworkComponent
   ],
   imports: [
     BrowserModule,
@@ -26,9 +27,9 @@ import { SelectNetworkComponent } from './select-network/select-network.componen
     CommonModule,
     MatButtonModule,
     FlexLayoutModule,
-    ServiceWorkerModule.register('ngsw-worker.js', {enabled: environment.production}),
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     BrowserAnimationsModule,
-    MatIconModule
+    MatIconModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

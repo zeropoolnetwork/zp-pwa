@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { exhaustMap, filter, map, mergeMap, shareReplay, take, tap } from 'rxjs/operators';
+import { exhaustMap, filter, map, mergeMap, shareReplay, take } from 'rxjs/operators';
 import { BehaviorSubject, combineLatest, Observable, of, timer } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { ZeroPoolService } from './zero-pool.service';
@@ -37,7 +37,7 @@ export class TransactionService {
     token: string,
     amount: number,
     fee: number,
-    progressCallback?: (step: StepList) => void,
+    progressCallback?: (step: StepList, txHash?: string) => void,
   ): Observable<string> {
 
     const o$ = this.isReady$.pipe(
@@ -49,7 +49,7 @@ export class TransactionService {
           UnconfirmedTransactionService.saveDepositTransaction({ tx, txHash });
           progressCallback(StepList.CONFIRM_TRANSACTION);
           const depositBlockNumber$ = fromPromise(this.zpService.zp.deposit(token, amount, txHash, (txHash: string) => {
-            progressCallback(StepList.START_ETH_TRANSACTION);
+            progressCallback(StepList.START_ETH_TRANSACTION, txHash);
           }));
           const gasTx$ = fromPromise(this.zpService.zpGas.prepareWithdraw(environment.ethToken, fee));
           const tx$ = of(tx);
@@ -61,7 +61,7 @@ export class TransactionService {
           progressCallback(StepList.VERIFYING_ZP_BLOCK);
           return this.relayerApi.sendTx$(tx, toHex(depositBlockNumber), gasTx[0]).pipe(
             mergeMap((txData: any) => {
-              progressCallback(StepList.RECEIPT_TX_DATA);
+              progressCallback(StepList.RECEIPT_TX_DATA, txData.transactionHash || txData);
               return this.updateState$(this.zpService.zp, txData, progressCallback);
             })
           );
@@ -72,7 +72,7 @@ export class TransactionService {
     return TransactionSynchronizer.execute<string>({ observable: o$, progressCallback });
   }
 
-  public gasDeposit(amount: number, progressCallback: (step: StepList) => void): Observable<string> {
+  public gasDeposit(amount: number, progressCallback: (step: StepList, txHash?: string) => void): Observable<string> {
     const o$ = this.isReady$.pipe(
       mergeMap(() => {
         progressCallback(StepList.GENERATE_TRANSACTION);
@@ -89,7 +89,7 @@ export class TransactionService {
                   to: address,
                   value: amount
                 }, 0, (txHash: string) => {
-                  progressCallback(StepList.START_ETH_TRANSACTION);
+                  progressCallback(StepList.START_ETH_TRANSACTION, txHash);
                 });
                 return fromPromise(tx$).pipe(
                   map((txData: any) => txData.transactionHash || txData)
@@ -114,7 +114,7 @@ export class TransactionService {
 
               return this.relayerApi.gasDonation$(zpTxData[0], txHash).pipe(
                 mergeMap((txData: any) => {
-                  progressCallback(StepList.RECEIPT_TX_DATA);
+                  progressCallback(StepList.RECEIPT_TX_DATA, txData.transactionHash || txData);
                   return this.updateState$(this.zpService.zpGas, txData, progressCallback);
                 })
               );
@@ -131,7 +131,7 @@ export class TransactionService {
     to: string,
     amount: number,
     fee: number,
-    progressCallback?: (step: StepList) => void
+    progressCallback?: (step: StepList, txHash?: string) => void
   ): Observable<string> {
 
     const o$ = this.isReady$.pipe(
@@ -154,7 +154,7 @@ export class TransactionService {
           // Wait for ZeroPool block
           return this.relayerApi.sendTx$(tx[0], '0x0', gasTx[0]).pipe(
             mergeMap((txData: any) => {
-              progressCallback && progressCallback(StepList.RECEIPT_TX_DATA);
+              progressCallback && progressCallback(StepList.RECEIPT_TX_DATA, txData.transactionHash || txData);
               return this.updateState$(this.zpService.zp, txData, progressCallback);
             })
           );
@@ -166,7 +166,9 @@ export class TransactionService {
     return TransactionSynchronizer.execute<string>({ observable: o$, progressCallback });
   }
 
-  public prepareWithdraw(token: string, amount: number, fee: number, progressCallback?: (msg) => void): Observable<string> {
+  public prepareWithdraw(token: string, amount: number, fee: number,
+                         progressCallback?: (step: StepList, txHash?: string) => void): Observable<string> {
+
     const o$ = this.isReady$.pipe(
       mergeMap(() => {
         if (progressCallback) {
@@ -186,7 +188,7 @@ export class TransactionService {
           // Wait for ZeroPool block
           return this.relayerApi.sendTx$(tx[0], '0x0', gasTx[0]).pipe(
             mergeMap((txData: any) => {
-              progressCallback && progressCallback(StepList.RECEIPT_TX_DATA);
+              progressCallback && progressCallback(StepList.RECEIPT_TX_DATA, txData.transactionHash || txData);
               return this.updateState$(this.zpService.zp, txData, progressCallback);
             })
           );

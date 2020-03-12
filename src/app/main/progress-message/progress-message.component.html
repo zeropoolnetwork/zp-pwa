@@ -6,5 +6,6 @@
 <h3>
   {{progressMessageLineOne}}
   <br>
-  <span style="font-weight: bold;">{{progressMessageLineTwo}}</span>
+  <a *ngIf="href" [href]="href" target="_blank" style="font-weight: bold; color: #333333">{{progressMessageLineTwo}}</a>
+  <span *ngIf="!href" style="font-weight: bold;">{{progressMessageLineTwo}}</span>
 </h3>

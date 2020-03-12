@@ -10,6 +10,7 @@ import { Web3ProviderService } from '../../services/web3.provider.service';
 import { ProgressMessageComponent } from '../progress-message/progress-message.component';
 import { UnconfirmedTransactionService } from '../../services/unconfirmed-transaction.service';
 import { ActionList, StepList } from '../progress-message/transaction-progress';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-gas-deposit',
@@ -92,18 +93,23 @@ export class GasDepositComponent implements OnInit {
 
     const amount = tw(this.amount.value).toNumber();
 
-    const progressCallback = (progressStep: StepList) => {
-      const action = ActionList.GAS_DEPOSIT;
-      this.progressDialog.showMessage(action, progressStep);
-    };
+    const progressCallback = (progressStep: StepList, txHash?: string) => {
+      if (txHash) {
+        txHash = progressStep === StepList.START_ETH_TRANSACTION
+          ? environment.etherscanPrefix + txHash
+          : environment.etherscanSideChainPrefix + txHash;
+      }
 
+      const action = ActionList.GAS_DEPOSIT;
+      this.progressDialog.showMessage(action, progressStep, txHash);
+    };
 
     // progressCallback
     this.txService.gasDeposit(amount, progressCallback).pipe(
       tap((txHash: string) => {
         this.inProgress = false;
         this.isDone = true;
-        console.log({gasDeposit: txHash});
+        console.log({ gasDeposit: txHash });
         UnconfirmedTransactionService.deleteGasDepositTransaction();
       }),
       catchError((e) => {
