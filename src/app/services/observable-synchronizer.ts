@@ -1,10 +1,11 @@
 import { Observable, of, Subject } from 'rxjs';
 import { catchError, concatMap, filter, map, take, tap } from 'rxjs/operators';
 import { v4 as uuidv4 } from 'uuid';
+import { StepList } from '../main/progress-message/transaction-progress';
 
 export interface IMyWrappedObservable {
   observable: Observable<any>;
-  progressCallback?: (msg) => void;
+  progressCallback?: (msg: StepList) => void;
   id?: string;
 }
 
@@ -31,7 +32,7 @@ class ObservableSynchronizer {
         this.queueCount += 1;
 
         if (this.queueCount > 1) {
-          o.progressCallback && o.progressCallback('queue');
+          o.progressCallback && o.progressCallback(StepList.QUEUE);
         }
       }),
       concatMap(

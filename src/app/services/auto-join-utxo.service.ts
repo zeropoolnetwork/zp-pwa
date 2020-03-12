@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { combineLatest, defer, Observable, of } from 'rxjs';
 import { StateStorageService } from './state.storage.service';
-import { catchError, delay, filter, mergeMap, repeatWhen, take, tap } from 'rxjs/operators';
+import { catchError, delay, filter, map, mergeMap, repeatWhen, shareReplay, take, tap } from 'rxjs/operators';
 import { MyUtxoState, Utxo } from 'zeropool-lib';
 import { AccountService, IAccount } from './account.service';
 import { environment } from '../../environments/environment';
 import { ZeroPoolService } from './zero-pool.service';
 import { TransactionService } from './transaction.service';
+import { TransactionSynchronizer } from './observable-synchronizer';
 
 export const defaultGasMaxFeeGwei = environment.relayerFee * 10;
 export const defaultMinUtxoSizeGwei = environment.relayerFee;
@@ -23,6 +24,17 @@ export interface AutoJoinSettings {
 })
 export class AutoJoinUtxoService {
 
+  private isReady$ = this.zpService.isReady$.pipe(
+    filter((isReady: boolean) => isReady),
+    take(1),
+    shareReplay(1),
+    mergeMap(() => {
+      return this.zpService.transactionBlocker.transactionLock$;
+    }),
+    filter((isBlocked: boolean) => !isBlocked),
+    take(1),
+  );
+
   constructor(
     private txService: TransactionService,
     private stateStorageService: StateStorageService,
@@ -31,12 +43,8 @@ export class AutoJoinUtxoService {
   ) {
 
     const account$ = this.accountService.account$;
-    const isReady$ = this.zpService.isReady$.pipe(
-      filter((isReady: boolean) => isReady),
-      take(1)
-    );
 
-    combineLatest([account$, isReady$]).pipe(
+    combineLatest([account$, this.isReady$]).pipe(
       mergeMap(
         (x: any) => {
 
@@ -59,17 +67,32 @@ export class AutoJoinUtxoService {
   }
 
   private processJoinUtxo(account: IAccount): Observable<any> {
-    return combineLatest([
-      this.stateStorageService.getUtxoState(),
-      this.stateStorageService.getGasUtxoState()
-    ]).pipe(
-      mergeMap(
+
+    const o$: Observable<{ myAddress, amountToJoin }> = this.isReady$.pipe(
+      mergeMap(() => {
+        return combineLatest([
+          this.stateStorageService.getUtxoState(),
+          this.stateStorageService.getGasUtxoState()
+        ]);
+      }),
+      map(
         (x) => {
 
           const [state, gasState]: [MyUtxoState<string>, MyUtxoState<string>] = x;
 
-          const { myAddress, amountToJoin } = this.calculateJoinAmount(state, gasState, account);
+          return this.calculateJoinAmount(state, gasState, account);
 
+        }
+      )
+    );
+
+    const calculatedJoinAmount$ = TransactionSynchronizer.execute<{ myAddress, amountToJoin }>({
+      observable: o$
+    });
+
+    return calculatedJoinAmount$.pipe(
+      mergeMap(
+        ({ myAddress, amountToJoin }) => {
           if (amountToJoin === 0 && myAddress === '0') {
             return of('');
           }
@@ -85,8 +108,9 @@ export class AutoJoinUtxoService {
           );
         }
       ),
-      take(1),
+      take(1)
     );
+
   }
 
   private calculateJoinAmount(state, gasState, account: IAccount) {

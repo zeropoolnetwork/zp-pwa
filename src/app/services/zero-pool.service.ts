@@ -13,7 +13,7 @@ import {
   stringifyUtxoState,
   ZeroPoolNetwork
 } from 'zeropool-lib';
-import { concatMap, exhaustMap, filter, map, mergeMap, shareReplay, switchMap, tap } from 'rxjs/operators';
+import { exhaustMap, filter, map, mergeMap, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { AccountService } from './account.service';
 import { environment } from '../../environments/environment';
 import { BehaviorSubject, combineLatest, interval, Observable, of, Subject } from 'rxjs';
@@ -118,40 +118,10 @@ export class ZeroPoolService {
           gasUtxoState,
         );
 
-        const listenAndSaveState$ = listenUtxoStateUpdates$(zp).pipe(
-          switchMap(
-            (state: MyUtxoState<string>) => {
-              return this.stateStorageService.saveUtxo(state);
-            }
-          )
-        );
-
-        const listenAndSaveGasState$ = listenUtxoStateUpdates$(zpGas).pipe(
-          switchMap(
-            (state: MyUtxoState<string>) => {
-              return this.stateStorageService.saveGasUtxo(state);
-            }
-          )
-        );
-
-        combineLatest([listenAndSaveState$, listenAndSaveGasState$])
-          .subscribe(
-            () => {
-              // allow to send next transactions
-              this.transactionBlocker.unlockTransactionSend();
-            }
-          );
-
-        listenHistoryStateUpdates$(zp).pipe(
-          switchMap(
-            (state: HistoryState<string>) => {
-              return this.stateStorageService.saveHistory(state);
-            }
-          )
-        ).subscribe();
-
         this.zp = zp;
         this.zpGas = zpGas;
+
+        this.listenUpdates();
 
         if (this.accountService.isNewAccount()) {
           return this.lightUpdate(zp, zpGas).pipe(
@@ -183,6 +153,40 @@ export class ZeroPoolService {
       shareReplay(1)
     );
 
+  }
+
+  private listenUpdates(): void {
+    const listenAndSaveState$ = listenUtxoStateUpdates$(this.zp).pipe(
+      switchMap(
+        (state: MyUtxoState<string>) => {
+          return this.stateStorageService.saveUtxo(state);
+        }
+      )
+    );
+
+    const listenAndSaveGasState$ = listenUtxoStateUpdates$(this.zpGas).pipe(
+      switchMap(
+        (state: MyUtxoState<string>) => {
+          return this.stateStorageService.saveGasUtxo(state);
+        }
+      )
+    );
+
+    combineLatest([listenAndSaveState$, listenAndSaveGasState$])
+      .subscribe(
+        () => {
+          // allow to send next transactions
+          this.transactionBlocker.unlockTransactionSend();
+        }
+      );
+
+    listenHistoryStateUpdates$(this.zp).pipe(
+      switchMap(
+        (state: HistoryState<string>) => {
+          return this.stateStorageService.saveHistory(state);
+        }
+      )
+    ).subscribe();
   }
 
   private updateStates$(
