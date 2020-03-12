@@ -8,6 +8,7 @@ import { of } from 'rxjs';
 import { ProgressMessageComponent } from '../progress-message/progress-message.component';
 import { TransactionService } from '../../services/transaction.service';
 import { ZeroPoolService } from '../../services/zero-pool.service';
+import { ActionList, StepList } from '../progress-message/transaction-progress';
 
 @Component({
   selector: 'app-withdraw',
@@ -74,40 +75,9 @@ export class WithdrawComponent implements OnInit {
 
     const amount = tw(this.toAmount.value).toNumber();
 
-    const progressCallback = (progressStep) => {
-      if (progressStep === 'generate-zp-tx') {
-        this.progressDialog.showMessage({
-          title: 'Withdraw in progress',
-          lineOne: 'Generating Zero Pool Transaction',
-          lineTwo: 'It will take a bit'
-          // isLineTwoBold: true
-        });
-      } else if (progressStep === 'wait-for-zp-block') {
-        this.progressDialog.showMessage({
-          title: 'Withdraw in progress',
-          lineOne: 'Transaction published',
-          lineTwo: 'Verifying ZeroPool block',
-          isLineTwoBold: true
-        });
-      } else if (progressStep === 'receipt-tx-data') {
-        //
-        this.progressDialog.showMessage({
-          title: 'Withdraw in progress',
-          lineOne: 'Block successfully verified',
-          lineTwo: 'Waiting for a transaction to be included in a block',
-          isLineTwoBold: true
-        });
-
-      } else if (progressStep === 'queue') {
-        //
-        this.progressDialog.showMessage({
-          title: 'Withdraw is in progress',
-          lineOne: 'Wait for the last transactions to be confirmed',
-          lineTwo: '',
-          isLineTwoBold: true
-        });
-
-      }
+    const progressCallback = (progressStep: StepList) => {
+      const action = ActionList.WITHDRAW;
+      this.progressDialog.showMessage(action, progressStep);
     };
 
     this.txService.prepareWithdraw(environment.ethToken, amount, environment.relayerFee, progressCallback).pipe(

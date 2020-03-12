@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { fw, tw } from 'zeropool-lib';
 import { environment } from '../../../environments/environment';
@@ -8,6 +8,7 @@ import { of } from 'rxjs';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { ValidateAddress } from '../../common/validateAddress';
 import { ProgressMessageComponent } from '../progress-message/progress-message.component';
+import { ActionList, StepList } from '../progress-message/transaction-progress';
 
 @Component({
   selector: 'app-transfer',
@@ -68,44 +69,9 @@ export class TransferComponent implements OnInit {
     this.transferIsInProgress = true;
 
     const amount = tw(this.toAmount.value).toNumber();
-    const progressCallback = (progressStep) => {
-      if (progressStep === 'generate-zp-tx') {
-        //
-        this.progressDialog.showMessage({
-          title: 'Transfer is in progress',
-          lineOne: 'Generating Zero Pool Transaction',
-          lineTwo: 'It will take a bit'
-          // isLineTwoBold: true
-        });
-        //
-      } else if (progressStep === 'wait-for-zp-block') {
-        //
-        this.progressDialog.showMessage({
-          title: 'Transfer is in progress',
-          lineOne: 'Transaction published',
-          lineTwo: 'Verifying ZeroPool block',
-          isLineTwoBold: true
-        });
-        //
-      } else if (progressStep === 'receipt-tx-data') {
-        //
-        this.progressDialog.showMessage({
-          title: 'Transfer is in progress',
-          lineOne: 'Block successfully verified',
-          lineTwo: 'Waiting for a transaction to be included in a block',
-          isLineTwoBold: true
-        });
-
-      } else if (progressStep === 'queue') {
-        //
-        this.progressDialog.showMessage({
-          title: 'Transfer is in progress',
-          lineOne: 'Wait for the last transactions to be confirmed',
-          lineTwo: '',
-          isLineTwoBold: true
-        });
-
-      }
+    const progressCallback = (progressStep: StepList) => {
+      const action = ActionList.TRANSFER;
+      this.progressDialog.showMessage(action, progressStep);
     };
 
     this.txService.transfer(environment.ethToken, this.toAddress, amount, environment.relayerFee, progressCallback).pipe(

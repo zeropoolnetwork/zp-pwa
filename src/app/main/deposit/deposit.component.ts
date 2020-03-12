@@ -11,6 +11,7 @@ import { depositProgress, depositProgress$, UnconfirmedTransactionService } from
 import { TransactionService } from '../../services/transaction.service';
 import { ProgressMessageComponent } from '../progress-message/progress-message.component';
 import { environment } from '../../../environments/environment';
+import { ActionList, StepList } from '../progress-message/transaction-progress';
 
 @Component({
   selector: 'app-deposit',
@@ -97,7 +98,7 @@ export class DepositComponent implements AfterViewInit, OnDestroy {
         }
 
         const progress = depositProgress$.subscribe(
-          (progressStep: string) => {
+          (progressStep: StepList) => {
             progressStep && this.setProgressState(progressStep);
           },
           () => {
@@ -114,54 +115,9 @@ export class DepositComponent implements AfterViewInit, OnDestroy {
 
   }
 
-  private setProgressState(progressStep = 'start') {
-    if (progressStep === 'open-metamask') {
-      this.progressDialog.showMessage({
-        title: 'Deposit in progress',
-        lineOne: 'Transaction generated',
-        lineTwo: 'Please check your metamask',
-        isLineTwoBold: true
-      });
-    } else if (progressStep === 'sending-transaction') {
-      this.progressDialog.showMessage({
-        title: 'Deposit in progress',
-        lineOne: 'Transaction generated',
-        lineTwo: 'Verifying ZeroPool block',
-        isLineTwoBold: true
-      });
-    } else if (progressStep === 'receipt-tx-data') {
-      //
-      this.progressDialog.showMessage({
-        title: 'Deposit in progress',
-        lineOne: 'Block successfully verified',
-        lineTwo: 'Waiting for a transaction to be included in a block',
-        isLineTwoBold: true
-      });
-
-    } else if (progressStep === 'queue') {
-      //
-      this.progressDialog.showMessage({
-        title: 'Deposit in progress',
-        lineOne: 'Wait for the last transactions to be confirmed',
-        lineTwo: '',
-        isLineTwoBold: true
-      });
-
-    } else if (progressStep === 'start') {
-      this.progressDialog.showMessage({
-        title: 'Deposit in progress',
-        lineOne: 'Generate ZeroPool transaction',
-        lineTwo: 'It might take some time'
-      });
-    } else if (progressStep === 'unconfirmed-deposit-start') {
-      this.progressDialog.showMessage({
-        title: 'Deposit in progress',
-        lineOne: 'Transaction generated',
-        lineTwo: 'Wait for deposit confirmation on chain',
-        isLineTwoBold: true
-      });
-    }
-
+  private setProgressState(progressStep: StepList) {
+    const action = ActionList.DEPOSIT;
+    this.progressDialog.showMessage(action, progressStep);
   }
 
   ngOnDestroy(): void {
@@ -171,7 +127,7 @@ export class DepositComponent implements AfterViewInit, OnDestroy {
   onDepositClick(): void {
     this.depositInProgress = true;
 
-    this.setProgressState();
+    this.setProgressState(StepList.GENERATE_TRANSACTION);
 
     const amount = tw(this.amount.value).toNumber();
 

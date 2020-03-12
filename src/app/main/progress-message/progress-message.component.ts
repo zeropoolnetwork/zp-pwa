@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActionList, resolveProgressMessage, StepList } from './transaction-progress';
 
 @Component({
   selector: 'app-progress-message',
@@ -20,24 +21,13 @@ export class ProgressMessageComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  showMessage(messages) {
+  showMessage(action: ActionList, step: StepList) {
+    const messages = resolveProgressMessage(action, step);
+
     this.title = messages.title || '';
     this.progressMessageLineOne = messages.lineOne || '';
     this.progressMessageLineTwo = messages.lineTwo || '';
     this.imageSrc = messages.image ? messages.image : this.imageSrc;
-    // this.isLineTwoBold = !!messages.isLineTwoBold;
-  }
-
-  // updateMessage(messages) {
-  //   this.title = messages.title || '';
-  //   this.progressMessageLineOne = messages.lineOne || '';
-  //   this.progressMessageLineTwo = messages.lineTwo || '';
-  //   this.imageSrc = messages.image ? messages.image : this.imageSrc;
-  //   // this.isLineTwoBold = !!messages.isLineTwoBold;
-  // }
-
-  showErrorMessage() {
-    // console.log('2');
   }
 
 }

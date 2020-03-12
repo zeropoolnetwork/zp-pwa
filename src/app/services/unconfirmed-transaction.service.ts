@@ -8,9 +8,10 @@ import { environment } from '../../environments/environment';
 import { RelayerApiService } from './relayer.api.service';
 import { TransactionSynchronizer } from './observable-synchronizer';
 import { TransactionReceipt } from 'web3-core';
+import { StepList } from '../main/progress-message/transaction-progress';
 
-export const depositProgress: BehaviorSubject<string> = new BehaviorSubject(undefined);
-export const depositProgress$: Observable<string> = depositProgress.asObservable();
+export const depositProgress: BehaviorSubject<StepList> = new BehaviorSubject(undefined);
+export const depositProgress$: Observable<StepList> = depositProgress.asObservable();
 
 export interface ZpTransaction {
   tx: Tx<string>;
@@ -220,7 +221,7 @@ export class UnconfirmedTransactionService {
   ): Observable<string> {
 
     if (depositTx && !depositTx.blockNumber) {
-      depositProgress.next('unconfirmed-deposit-start');
+      depositProgress.next(StepList.UNCONFIRMED_DEPOSIT_START);
     }
 
     if (!depositTx || !depositTx.blockNumber) {
@@ -235,14 +236,14 @@ export class UnconfirmedTransactionService {
     }
 
 
-    depositProgress.next('sending-transaction');
+    depositProgress.next(StepList.VERIFYING_ZP_BLOCK);
 
     return this.relayerApi.sendTx$(depositZpTx.tx, toHex(depositTx.blockNumber), gasTx).pipe(
       tap(() => {
         UnconfirmedTransactionService.deleteDepositTransaction();
       }),
       mergeMap((txData: any) => {
-        depositProgress.next('receipt-tx-data');
+        depositProgress.next(StepList.RECEIPT_TX_DATA);
 
         return this.waitForTx(this.zpService.zp, txData.transactionHash || txData).pipe(
           filter(x => !!x),

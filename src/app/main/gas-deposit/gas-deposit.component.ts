@@ -9,6 +9,7 @@ import { AmountValidatorParams, CustomValidators } from './custom-validators';
 import { Web3ProviderService } from '../../services/web3.provider.service';
 import { ProgressMessageComponent } from '../progress-message/progress-message.component';
 import { UnconfirmedTransactionService } from '../../services/unconfirmed-transaction.service';
+import { ActionList, StepList } from '../progress-message/transaction-progress';
 
 @Component({
   selector: 'app-gas-deposit',
@@ -91,49 +92,9 @@ export class GasDepositComponent implements OnInit {
 
     const amount = tw(this.amount.value).toNumber();
 
-    const progressCallback = (progressStep) => {
-      if (progressStep === 'wait-for-zp-block') {
-        this.progressDialog.showMessage({
-          title: 'Gas deposit in progress',
-          lineOne: 'Transaction published',
-          lineTwo: 'Verifying ZeroPool block'
-        });
-      } else if (progressStep === 'queue') {
-        //
-        this.progressDialog.showMessage({
-          title: 'Gas Deposit in progress',
-          lineOne: 'Wait for the last transactions to be confirmed',
-          lineTwo: '',
-          isLineTwoBold: true
-        });
-
-      } else if (progressStep === 'generate-transaction') {
-        //
-        this.progressDialog.showMessage({
-          title: 'Gas Deposit in progress',
-          lineOne: 'Generate Gas Deposit Transaction',
-          lineTwo: '',
-          isLineTwoBold: true
-        });
-
-      } else if (progressStep === 'receipt-tx-data') {
-        //
-        this.progressDialog.showMessage({
-          title: 'Gas Deposit in progress',
-          lineOne: 'Block successfully verified',
-          lineTwo: 'Waiting for a transaction to be included in a block',
-          isLineTwoBold: true
-        });
-
-      } else if (progressStep === 'open-metamask') {
-        //
-        this.progressDialog.showMessage({
-          title: 'Gas deposit in progress',
-          lineOne: 'Transaction generated',
-          lineTwo: 'Please check your metamask',
-          isLineTwoBold: true
-        });
-      }
+    const progressCallback = (progressStep: StepList) => {
+      const action = ActionList.GAS_DEPOSIT;
+      this.progressDialog.showMessage(action, progressStep);
     };
 
 
