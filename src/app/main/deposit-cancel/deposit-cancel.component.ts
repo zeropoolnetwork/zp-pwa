@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
-import { fw, PayNote } from 'zeropool-lib';
+import { fw, PayNote, toHex } from 'zeropool-lib';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { environment } from '../../../environments/environment';
 import { catchError, distinctUntilChanged, exhaustMap, filter, map, mergeMap, take, tap } from 'rxjs/operators';
 import { BehaviorSubject, combineLatest, merge, Observable, of } from 'rxjs';
 import { TransactionService } from '../../services/transaction.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
-import { Transaction } from 'web3-core';
 
 interface IWrappedPayNote {
   payNote: PayNote;
@@ -50,7 +49,7 @@ export class DepositCancelComponent {
 
     const activeWithdrawalsUpdate$ = zpService.zpUpdates$.pipe(
       map(() => {
-        return wrappPayNoteList(this.zpService.lostDeposits || []);
+        return wrapPayNoteList(this.zpService.lostDeposits || []);
       }),
       exhaustMap((w: IWrappedPayNote[]) => {
         return combineLatest(
@@ -60,7 +59,7 @@ export class DepositCancelComponent {
     );
 
     const w$ = merge(
-      of(wrappPayNoteList(this.zpService.lostDeposits || [])),
+      of(wrapPayNoteList(this.zpService.lostDeposits || [])),
       activeWithdrawalsUpdate$
     );
 
@@ -81,22 +80,6 @@ export class DepositCancelComponent {
     );
   }
 
-  cancelDeposit(w: PayNote): void {
-    localStorage.setItem(w.txHash, 'in-progress');
-    this.txService.depositCancel(w).pipe(
-      tap((txHash: any) => {
-        console.log({
-          depositCancel: txHash
-        });
-      }),
-      catchError((e) => {
-        localStorage.removeItem(w.txHash);
-        console.log(e);
-        return of('');
-      })
-    ).subscribe();
-  }
-
   getAmount(val: number): number {
     return fw(val);
   }
@@ -113,24 +96,29 @@ export class DepositCancelComponent {
 
     return this.zpService.isReady$.pipe(
       filter((isReady: boolean) => isReady),
-      tap((tx: boolean) => {
-        console.log(tx);
-      }),
       take(1),
       mergeMap(() => {
-        return fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransaction(ethTxHash));
+        return combineLatest([
+          fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransaction(ethTxHash)),
+          fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransactionReceipt(ethTxHash))
+        ]);
       }),
-      map((tx: Transaction) => {
+      map(([tx, receipt]) => {
+        if (receipt && tx.blockNumber && !receipt.status) {
+          return false;
+        }
         return !!tx;
       }),
-      tap((tx: boolean) => {
-        console.log(tx);
-      })
     );
   }
 
   withdraw(w: PayNote): void {
-    this.txService.withdraw(w, (txHash: string) => {
+    // todo: make it normal
+    // @ts-ignore
+    // w.blockNumber = toHex(w.blockNumber);
+    // // @ts-ignore
+    // w.utxo.amount = toHex(w.utxo.amount);
+    this.txService.depositCancel(w, (txHash: string) => {
       // map: zpTx => ethTx
       localStorage.setItem(w.txHash, txHash);
       this.buttonsSubject.next([
@@ -140,7 +128,7 @@ export class DepositCancelComponent {
     }).pipe(
       tap((txHash: any) => {
         console.log({
-          withdraw: txHash
+          depositCancel: txHash
         });
       }),
       catchError((e) => {
@@ -171,7 +159,7 @@ export class DepositCancelComponent {
 
 }
 
-function wrappPayNoteList(withdrawals: PayNote[]): IWrappedPayNote[] {
+function wrapPayNoteList(withdrawals: PayNote[]): IWrappedPayNote[] {
   return withdrawals.map(
     (payNote: PayNote) => {
       return {

@@ -54,7 +54,7 @@ export class WithdrawalsListComponent {
     const activeWithdrawalsUpdate$ = zpService.zpUpdates$.pipe(
       map(() => {
         this.checkZpEthBalance();
-        return wrappPayNoteList(this.zpService.activeWithdrawals || []);
+        return wrapPayNoteList(this.zpService.activeWithdrawals || []);
       }),
       exhaustMap((w: IWrappedPayNote[]) => {
         return combineLatest(
@@ -64,7 +64,7 @@ export class WithdrawalsListComponent {
     );
 
     const w$ = merge(
-      of(wrappPayNoteList(this.zpService.activeWithdrawals || [])),
+      of(wrapPayNoteList(this.zpService.activeWithdrawals || [])),
       activeWithdrawalsUpdate$
     );
 
@@ -105,9 +105,16 @@ export class WithdrawalsListComponent {
       }),
       take(1),
       mergeMap(() => {
-        return fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransaction(ethTxHash));
+        return combineLatest([
+          fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransaction(ethTxHash)),
+          fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransactionReceipt(ethTxHash))
+        ])
       }),
-      map((tx: Transaction) => {
+      map(([tx, receipt]) => {
+        console.log(receipt)
+        if (receipt && tx.blockNumber && !receipt.status) {
+          return false;
+        }
         return !!tx;
       }),
       tap((tx: boolean) => {
@@ -166,7 +173,7 @@ export class WithdrawalsListComponent {
 
 }
 
-function wrappPayNoteList(withdrawals: PayNote[]): IWrappedPayNote[] {
+function wrapPayNoteList(withdrawals: PayNote[]): IWrappedPayNote[] {
   return withdrawals.map(
     (payNote: PayNote) => {
       return {
