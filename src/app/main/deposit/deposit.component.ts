@@ -35,7 +35,7 @@ export class DepositComponent implements AfterViewInit, OnDestroy {
   progressDialog: ProgressMessageComponent;
 
   public form: FormGroup = this.fb.group({
-    amount: ['', Validators.max(0.1)], // Min, Balance
+    amount: ['', [Validators.required, Validators.max(0.1)]], // Min, Balance
   });
 
   get amount(): AbstractControl {
@@ -64,7 +64,6 @@ export class DepositComponent implements AfterViewInit, OnDestroy {
     private web3Service: Web3ProviderService,
     private fb: FormBuilder
   ) {
-    // Показывать что в процессе если уже зашел тудаы
     this.availableEthAmount = this.zpService.ethBalance;
   }
 

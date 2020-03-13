@@ -59,11 +59,17 @@
 
         <div class="button-block">
           <div class="actions mb-20">
-            <button mat-stroked-button routerLink="./deposit"
+
+            <button mat-stroked-button *ngIf="!hasLostDeposits" routerLink="/main/deposit"
                     matBadgePosition="above before"
                     matBadge="1"
                     matBadgeColor="primary"
                     [matBadgeHidden]="!hasDepositInProgress">Deposit</button>
+
+            <button mat-stroked-button *ngIf="hasLostDeposits" routerLink="/main/cancel-deposit"
+                    matBadgePosition="above before"
+                    [matBadge]="lostDepositsAmount"
+                    matBadgeColor="warn">Deposit</button>
 
             <button mat-stroked-button routerLink="./transfer" [disabled]="!balance">Transfer</button>
 

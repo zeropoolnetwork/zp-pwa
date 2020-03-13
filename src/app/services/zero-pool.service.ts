@@ -44,6 +44,28 @@ export class ZeroPoolService {
   public zpBalance: ZpBalance;
   public zpHistory: HistoryItem[];
   public activeWithdrawals: PayNote[];
+
+  public lostDeposits: PayNote[] = [
+    {
+      utxo: {
+        owner: '0xAAA',
+        token: '0x0000000000000000000000000000000000000000',
+        amount: 12312000000, // wei
+      },
+      blockNumber: 10,
+      txHash: '0xAAAA'
+    },
+    {
+      utxo: {
+        owner: '0xAAA',
+        token: '0x0000000000000000000000000000000000000000',
+        amount: 400000000, // wei
+      },
+      blockNumber: 10,
+      txHash: '0xAAAA'
+    }
+  ];
+
   public currentBlockNumber: number;
 
   public zpGasBalance: number;
@@ -261,7 +283,7 @@ export class ZeroPoolService {
             ethBalance,
           ]: [IMerkleTree, IMerkleTree, string] = x;
 
-          this.zpBalance = { '0x0000000000000000000000000000000000000000': 0 };
+          this.zpBalance = {'0x0000000000000000000000000000000000000000': 0};
           this.zpHistory = [];
           this.activeWithdrawals = [];
           this.currentBlockNumber = 0;

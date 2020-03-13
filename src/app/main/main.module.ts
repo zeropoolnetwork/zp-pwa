@@ -34,11 +34,13 @@ import { AutoJoinUtxoService } from '../services/auto-join-utxo.service';
 import { UnconfirmedTransactionService } from '../services/unconfirmed-transaction.service';
 import { ProgressMessageComponent } from './progress-message/progress-message.component';
 import { TransactionBlockerService } from '../services/transaction-blocker.service';
+import { DepositCancelComponent } from './deposit-cancel/deposit-cancel.component';
 
 @NgModule({
   declarations: [
     MainComponent,
     DepositComponent,
+    DepositCancelComponent,
     TransferComponent,
     WithdrawComponent,
     GasIsNeededComponent,

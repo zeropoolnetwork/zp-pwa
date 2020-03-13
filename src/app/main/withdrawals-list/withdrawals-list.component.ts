@@ -84,9 +84,7 @@ export class WithdrawalsListComponent {
   }
 
   getAssetName(assetAddress: string) {
-    if (assetAddress === environment.ethToken) {
-      return 'ETH';
-    }
+    return assetAddress === environment.ethToken ? 'ETH' : '';
   }
 
 }
