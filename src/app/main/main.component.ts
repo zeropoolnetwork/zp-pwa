@@ -32,6 +32,14 @@ export class MainComponent implements OnInit {
   hasDepositInProgress = false;
   hasGasDepositInProgress = false;
 
+  get hasLostDeposits(): boolean {
+    return true;
+  }
+
+  get lostDepositsAmount(): number {
+    return 2;
+  }
+
   totalWithdrawals = 0;
 
   get hasWithdrawals() {
@@ -84,11 +92,6 @@ export class MainComponent implements OnInit {
         this.hasDepositInProgress = false;
       }
     ));
-
-  }
-
-  connectWallet() {
-    this.web3Service.connectWeb3();
   }
 
   updateUiState() {
@@ -144,5 +147,4 @@ export class MainComponent implements OnInit {
       console.log('!');
     });
   }
-
 }

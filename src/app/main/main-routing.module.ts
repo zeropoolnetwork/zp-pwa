@@ -13,11 +13,13 @@ import { GasGuard } from './gas.guard';
 import { GasDepositComponent } from './gas-deposit/gas-deposit.component';
 import { DustProtectionComponent } from './settings/dust-protection/dust-protection.component';
 import { ResetAccountComponent } from './settings/reset-account/reset-account.component';
+import { DepositCancelComponent } from './deposit-cancel/deposit-cancel.component';
 
 const routes: Routes = [
   {path: '', component: MainComponent},
   {path: 'gas-is-needed', component: GasIsNeededComponent},
   {path: 'gas-deposit', component: GasDepositComponent},
+  {path: 'cancel-deposit', component: DepositCancelComponent},
   {path: 'deposit', component: DepositComponent, canActivate: [GasGuard]},
   {path: 'transfer', component: TransferComponent, canActivate: [GasGuard]},
   {path: 'withdraw', component: WithdrawComponent, canActivate: [GasGuard]},

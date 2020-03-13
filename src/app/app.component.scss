@@ -74,8 +74,9 @@ $toolbar-height: 60px;
 }
 
 .logo {
+  outline: none;
+  cursor: pointer;
   font-weight: 400;
-
   &-bold {
     font-weight: 600;
   }

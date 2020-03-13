@@ -1,0 +1,32 @@
+<div class="fixed-center widget-box">
+  <h2>Broken deposits</h2>
+  <p>It seems that your deposit transaction wasn't published in ZeroPool block in time.</p>
+  <p>You can get your funds back</p>
+  <div class="lost-deposit-list">
+
+    <div *ngFor="let d of lostDeposits">
+      <div class="lost-deposit-row">
+
+        <div>
+          <p>Deposit</p>
+          <h3>{{ getAmount(d.utxo.amount) }} {{ getAssetName(d.utxo.token) }}</h3>
+        </div>
+
+        <ng-container *ngIf="isFinalizingNow(d)">
+          <loaders-css loader="ball-beat" [color]="'rgba(100, 100, 100, 0.5)'" [scale]="1"></loaders-css>
+        </ng-container>
+
+        <ng-container *ngIf="!isFinalizingNow(d)">
+          <button (click)="cancelDeposit(d)" mat-stroked-button>Withdraw</button>
+        </ng-container>
+
+      </div>
+    </div>
+
+  </div>
+  <div class="actions mt-20">
+    <button mat-stroked-button routerLink="/main">Back</button>
+    <button [disabled]="!isAvailableNewDeposit" mat-flat-button
+            routerLink="/main/deposit" color="accent">New deposit</button>
+  </div>
+</div>

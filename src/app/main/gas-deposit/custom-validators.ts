@@ -1,4 +1,4 @@
-import { AbstractControl, ValidationErrors } from '@angular/forms';
+import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
 export type AmountValidatorParams = {
   availableAmount?: Number;
@@ -8,7 +8,7 @@ export type AmountValidatorParams = {
 
 export class CustomValidators {
 
-  static amount(params: AmountValidatorParams) {
+  static amount(params: AmountValidatorParams): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       const {availableAmount, minAmount, maxAmount} = params;
       const num = control.value;
@@ -24,7 +24,7 @@ export class CustomValidators {
       if (num > availableAmount) {
         return {'notEnough': true};
       }
-      
+
       return null;
     };
   }
