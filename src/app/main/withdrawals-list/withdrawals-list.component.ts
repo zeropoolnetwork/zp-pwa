@@ -20,7 +20,7 @@ interface IWrappedPayNote {
 })
 export class WithdrawalsListComponent {
 
-  expiresBlockNumber: number | string;
+  expiresBlockNumber = this.zpService.challengeExpiresBlocks;
 
   isAvailableNewWithdraw = false;
 
@@ -32,8 +32,6 @@ export class WithdrawalsListComponent {
     private zpService: ZeroPoolService,
     private txService: TransactionService
   ) {
-
-    this.expiresBlockNumber = this.zpService.challengeExpiresBlocks;
 
     this.checkZpEthBalance();
 
@@ -65,13 +63,13 @@ export class WithdrawalsListComponent {
       }),
     );
 
-    const x$ = merge(
+    const w$ = merge(
       of(wrappPayNoteList(this.zpService.activeWithdrawals || [])),
       activeWithdrawalsUpdate$
     );
 
     this.withdrawals$ = combineLatest([
-      x$,
+      w$,
       this.buttonsSubject.asObservable().pipe(distinctUntilChanged())
     ]).pipe(
       map((x) => {

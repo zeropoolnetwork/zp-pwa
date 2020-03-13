@@ -4,20 +4,25 @@
   <p>You can get your funds back</p>
   <div class="lost-deposit-list">
 
-    <div *ngFor="let d of lostDeposits">
+    <div *ngFor="let w of withdrawals$ | async">
       <div class="lost-deposit-row">
 
         <div>
-          <p>Deposit</p>
-          <h3>{{ getAmount(d.utxo.amount) }} {{ getAssetName(d.utxo.token) }}</h3>
+          <p *ngIf="!isReadyToFinalize(w.payNote.blockNumber)">
+            Pending {{ getRemainingBlockNumber(w.payNote.blockNumber) }} / {{ expiresBlockNumber }} blocks
+          </p>
+
+          <p *ngIf="isReadyToFinalize(w.payNote.blockNumber)">Verified</p>
+          <h3>{{ getAmount(w.payNote.utxo.amount) }} {{ getAssetName(w.payNote.utxo.token) }}</h3>
         </div>
 
-        <ng-container *ngIf="isFinalizingNow(d)">
+        <ng-container *ngIf="w.isFinalizingNow">
           <loaders-css loader="ball-beat" [color]="'rgba(100, 100, 100, 0.5)'" [scale]="1"></loaders-css>
         </ng-container>
 
-        <ng-container *ngIf="!isFinalizingNow(d)">
-          <button (click)="cancelDeposit(d)" mat-stroked-button>Withdraw</button>
+
+        <ng-container *ngIf="!w.isFinalizingNow">
+          <button [disabled]="!isReadyToFinalize(w.payNote.blockNumber)" (click)="withdraw(w.payNote)" mat-stroked-button>Withdraw</button>
         </ng-container>
 
       </div>
