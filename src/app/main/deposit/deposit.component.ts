@@ -7,7 +7,12 @@ import { of, Subscription } from 'rxjs';
 import { catchError, switchMap, tap } from 'rxjs/operators';
 import { AmountValidatorParams, CustomValidators } from '../gas-deposit/custom-validators';
 import { Web3ProviderService } from '../../services/web3.provider.service';
-import { depositProgress, depositProgress$, UnconfirmedTransactionService } from '../../services/unconfirmed-transaction.service';
+import {
+  depositProgress,
+  depositProgress$,
+  UnconfirmedTransactionService,
+  UnconfirmedTxProgressNotification
+} from '../../services/unconfirmed-transaction.service';
 import { TransactionService } from '../../services/transaction.service';
 import { ProgressMessageComponent } from '../progress-message/progress-message.component';
 import { environment } from '../../../environments/environment';
@@ -93,12 +98,12 @@ export class DepositComponent implements AfterViewInit, OnDestroy {
 
         if (depositProgress.value) {
           this.depositInProgress = true;
-          this.setProgressState(depositProgress.value);
+          this.setProgressState(depositProgress.value.step, depositProgress.value.extraData);
         }
 
         const progress = depositProgress$.subscribe(
-          (progressStep: StepList) => {
-            progressStep && this.setProgressState(progressStep);
+          (progressStep: UnconfirmedTxProgressNotification) => {
+            progressStep && this.setProgressState(progressStep.step, progressStep.extraData);
           },
           () => {
           },

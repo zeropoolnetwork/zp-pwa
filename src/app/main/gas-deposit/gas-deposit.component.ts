@@ -110,7 +110,6 @@ export class GasDepositComponent implements OnInit {
       this.setProgressState(progressStep, txHash);
     };
 
-    // progressCallback
     this.txService.gasDeposit(amount, progressCallback).pipe(
       tap((txHash: string) => {
         this.inProgress = false;

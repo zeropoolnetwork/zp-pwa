@@ -10,13 +10,19 @@ import { TransactionSynchronizer } from './observable-synchronizer';
 import { Transaction, TransactionReceipt } from 'web3-core';
 import { StepList } from '../main/progress-message/transaction-progress';
 
-export const depositProgress: BehaviorSubject<StepList> = new BehaviorSubject(undefined);
-export const depositProgress$: Observable<StepList> = depositProgress.asObservable();
+export interface UnconfirmedTxProgressNotification {
+  step: StepList,
+  extraData?: any
+}
+
+export const depositProgress: BehaviorSubject<UnconfirmedTxProgressNotification> = new BehaviorSubject(undefined);
+export const depositProgress$: Observable<UnconfirmedTxProgressNotification> = depositProgress.asObservable();
 
 export interface ZpTransaction {
   tx: Tx<string>;
-  txHash: string;
+  txHash?: string;
   timestamp?: number;
+  ethTxHash?: string;
 }
 
 const dateExpiresInMinutes = 10;
@@ -30,7 +36,8 @@ export class UnconfirmedTransactionService {
     this.save('deposit', {
       tx: tx.tx,
       txHash: tx.txHash,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      ethTxHash: tx.ethTxHash
     });
   }
 
@@ -45,7 +52,7 @@ export class UnconfirmedTransactionService {
   static saveGasDepositTransaction(tx: ZpTransaction): void {
     this.save('gas-deposit', {
       tx: tx.tx,
-      txHash: tx.txHash,
+      ethTxHash: tx.ethTxHash,
       timestamp: Date.now()
     });
   }
@@ -81,7 +88,7 @@ export class UnconfirmedTransactionService {
       filter((isReady: boolean) => isReady),
       take(1),
       mergeMap(() => {
-        return this.waitForTx(this.zpService.zp, depositZpTx.txHash, () => {
+        return this.waitForTx(this.zpService.zp, depositZpTx.ethTxHash, () => {
 
           const timePassed = Date.now() - depositZpTx.timestamp;
           const isExpired = !(timePassed <= 60000 * dateExpiresInMinutes);
@@ -117,7 +124,7 @@ export class UnconfirmedTransactionService {
 
     const onDepositError = (e) => {
       UnconfirmedTransactionService.deleteGasDepositTransaction();
-      depositProgress.next(StepList.FAILED);
+      depositProgress.next({ step: StepList.FAILED });
       console.log('unconfirmed transaction failed: ', e.message || e);
     };
 
@@ -188,7 +195,7 @@ export class UnconfirmedTransactionService {
 
     const onDepositError = (e) => {
       UnconfirmedTransactionService.deleteDepositTransaction();
-      depositProgress.next(StepList.FAILED);
+      depositProgress.next({ step: StepList.FAILED });
       console.log('unconfirmed transaction failed: ', e.message || e);
     };
 
@@ -232,8 +239,16 @@ export class UnconfirmedTransactionService {
     depositZpTx: ZpTransaction
   ): Observable<string> {
 
-    if (depositTx && !depositTx.blockNumber) {
-      depositProgress.next(StepList.UNCONFIRMED_DEPOSIT_START);
+    // todo: check if transaction exists in chain
+    if (depositZpTx.ethTxHash) {
+      depositProgress.next({
+        step: StepList.UNCONFIRMED_DEPOSIT_START,
+        extraData: depositZpTx.ethTxHash
+      });
+    }
+
+    if (depositTx && !depositTx.blockNumber && !depositZpTx.ethTxHash) {
+      depositProgress.next({ step: StepList.UNCONFIRMED_DEPOSIT_START });
     }
 
     if (!depositTx || !depositTx.blockNumber) {
@@ -250,14 +265,14 @@ export class UnconfirmedTransactionService {
     }
 
 
-    depositProgress.next(StepList.VERIFYING_ZP_BLOCK);
+    depositProgress.next({ step: StepList.VERIFYING_ZP_BLOCK });
 
     return this.relayerApi.sendTx$(depositZpTx.tx, toHex(depositTx.blockNumber), gasTx).pipe(
       tap(() => {
         UnconfirmedTransactionService.deleteDepositTransaction();
       }),
       mergeMap((txData: any) => {
-        depositProgress.next(StepList.RECEIPT_TX_DATA);
+        depositProgress.next({ step: StepList.RECEIPT_TX_DATA, extraData: txData.transactionHash || txData });
 
         return this.waitForTx(this.zpService.zp, txData.transactionHash || txData).pipe(
           filter(x => !!x),

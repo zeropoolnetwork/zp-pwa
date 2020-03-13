@@ -54,6 +54,7 @@ export class TransactionService {
           UnconfirmedTransactionService.saveDepositTransaction({ tx, txHash });
           progressCallback(StepList.CONFIRM_TRANSACTION);
           const depositBlockNumber$ = fromPromise(this.zpService.zp.deposit(token, amount, txHash, (hash: string) => {
+            UnconfirmedTransactionService.saveDepositTransaction({ tx, txHash, ethTxHash: hash });
             progressCallback(StepList.START_ETH_TRANSACTION, hash);
           }));
           const gasTx$ = fromPromise(this.zpService.zpGas.prepareWithdraw(environment.ethToken, fee));
@@ -94,6 +95,10 @@ export class TransactionService {
                   to: address,
                   value: amount
                 }, 0, (txHash: string) => {
+                  UnconfirmedTransactionService.saveGasDepositTransaction({
+                    tx: zpTxData[0],
+                    ethTxHash: txHash
+                  });
                   progressCallback(StepList.START_ETH_TRANSACTION, txHash);
                 });
                 return fromPromise(tx$).pipe(
@@ -102,16 +107,9 @@ export class TransactionService {
 
               }
             ),
-            mergeMap(
-              (txHash: string) => {
-                UnconfirmedTransactionService.saveGasDepositTransaction({
-                  tx: zpTxData[0],
-                  txHash
-                });
-
-                return this.waitForTx(this.zpService.zp, txHash);
-              }
-            ),
+            mergeMap((txHash: string) => {
+              return this.waitForTx(this.zpService.zp, txHash);
+            }),
             filter(x => !!x),
             take(1),
             mergeMap((txHash: string) => {
