@@ -45,26 +45,7 @@ export class ZeroPoolService {
   public zpHistory: HistoryItem[];
   public activeWithdrawals: PayNote[];
 
-  public lostDeposits: PayNote[] = [
-    {
-      utxo: {
-        owner: '0xAAA',
-        token: '0x0000000000000000000000000000000000000000',
-        amount: 12312000000, // wei
-      },
-      blockNumber: 10,
-      txHash: '0xAAAA'
-    },
-    {
-      utxo: {
-        owner: '0xAAA',
-        token: '0x0000000000000000000000000000000000000000',
-        amount: 400000000, // wei
-      },
-      blockNumber: 10,
-      txHash: '0xAAAA'
-    }
-  ];
+  public lostDeposits: PayNote[];
 
   public currentBlockNumber: number;
 
@@ -219,6 +200,7 @@ export class ZeroPoolService {
 
     const getBalanceAndHistory$ = fromPromise(zp.getBalanceAndHistory());
     const getActiveWithdrawals$ = fromPromise(zp.getActiveWithdrawals());
+    const getUncompleteDeposits$ = fromPromise(zp.getUncompleteDeposits());
     const getBlockNumber = fromPromise(zp.ZeroPool.web3Ethereum.getBlockNumber());
     const getGasBalance = fromPromise(zpGas.getBalanceAndHistory());
     const getEthBalance = fromPromise(
@@ -230,6 +212,7 @@ export class ZeroPoolService {
       [
         getBalanceAndHistory$,
         getActiveWithdrawals$,
+        getUncompleteDeposits$,
         getBlockNumber,
         getGasBalance,
         getEthBalance
@@ -239,14 +222,16 @@ export class ZeroPoolService {
         const [
           balancesAndHistory,
           activeWithdrawals,
+          uncompleteDeposits$,
           blockNumber,
           gasBalancesAndHistory,
           ethBalance
-        ]: [HistoryAndBalances, PayNote[], number, HistoryAndBalances, string] = x;
+        ]: [HistoryAndBalances, PayNote[], PayNote[], number, HistoryAndBalances, string] = x;
 
         this.zpBalance = balancesAndHistory.balances;
         this.zpHistory = balancesAndHistory.historyItems;
         this.activeWithdrawals = activeWithdrawals;
+        this.lostDeposits = uncompleteDeposits$;
         this.currentBlockNumber = blockNumber;
 
         this.zpGasBalance = gasBalancesAndHistory.balances[environment.ethToken] || 0;

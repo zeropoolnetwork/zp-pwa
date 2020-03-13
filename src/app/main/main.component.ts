@@ -32,19 +32,13 @@ export class MainComponent implements OnInit {
   hasDepositInProgress = false;
   hasGasDepositInProgress = false;
 
-  get hasLostDeposits(): boolean {
-    return true;
-  }
-
-  get lostDepositsAmount(): number {
-    return 2;
-  }
 
   totalWithdrawals = 0;
+  totalLostDeposits = 0;
 
   get hasWithdrawals() {
     return this.totalWithdrawals > 0;
-  };
+  }
 
   hasVerifiedWithdrawals = false;
 
@@ -100,12 +94,12 @@ export class MainComponent implements OnInit {
     this.zpGasBalance = fw(this.zpService.zpGasBalance);
 
     this.totalWithdrawals = this.zpService.activeWithdrawals.length;
+    this.totalLostDeposits = this.zpService.lostDeposits.length;
 
-    if (this.totalWithdrawals !== 0 && (typeof this.zpService.challengeExpiresBlocks == 'number')) {
+    if (this.totalWithdrawals !== 0 && (typeof this.zpService.challengeExpiresBlocks === 'number')) {
       //
-      //this.hasWithdrawals = true;
       const readyBlock = this.zpService.currentBlockNumber - this.zpService.challengeExpiresBlocks;
-      //
+
       this.zpService.activeWithdrawals.forEach(
         (payNote: PayNote) => {
           if (payNote.blockNumber <= readyBlock) {

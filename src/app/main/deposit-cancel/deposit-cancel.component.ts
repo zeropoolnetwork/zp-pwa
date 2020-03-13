@@ -31,10 +31,10 @@ export class DepositCancelComponent {
 
   cancelDeposit(w: PayNote): void {
     localStorage.setItem(w.txHash, 'in-progress');
-    this.txService.withdraw(w).pipe(
+    this.txService.depositCancel(w).pipe(
       tap((txHash: any) => {
         console.log({
-          withdraw: txHash
+          depositCancel: txHash
         });
       }),
       catchError((e) => {
