@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { fw, PayNote, toHex } from 'zeropool-lib';
+import { fw, PayNote } from 'zeropool-lib';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { environment } from '../../../environments/environment';
 import { catchError, distinctUntilChanged, exhaustMap, filter, map, mergeMap, take, tap } from 'rxjs/operators';
@@ -113,12 +113,11 @@ export class DepositCancelComponent {
   }
 
   withdraw(w: PayNote): void {
-    // todo: make it normal
-    // @ts-ignore
-    // w.blockNumber = toHex(w.blockNumber);
-    // // @ts-ignore
-    // w.utxo.amount = toHex(w.utxo.amount);
-    this.txService.depositCancel(w, (txHash: string) => {
+    this.txService.depositCancel(w, (error: any, txHash: string | undefined) => {
+      if (error) {
+        return;
+      }
+
       // map: zpTx => ethTx
       localStorage.setItem(w.txHash, txHash);
       this.buttonsSubject.next([

@@ -53,10 +53,14 @@ export class TransactionService {
         ([tx, txHash]: [Tx<string>, string]) => {
           UnconfirmedTransactionService.saveDepositTransaction({ tx, txHash });
           progressCallback(StepList.CONFIRM_TRANSACTION);
-          const depositBlockNumber$ = fromPromise(this.zpService.zp.deposit(token, amount, txHash, (hash: string) => {
-            UnconfirmedTransactionService.saveDepositTransaction({ tx, txHash, ethTxHash: hash });
-            progressCallback(StepList.START_ETH_TRANSACTION, hash);
-          }));
+          const depositBlockNumber$ = fromPromise(this.zpService.zp.deposit(token, amount, txHash,
+            (error: any, hash: string | undefined) => {
+              if (error) {
+                progressCallback && progressCallback(StepList.FAILED);
+              }
+              UnconfirmedTransactionService.saveDepositTransaction({ tx, txHash, ethTxHash: hash });
+              progressCallback(StepList.START_ETH_TRANSACTION, hash);
+            }));
           const gasTx$ = fromPromise(this.zpService.zpGas.prepareWithdraw(environment.ethToken, fee));
           const tx$ = of(tx);
           return combineLatest([tx$, depositBlockNumber$, gasTx$]);
@@ -94,7 +98,10 @@ export class TransactionService {
                 const tx$ = this.zpService.zp.ZeroPool.web3Ethereum.sendTransaction({
                   to: address,
                   value: amount
-                }, 0, (txHash: string) => {
+                }, 0, (error: any, txHash: string | undefined) => {
+                  if (error) {
+                    progressCallback && progressCallback(StepList.FAILED);
+                  }
                   UnconfirmedTransactionService.saveGasDepositTransaction({
                     tx: zpTxData[0],
                     ethTxHash: txHash
@@ -202,7 +209,7 @@ export class TransactionService {
     return TransactionSynchronizer.execute<string>({ observable: o$, progressCallback });
   }
 
-  public withdraw(w: PayNote, onTxHash?: (txHash: string) => void): Observable<string> {
+  public withdraw(w: PayNote, onTxHash?: (error: any, txHash: string | undefined) => void): Observable<string> {
     return this.zpService.isReady$.pipe(
       filter((isReady: boolean) => isReady),
       take(1),
@@ -218,7 +225,7 @@ export class TransactionService {
     );
   }
 
-  public depositCancel(w: PayNote, onTxHash?: (txHash: string) => void): Observable<string> {
+  public depositCancel(w: PayNote, onTxHash?: (error: any, txHash: string | undefined) => void): Observable<string> {
     return this.zpService.isReady$.pipe(
       filter((isReady: boolean) => isReady),
       take(1),

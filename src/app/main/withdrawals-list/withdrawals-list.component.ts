@@ -5,8 +5,8 @@ import { environment } from '../../../environments/environment';
 import { catchError, distinctUntilChanged, exhaustMap, filter, map, mergeMap, take, tap } from 'rxjs/operators';
 import { BehaviorSubject, combineLatest, merge, Observable, of } from 'rxjs';
 import { TransactionService } from '../../services/transaction.service';
-import { Transaction } from 'web3-core';
 import { fromPromise } from 'rxjs/internal-compatibility';
+import { StepList } from '../progress-message/transaction-progress';
 
 interface IWrappedPayNote {
   payNote: PayNote;
@@ -108,10 +108,10 @@ export class WithdrawalsListComponent {
         return combineLatest([
           fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransaction(ethTxHash)),
           fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransactionReceipt(ethTxHash))
-        ])
+        ]);
       }),
       map(([tx, receipt]) => {
-        console.log(receipt)
+        console.log(receipt);
         if (receipt && tx.blockNumber && !receipt.status) {
           return false;
         }
@@ -124,7 +124,11 @@ export class WithdrawalsListComponent {
   }
 
   withdraw(w: PayNote): void {
-    this.txService.withdraw(w, (txHash: string) => {
+    this.txService.withdraw(w, (error: any, txHash: string | undefined) => {
+      if (error) {
+        return;
+      }
+
       // map: zpTx => ethTx
       localStorage.setItem(w.txHash, txHash);
       this.buttonsSubject.next([

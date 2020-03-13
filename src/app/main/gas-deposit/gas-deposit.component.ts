@@ -89,6 +89,13 @@ export class GasDepositComponent implements OnInit {
   }
 
   private setProgressState(progressStep: StepList, txHash?: string) {
+    if (progressStep === StepList.FAILED) {
+      this.inProgress = false;
+      this.isDoneWithError = true;
+      UnconfirmedTransactionService.deleteGasDepositTransaction();
+      return;
+    }
+
     if (txHash) {
       txHash = progressStep === StepList.START_ETH_TRANSACTION
         ? environment.etherscanPrefix + txHash

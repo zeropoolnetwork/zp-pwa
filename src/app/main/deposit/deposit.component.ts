@@ -123,6 +123,7 @@ export class DepositComponent implements AfterViewInit, OnDestroy {
     if (progressStep === StepList.FAILED) {
       this.depositInProgress = false;
       this.isFinishedWithError = true;
+      UnconfirmedTransactionService.deleteDepositTransaction();
       return;
     }
 
