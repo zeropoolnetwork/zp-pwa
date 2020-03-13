@@ -271,6 +271,7 @@ export class ZeroPoolService {
           this.zpBalance = {'0x0000000000000000000000000000000000000000': 0};
           this.zpHistory = [];
           this.activeWithdrawals = [];
+          this.lostDeposits = [];
           this.currentBlockNumber = 0;
 
           this.zpGasBalance = 0;
