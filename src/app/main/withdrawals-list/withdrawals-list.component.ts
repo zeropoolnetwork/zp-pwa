@@ -2,9 +2,16 @@ import { Component } from '@angular/core';
 import { fw, PayNote } from 'zeropool-lib';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { environment } from '../../../environments/environment';
-import { catchError, tap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { catchError, distinctUntilChanged, exhaustMap, filter, map, mergeMap, take, tap } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, merge, Observable, of } from 'rxjs';
 import { TransactionService } from '../../services/transaction.service';
+import { Transaction } from 'web3-core';
+import { fromPromise } from 'rxjs/internal-compatibility';
+
+interface IWrappedPayNote {
+  payNote: PayNote;
+  isFinalizingNow: boolean;
+}
 
 @Component({
   selector: 'app-withdrawals-list',
@@ -13,10 +20,13 @@ import { TransactionService } from '../../services/transaction.service';
 })
 export class WithdrawalsListComponent {
 
-  withdrawals: PayNote[];
   expiresBlockNumber: number | string;
 
   isAvailableNewWithdraw = false;
+
+  withdrawals$: Observable<IWrappedPayNote[]>;
+
+  private buttonsSubject: BehaviorSubject<string[]> = new BehaviorSubject([]);
 
   constructor(
     private zpService: ZeroPoolService,
@@ -24,15 +34,58 @@ export class WithdrawalsListComponent {
   ) {
 
     this.expiresBlockNumber = this.zpService.challengeExpiresBlocks;
-    this.withdrawals = this.zpService.activeWithdrawals;
 
     this.checkZpEthBalance();
-    zpService.zpUpdates$.subscribe(
-      () => {
+
+    const isFinalizingNow$ = (w: IWrappedPayNote): Observable<IWrappedPayNote> => {
+      return this.isFinalizingNow(w.payNote).pipe(
+        tap((isFinalizingNow: boolean) => {
+          if (!isFinalizingNow) {
+            localStorage.removeItem(w.payNote.txHash);
+          }
+        }),
+        map((isFinalizingNow: boolean) => {
+          return {
+            payNote: w.payNote,
+            isFinalizingNow
+          };
+        })
+      );
+    };
+
+    const activeWithdrawalsUpdate$ = zpService.zpUpdates$.pipe(
+      map(() => {
         this.checkZpEthBalance();
-        this.withdrawals = this.zpService.activeWithdrawals;
-      }
+        return wrappPayNoteList(this.zpService.activeWithdrawals || []);
+      }),
+      exhaustMap((w: IWrappedPayNote[]) => {
+        return combineLatest(
+          w.map(isFinalizingNow$)
+        );
+      }),
     );
+
+    const x$ = merge(
+      of(wrappPayNoteList(this.zpService.activeWithdrawals || [])),
+      activeWithdrawalsUpdate$
+    );
+
+    this.withdrawals$ = combineLatest([
+      x$,
+      this.buttonsSubject.asObservable().pipe(distinctUntilChanged())
+    ]).pipe(
+      map((x) => {
+        const [w, s]: [IWrappedPayNote[], string[]] = x;
+        return w.map((wrappedPayNote: IWrappedPayNote) => {
+          if (s.indexOf(wrappedPayNote.payNote.txHash) !== -1) {
+            wrappedPayNote.isFinalizingNow = true;
+          }
+
+          return wrappedPayNote;
+        });
+      })
+    );
+
   }
 
   checkZpEthBalance() {
@@ -41,13 +94,39 @@ export class WithdrawalsListComponent {
     }
   }
 
-  isFinalizingNow(w: PayNote): boolean {
-    return localStorage.getItem(w.txHash) === 'in-progress';
+  isFinalizingNow(w: PayNote): Observable<boolean> {
+    const ethTxHash = localStorage.getItem(w.txHash);
+    if (!ethTxHash) {
+      return of(false);
+    }
+
+    return this.zpService.isReady$.pipe(
+      filter((isReady: boolean) => isReady),
+      tap((tx: boolean) => {
+        console.log(tx);
+      }),
+      take(1),
+      mergeMap(() => {
+        return fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransaction(ethTxHash));
+      }),
+      map((tx: Transaction) => {
+        return !!tx;
+      }),
+      tap((tx: boolean) => {
+        console.log(tx);
+      })
+    );
   }
 
   withdraw(w: PayNote): void {
-    localStorage.setItem(w.txHash, 'in-progress');
-    this.txService.withdraw(w).pipe(
+    this.txService.withdraw(w, (txHash: string) => {
+      // map: zpTx => ethTx
+      localStorage.setItem(w.txHash, txHash);
+      this.buttonsSubject.next([
+        ...this.buttonsSubject.value,
+        w.txHash
+      ]);
+    }).pipe(
       tap((txHash: any) => {
         console.log({
           withdraw: txHash
@@ -89,4 +168,15 @@ export class WithdrawalsListComponent {
     }
   }
 
+}
+
+function wrappPayNoteList(withdrawals: PayNote[]): IWrappedPayNote[] {
+  return withdrawals.map(
+    (payNote: PayNote) => {
+      return {
+        payNote,
+        isFinalizingNow: !!localStorage.getItem(payNote.txHash)
+      };
+    }
+  );
 }

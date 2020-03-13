@@ -204,13 +204,13 @@ export class TransactionService {
     return TransactionSynchronizer.execute<string>({ observable: o$, progressCallback });
   }
 
-  public withdraw(w: PayNote): Observable<string> {
+  public withdraw(w: PayNote, onTxHash?: (txHash: string) => void): Observable<string> {
     return this.zpService.isReady$.pipe(
       filter((isReady: boolean) => isReady),
       take(1),
       mergeMap(() => {
         // Open Metamask
-        return fromPromise(this.zpService.zp.withdraw(w, waitBlocks));
+        return fromPromise(this.zpService.zp.withdraw(w, waitBlocks, onTxHash));
       }),
       map(
         (txData: any) => {
@@ -220,13 +220,13 @@ export class TransactionService {
     );
   }
 
-  public depositCancel(w: PayNote): Observable<string> {
+  public depositCancel(w: PayNote, onTxHash?: (txHash: string) => void): Observable<string> {
     return this.zpService.isReady$.pipe(
       filter((isReady: boolean) => isReady),
       take(1),
       mergeMap(() => {
         // Open Metamask
-        return fromPromise(this.zpService.zp.depositCancel(w, waitBlocks));
+        return fromPromise(this.zpService.zp.depositCancel(w, waitBlocks, onTxHash));
       }),
       map(
         (txData: any) => {
