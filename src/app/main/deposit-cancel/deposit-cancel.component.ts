@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { fw, PayNote } from 'zeropool-lib';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { environment } from '../../../environments/environment';
-import { catchError, exhaustMap, filter, map, mergeMap, shareReplay, take, tap } from 'rxjs/operators';
+import { catchError, exhaustMap, filter, flatMap, map, mergeMap, shareReplay, take, tap } from 'rxjs/operators';
 import { BehaviorSubject, combineLatest, merge, Observable, of } from 'rxjs';
 import { TransactionService } from '../../services/transaction.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
@@ -107,17 +107,19 @@ export class DepositCancelComponent {
     return this.zpService.isReady$.pipe(
       filter((isReady: boolean) => isReady),
       take(1),
-      mergeMap(() => {
-        return combineLatest([
-          fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransaction(ethTxHash)),
-          fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransactionReceipt(ethTxHash))
+      flatMap(() => {
+        const w3eth = this.zpService.zp.ZeroPool.web3Ethereum;
+        const all$ = Promise.all([
+          w3eth.getTransaction(ethTxHash),
+          w3eth.getTransactionReceipt(ethTxHash)
         ]);
+        return fromPromise(all$);
       }),
       map(([tx, receipt]) => {
-        if (receipt && tx.blockNumber && !receipt.status) {
-          return false;
-        }
-        return !!tx;
+        const hasFailedEthTx = receipt && tx.blockNumber && !receipt.status;
+        const isTransactionPublished = () => !!tx;
+        //
+        return hasFailedEthTx ? false : isTransactionPublished();
       }),
     );
   }

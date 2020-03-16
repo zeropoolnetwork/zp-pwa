@@ -15,7 +15,10 @@
         <mat-label>Enter amount of zpETH</mat-label>
         <input matInput formControlName="toAmount" autocomplete="off" type="number">
 
-        <mat-hint *ngIf="myZpBalance" align="end">Available {{myZpBalance}} zpETH</mat-hint>
+        <mat-hint *ngIf="myZpBalance" align="end">
+          Available {{myZpBalance}} zpETH
+          <span class="fill-value-hint" (click)="fillMax(myZpBalance);">{{myZpBalance}} zpETH</span>
+        </mat-hint>
 
         <mat-error *ngIf="toAmount.hasError('min')">
           Min amount is {{minAmount}} zpETH
@@ -37,7 +40,7 @@
   <ng-container *ngIf="isDone">
     <h2 class="title" style="margin-bottom: 25px">Successful Withdrawal</h2>
     <div>
-      <img src="/assets/images/guy-fawkes-thanks.png" width="240px">
+      <img src="/assets/images/guy-fawkes-thanks.png" width="240px" height="240">
     </div>
     <div class="actions" style="margin-top: 25px">
       <button mat-stroked-button routerLink="/main">Back</button>
@@ -47,7 +50,7 @@
   <ng-container *ngIf="isDoneWithError">
     <h2 class="title">Oops!<br>something went wrong</h2>
     <div>
-      <img src="/assets/images/guy-fawkes-dont-know.png" width="240px">
+      <img src="/assets/images/guy-fawkes-dont-know.png" width="240px" height="240">
     </div>
     <h3 class="title"></h3>
     <div class="actions">
