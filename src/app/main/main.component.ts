@@ -51,8 +51,8 @@ export class MainComponent implements OnInit {
     private zpService: ZeroPoolService,
     private web3Service: Web3ProviderService,
     private clipboard: Clipboard,
-    private autoJoin: AutoJoinUtxoService,
-    private unconfirmedTx: UnconfirmedTransactionService,
+    private autoJoin: AutoJoinUtxoService, // background script
+    private unconfirmedTx: UnconfirmedTransactionService, // background script
     private router: Router
   ) {
 
@@ -72,7 +72,7 @@ export class MainComponent implements OnInit {
       }
     ));
 
-    if (!depositProgress.value) {
+    if (depositProgress.value) {
       this.hasDepositInProgress = true;
     }
 
@@ -95,6 +95,10 @@ export class MainComponent implements OnInit {
 
     this.totalWithdrawals = this.zpService.activeWithdrawals.length;
     this.totalLostDeposits = this.zpService.lostDeposits.length;
+
+    if (this.totalLostDeposits !== 0 && (typeof this.zpService.depositExpiresBlocks === 'number')) {
+      this.hasDepositInProgress = true;
+    }
 
     if (this.totalWithdrawals !== 0 && (typeof this.zpService.challengeExpiresBlocks === 'number')) {
       //

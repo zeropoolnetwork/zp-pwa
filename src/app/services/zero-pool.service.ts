@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { CircomLoaderService } from './circom-loader.service';
 import {
   fw,
-  GetBalanceProgressNotification,
   HistoryAndBalances,
   HistoryItem,
   HistoryState,
@@ -52,10 +51,7 @@ export class ZeroPoolService {
   public zpGasBalance: number;
 
   public challengeExpiresBlocks: number | string = '?';
-
-  private balanceProgressNotificator: Subject<GetBalanceProgressNotification> = new Subject();
-  public balanceProgressNotificator$: Observable<GetBalanceProgressNotification> =
-    this.balanceProgressNotificator.asObservable();
+  public depositExpiresBlocks: number | string = '?';
 
   private zpUpdatesSubject = new Subject<boolean>();
   public zpUpdates$: Observable<boolean> = this.zpUpdatesSubject.asObservable();
@@ -129,10 +125,14 @@ export class ZeroPoolService {
         if (this.accountService.isNewAccount()) {
           return this.lightUpdate(zp, zpGas).pipe(
             mergeMap(() => {
-              return fromPromise(this.zp.ZeroPool.getChallengeExpiresBlocks());
+              return combineLatest([
+                fromPromise(this.zp.ZeroPool.getChallengeExpiresBlocks()),
+                fromPromise(this.zp.ZeroPool.getDepositExpiresBlocks())
+              ]);
             }),
-            mergeMap((blocksNum) => {
-              this.challengeExpiresBlocks = +blocksNum;
+            mergeMap(([challengeExpiresBlocks, depsositExpiresBlocks]) => {
+              this.challengeExpiresBlocks = +challengeExpiresBlocks;
+              this.depositExpiresBlocks = +depsositExpiresBlocks;
               this.zpUpdatesSubject.next(true);
               this.isReady.next(true);
               return this.pushUpdates$(zp, zpGas);
@@ -140,7 +140,7 @@ export class ZeroPoolService {
           );
         }
 
-        return this.updateStates$(zp, zpGas, this.balanceProgressNotificator).pipe(
+        return this.updateStates$(zp, zpGas).pipe(
           mergeMap(() => {
             return fromPromise(this.zp.ZeroPool.getChallengeExpiresBlocks());
           }),
@@ -195,12 +195,11 @@ export class ZeroPoolService {
   private updateStates$(
     zp: ZeroPoolNetwork,
     zpGas: ZeroPoolNetwork,
-    balanceProgress?: Subject<GetBalanceProgressNotification>,
   ): Observable<boolean> {
 
     const getBalanceAndHistory$ = fromPromise(zp.getBalanceAndHistory());
     const getActiveWithdrawals$ = fromPromise(zp.getActiveWithdrawals());
-    const getUncompleteDeposits$ = fromPromise(zp.getUncompleteDeposits());
+    const getUncompletedDeposits$ = fromPromise(zp.getUncompleteDeposits());
     const getBlockNumber = fromPromise(zp.ZeroPool.web3Ethereum.getBlockNumber());
     const getGasBalance = fromPromise(zpGas.getBalanceAndHistory());
     const getEthBalance = fromPromise(
@@ -212,7 +211,7 @@ export class ZeroPoolService {
       [
         getBalanceAndHistory$,
         getActiveWithdrawals$,
-        getUncompleteDeposits$,
+        getUncompletedDeposits$,
         getBlockNumber,
         getGasBalance,
         getEthBalance
@@ -222,7 +221,7 @@ export class ZeroPoolService {
         const [
           balancesAndHistory,
           activeWithdrawals,
-          uncompleteDeposits$,
+          uncompletedDeposits$,
           blockNumber,
           gasBalancesAndHistory,
           ethBalance
@@ -231,7 +230,7 @@ export class ZeroPoolService {
         this.zpBalance = balancesAndHistory.balances;
         this.zpHistory = balancesAndHistory.historyItems;
         this.activeWithdrawals = activeWithdrawals;
-        this.lostDeposits = uncompleteDeposits$;
+        this.lostDeposits = uncompletedDeposits$;
         this.currentBlockNumber = blockNumber;
 
         this.zpGasBalance = gasBalancesAndHistory.balances[environment.ethToken] || 0;
@@ -268,7 +267,7 @@ export class ZeroPoolService {
             ethBalance,
           ]: [IMerkleTree, IMerkleTree, string] = x;
 
-          this.zpBalance = {'0x0000000000000000000000000000000000000000': 0};
+          this.zpBalance = { '0x0000000000000000000000000000000000000000': 0 };
           this.zpHistory = [];
           this.activeWithdrawals = [];
           this.lostDeposits = [];

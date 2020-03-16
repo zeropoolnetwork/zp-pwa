@@ -68,6 +68,7 @@
             <button mat-stroked-button *ngIf="!hasDepositInProgress" routerLink="/main/cancel-deposit"
                     matBadgePosition="above before"
                     [matBadge]="totalLostDeposits"
+                    [matBadgeHidden]="!hasDepositInProgress"
                     matBadgeColor="warn">Deposit</button>
 
             <button mat-stroked-button routerLink="./transfer" [disabled]="!balance">Transfer</button>
