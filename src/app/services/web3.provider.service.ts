@@ -32,7 +32,6 @@ export class Web3ProviderService {
   private manuallyConnected$ = new Subject<HttpProvider>();
 
   constructor(router: Router) {
-
     this.address$ = merge(this.alreadyConnected$, this.manuallyConnected$).pipe(
       filter((provider: HttpProvider) => {
         this.web3Provider = provider;
@@ -49,6 +48,16 @@ export class Web3ProviderService {
 
     this.isReady$ = this.address$.pipe(
       map(address => !!address),
+      tap(() => {
+        ethereum.on('networkChanged', () => {
+          window.location.reload();
+        });
+
+        ethereum.on('accountsChanged', () => {
+          window.location.reload();
+        });
+      }),
+      shareReplay(1)
     );
 
     interval(500).pipe(
@@ -86,14 +95,10 @@ export class Web3ProviderService {
   }
 
   connectWeb3(): boolean {
+    debugger;
+
     if (typeof ethereum !== 'undefined') {
       this.enableWeb3(ethereum);
-      ethereum.on('networkChanged', () => {
-        window.location.reload();
-      });
-      ethereum.on('accountsChanged', () => {
-        window.location.reload();
-      });
       return true;
     }
 
@@ -134,7 +139,7 @@ export class Web3ProviderService {
   }
 
   public checkNetwork(provider: any): boolean {
-    console.log({chain: provider.chainId});
+    console.log({ chain: provider.chainId });
     return provider.chainId === environment.chainId;
   }
 
