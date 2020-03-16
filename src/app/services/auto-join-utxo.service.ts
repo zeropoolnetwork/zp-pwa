@@ -99,9 +99,6 @@ export class AutoJoinUtxoService {
 
           console.log('start join');
           return this.txService.transfer(environment.ethToken, myAddress, amountToJoin, environment.relayerFee).pipe(
-            tap(() => {
-              this.increaseFeeSpent();
-            }),
             catchError((e) => {
               return of('tx failed');
             })
@@ -185,11 +182,6 @@ export class AutoJoinUtxoService {
       isActivated: localStorage.getItem('auto-join') !== 'false', // activated by default
       feeSpent: Number(localStorage.getItem('fee-spent')) || 0
     };
-  }
-
-  increaseFeeSpent(): void {
-    const oldFeeSpent = Number(localStorage.getItem('fee-spent')) || 0;
-    localStorage.setItem('fee-spent', String(oldFeeSpent + environment.relayerFee));
   }
 
 }
