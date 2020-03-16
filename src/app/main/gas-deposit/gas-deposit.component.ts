@@ -29,11 +29,15 @@ export class GasDepositComponent implements OnInit {
   // objectValues = Object.values;
 
   get maxEth(): number {
-    return 0.1;
+    return 0.05;
   }
 
   get minEth(): number {
     return 0.00001;
+  }
+
+  setMax() {
+    this.amount.setValue(this.maxEth);
   }
 
   get amountValidatorParams(): AmountValidatorParams {

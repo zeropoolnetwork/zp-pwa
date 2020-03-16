@@ -12,7 +12,7 @@ export function ValidateAddress(control: AbstractControl) {
 
   if (!/0[xX][0-9a-fA-F]+/.test(control.value)) {
     return {
-      badSymobol: {
+      badSymbol: {
         value: control.value
       }
     };

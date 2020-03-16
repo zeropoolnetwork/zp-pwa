@@ -37,18 +37,18 @@ export function resolveProgressMessage(action: ActionList, step: StepList): IPro
       break;
     case StepList.VERIFYING_ZP_BLOCK:
       progressMessage.lineOne = 'Transaction generated';
-
-      progressMessage.lineTwo = 'Verifying ZeroPool block';
+      progressMessage.lineTwo = 'Relayer verifies ZeroPool block';
       break;
     case StepList.CONFIRM_TRANSACTION:
       progressMessage.lineOne = 'Transaction generated';
-      progressMessage.lineTwo = 'Please check your metamask';
+      progressMessage.lineTwo = 'Please check your Metamask';
       break;
     case StepList.QUEUE:
       progressMessage.lineOne = 'Wait for the last transactions to be confirmed';
       break;
     case StepList.GENERATE_TRANSACTION:
-      progressMessage.lineOne = 'Generate ZeroPool transaction';
+      progressMessage.image   = '/assets/images/guy-fawkes-cooking.png';
+      progressMessage.lineOne = 'Prepare ZeroPool transaction';
       progressMessage.lineTwo = 'It might take some time';
       break;
     case StepList.UNCONFIRMED_DEPOSIT_START:
