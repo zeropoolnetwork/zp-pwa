@@ -10,6 +10,7 @@ import {
   PayNote,
   stringifyUtxoHistoryState,
   stringifyUtxoState,
+  Utxo,
   ZeroPoolNetwork
 } from 'zeropool-lib';
 import { exhaustMap, filter, map, mergeMap, shareReplay, switchMap, tap } from 'rxjs/operators';
@@ -39,6 +40,8 @@ export class ZeroPoolService {
   public zp: ZeroPoolNetwork;
   public zpGas: ZeroPoolNetwork;
 
+  public maxAmountToSend: number;
+
   public ethBalance: number;
   public zpBalance: ZpBalance;
   public zpHistory: HistoryItem[];
@@ -63,8 +66,6 @@ export class ZeroPoolService {
     private stateStorageService: StateStorageService,
     public transactionBlocker: TransactionBlockerService
   ) {
-
-    // see: prepareWithdraw / prepareWithdraw-list components
 
     const circomLoaded$ = this.circomService.isReady$.pipe(
       filter((isReady) => isReady),
@@ -166,6 +167,12 @@ export class ZeroPoolService {
     const listenAndSaveState$ = listenUtxoStateUpdates$(this.zp).pipe(
       switchMap(
         (state: MyUtxoState<string>) => {
+
+          this.maxAmountToSend = state.utxoList
+            .sort(sortUtxo)
+            .slice(0, 2)
+            .reduce((acc, utxo) => acc + +utxo.amount, 0);
+
           return this.stateStorageService.saveUtxo(state);
         }
       )
@@ -337,4 +344,15 @@ function listenHistoryStateUpdates$(zp: ZeroPoolNetwork): Observable<HistoryStat
     }),
   );
 
+}
+
+function sortUtxo(a: Utxo<string>, b: Utxo<string>): number {
+  const diff = +b.amount - +a.amount;
+  if (diff < 0) {
+    return -1;
+  } else if (diff > 0) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
