@@ -9,8 +9,8 @@ import { ZeroPoolService } from './zero-pool.service';
 import { TransactionService } from './transaction.service';
 import { TransactionSynchronizer } from './observable-synchronizer';
 
-export const defaultGasMaxFeeGwei = environment.relayerFee * 10;
-export const defaultMinUtxoSizeGwei = environment.relayerFee;
+export const defaultGasMaxFeeGwei = environment.relayerFee;
+export const defaultMinUtxoSizeGwei = environment.relayerFee * 100;
 
 export interface AutoJoinSettings {
   maxGasFee: number;
@@ -117,12 +117,6 @@ export class AutoJoinUtxoService {
     const settings = this.getSettings();
     if (!settings.isActivated) {
       console.log('auto join deactivated');
-      return { myAddress: '0', amountToJoin: 0 };
-    }
-
-    if (settings.feeSpent + (environment.relayerFee) > settings.maxGasFee) {
-      // todo: add notification when limit is over
-      console.log('spent all allowed gas fee for auto-join');
       return { myAddress: '0', amountToJoin: 0 };
     }
 
