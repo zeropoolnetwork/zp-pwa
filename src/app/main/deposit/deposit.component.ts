@@ -151,15 +151,10 @@ export class DepositComponent implements AfterViewInit, OnDestroy {
     };
 
     // Generate ZeroPool transaction
-
     this.txService.deposit(environment.ethToken, amount, environment.relayerFee, progressCallback).pipe(
       tap((txHash: any) => {
         this.isFinished = true;
-
-        console.log({
-          deposit: txHash
-        });
-
+        console.log({deposit: txHash});
       }),
       catchError((e) => {
         this.isFinishedWithError = true;
@@ -169,10 +164,12 @@ export class DepositComponent implements AfterViewInit, OnDestroy {
       tap(() => {
         this.depositInProgress = false;
         UnconfirmedTransactionService.deleteDepositTransaction();
-
       })
     ).subscribe();
   }
 
+  fillMax(max: number) {
+    this.amount.setValue(max);
+  }
 }
 

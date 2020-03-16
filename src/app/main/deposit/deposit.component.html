@@ -12,7 +12,11 @@
 
         <mat-label>Enter amount of ETH</mat-label>
         <input matInput formControlName="amount" autocomplete="off" type="number">
-        <mat-hint *ngIf="availableEthAmount" align="end">Available {{availableEthAmount}} ETH</mat-hint>
+        <!-- <mat-hint align="end">Available {{availableEthAmount}} ETH</mat-hint> -->
+        <mat-hint align="end">
+          Maximum amount of deposit in BETA is:
+          <span class="fill-value-hint" (click)="fillMax(maxEth);">{{maxEth}} ETH</span>
+        </mat-hint>
 
         <mat-error *ngIf="amount.hasError('min')">
           Min amount of deposit {{minEth}}

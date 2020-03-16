@@ -73,10 +73,16 @@ $toolbar-height: 60px;
   }
 }
 
+.fill-value-hint {
+  text-decoration: underline;
+  cursor: pointer
+}
+
 .logo {
   outline: none;
   cursor: pointer;
   font-weight: 400;
+
   &-bold {
     font-weight: 600;
   }

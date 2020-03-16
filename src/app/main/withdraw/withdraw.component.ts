@@ -106,7 +106,9 @@ export class WithdrawComponent implements OnInit {
         return of('');
       })
     ).subscribe();
-
   }
 
+  fillMax(max: number) {
+    this.toAmount.setValue(max);
+  }
 }

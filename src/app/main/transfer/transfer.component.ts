@@ -59,6 +59,13 @@ export class TransferComponent implements OnInit {
       Validators.min(this.minAmount),
       Validators.max(this.myZpBalance)
     ]);
+
+    // this.zpService.zpUpdates$.pipe(
+    //   tap(() => {
+    //     this.zpService.maxAmountToSend
+    //   })
+    // );
+
     this.form.get('toAmount').updateValueAndValidity();
 
   }
