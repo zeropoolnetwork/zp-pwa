@@ -2,10 +2,11 @@ import { Component } from '@angular/core';
 import { fw, PayNote } from 'zeropool-lib';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { environment } from '../../../environments/environment';
-import { catchError, distinctUntilChanged, exhaustMap, filter, map, mergeMap, take, tap } from 'rxjs/operators';
-import { BehaviorSubject, combineLatest, merge, Observable, of } from 'rxjs';
+import { catchError, distinctUntilChanged, exhaustMap, filter, map, mergeMap, switchMap, take, tap } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, interval, merge, Observable, of } from 'rxjs';
 import { TransactionService } from '../../services/transaction.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
+import { Router } from '@angular/router';
 
 interface IWrappedPayNote {
   payNote: PayNote;
@@ -19,7 +20,7 @@ interface IWrappedPayNote {
 })
 export class DepositCancelComponent {
 
-  expiresBlockNumber = this.zpService.challengeExpiresBlocks;
+  expiresBlockNumber = this.zpService.depositExpiresBlocks;
 
   isAvailableNewDeposit = true;
   withdrawals$: Observable<IWrappedPayNote[]>;
@@ -28,7 +29,8 @@ export class DepositCancelComponent {
 
   constructor(
     private zpService: ZeroPoolService,
-    private txService: TransactionService
+    private txService: TransactionService,
+    private router: Router
   ) {
 
     const isFinalizingNow$ = (w: IWrappedPayNote): Observable<IWrappedPayNote> => {
@@ -65,7 +67,7 @@ export class DepositCancelComponent {
 
     this.withdrawals$ = combineLatest([
       w$,
-      this.buttonsSubject.asObservable().pipe(distinctUntilChanged())
+      this.buttonsSubject.asObservable()
     ]).pipe(
       map((x) => {
         const [w, s]: [IWrappedPayNote[], string[]] = x;
@@ -126,9 +128,17 @@ export class DepositCancelComponent {
       ]);
     }).pipe(
       tap((txHash: any) => {
+        localStorage.removeItem(w.txHash);
         console.log({
           depositCancel: txHash
         });
+        const updatedButtons = this.buttonsSubject.value.filter((id) => id !== w.txHash);
+        this.buttonsSubject.next(updatedButtons);
+
+        if (this.buttonsSubject.value.length === 0) {
+          this.router.navigate(['main']);
+        }
+
       }),
       catchError((e) => {
         localStorage.removeItem(w.txHash);

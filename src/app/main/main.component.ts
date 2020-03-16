@@ -9,7 +9,7 @@ import { Web3ProviderService } from '../services/web3.provider.service';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { AutoJoinUtxoService } from '../services/auto-join-utxo.service';
 import { Router } from '@angular/router';
-import { depositProgress, depositProgress$, UnconfirmedTransactionService } from '../services/unconfirmed-transaction.service';
+import { depositProgress$, UnconfirmedTransactionService } from '../services/unconfirmed-transaction.service';
 import { environment } from '../../environments/environment';
 
 @Component({
@@ -34,7 +34,7 @@ export class MainComponent implements OnInit {
 
 
   totalWithdrawals = 0;
-  totalLostDeposits = 0;
+  totalUncompletedDeposits = 0;
 
   get hasWithdrawals() {
     return this.totalWithdrawals > 0;
@@ -72,11 +72,7 @@ export class MainComponent implements OnInit {
       }
     ));
 
-    if (depositProgress.value) {
-      this.hasDepositInProgress = true;
-    }
-
-    // Poling of deposit
+    // Polling of deposit
     this.subscription.add(depositProgress$.subscribe(
       (progress) => {
         this.hasDepositInProgress = progress && true;
@@ -93,11 +89,19 @@ export class MainComponent implements OnInit {
     this.history = this.zpService.zpHistory;
     this.zpGasBalance = fw(this.zpService.zpGasBalance);
 
-    this.totalWithdrawals = this.zpService.activeWithdrawals.length;
-    this.totalLostDeposits = this.zpService.lostDeposits.length;
+    this.hasDepositInProgress = UnconfirmedTransactionService.hasOngoingDepositTransaction();
 
-    if (this.totalLostDeposits !== 0 && (typeof this.zpService.depositExpiresBlocks === 'number')) {
-      this.hasDepositInProgress = true;
+    this.totalWithdrawals = this.zpService.activeWithdrawals.length;
+
+    if (this.hasDepositInProgress) {
+      const isDepositInProgress = this.zpService.lostDeposits.find((lostDeposit) => {
+        return lostDeposit.txHash === UnconfirmedTransactionService.getDepositTransaction().txHash;
+      });
+      this.totalUncompletedDeposits = isDepositInProgress
+        ? this.zpService.lostDeposits.length
+        : this.zpService.lostDeposits.length + 1;
+    } else {
+      this.totalUncompletedDeposits = this.zpService.lostDeposits.length;
     }
 
     if (this.totalWithdrawals !== 0 && (typeof this.zpService.challengeExpiresBlocks === 'number')) {

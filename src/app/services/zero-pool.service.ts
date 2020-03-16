@@ -130,9 +130,9 @@ export class ZeroPoolService {
                 fromPromise(this.zp.ZeroPool.getDepositExpiresBlocks())
               ]);
             }),
-            mergeMap(([challengeExpiresBlocks, depsositExpiresBlocks]) => {
+            mergeMap(([challengeExpiresBlocks, depositExpiresBlocks]) => {
               this.challengeExpiresBlocks = +challengeExpiresBlocks;
-              this.depositExpiresBlocks = +depsositExpiresBlocks;
+              this.depositExpiresBlocks = +depositExpiresBlocks;
               this.zpUpdatesSubject.next(true);
               this.isReady.next(true);
               return this.pushUpdates$(zp, zpGas);
@@ -142,10 +142,14 @@ export class ZeroPoolService {
 
         return this.updateStates$(zp, zpGas).pipe(
           mergeMap(() => {
-            return fromPromise(this.zp.ZeroPool.getChallengeExpiresBlocks());
+            return combineLatest([
+              fromPromise(this.zp.ZeroPool.getChallengeExpiresBlocks()),
+              fromPromise(this.zp.ZeroPool.getDepositExpiresBlocks())
+            ]);
           }),
-          mergeMap((blocksNum) => {
-            this.challengeExpiresBlocks = +blocksNum;
+          mergeMap(([challengeExpiresBlocks, depositExpiresBlocks]) => {
+            this.challengeExpiresBlocks = +challengeExpiresBlocks;
+            this.depositExpiresBlocks = +depositExpiresBlocks;
             this.zpUpdatesSubject.next(true);
             this.isReady.next(true);
             return this.pushUpdates$(zp, zpGas);

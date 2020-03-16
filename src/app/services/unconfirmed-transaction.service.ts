@@ -41,6 +41,14 @@ export class UnconfirmedTransactionService {
     });
   }
 
+  static getDepositTransaction(): ZpTransaction | undefined {
+    return this.get<ZpTransaction>('deposit');
+  }
+
+  static getGasDepositTransaction(): ZpTransaction | undefined {
+    return this.get<ZpTransaction>('gas-deposit');
+  }
+
   static deleteDepositTransaction(): void {
     this.delete('deposit');
   }
@@ -73,13 +81,23 @@ export class UnconfirmedTransactionService {
     localStorage.removeItem(key);
   }
 
+  private static get<T>(key: string): T | undefined {
+    const item = localStorage.getItem(key);
+    try {
+      return JSON.parse(item) as T;
+    } catch (e) {
+      return undefined;
+    }
+  }
+
+
   constructor(private zpService: ZeroPoolService, private relayerApi: RelayerApiService) {
     this.tryDeposit();
     this.tryGasDeposit();
   }
 
   private tryGasDeposit(): void {
-    const depositZpTx = this.getGasDepositTransaction();
+    const depositZpTx = UnconfirmedTransactionService.getGasDepositTransaction();
     if (!depositZpTx) {
       return;
     }
@@ -97,7 +115,7 @@ export class UnconfirmedTransactionService {
             UnconfirmedTransactionService.deleteGasDepositTransaction();
           }
 
-          return !isExpired && !!this.getGasDepositTransaction();
+          return !isExpired && !!UnconfirmedTransactionService.getGasDepositTransaction();
         }).pipe(filter(x => !!x), take(1));
       })
     );
@@ -118,7 +136,7 @@ export class UnconfirmedTransactionService {
     const depositTakeWhileFunc = () => {
       return (
         Date.now() - depositZpTx.timestamp < 60000 * dateExpiresInMinutes &&
-        !!this.getGasDepositTransaction()
+        !!UnconfirmedTransactionService.getGasDepositTransaction()
       );
     };
 
@@ -138,7 +156,7 @@ export class UnconfirmedTransactionService {
   }
 
   private tryDeposit(): void {
-    const depositZpTx = this.getDepositTransaction();
+    const depositZpTx = UnconfirmedTransactionService.getDepositTransaction();
     if (!depositZpTx) {
       return;
     }
@@ -189,7 +207,7 @@ export class UnconfirmedTransactionService {
     const depositTakeWhileFunc = () => {
       return (
         Date.now() - depositZpTx.timestamp < 60000 * dateExpiresInMinutes &&
-        !!this.getDepositTransaction()
+        !!UnconfirmedTransactionService.getDepositTransaction()
       );
     };
 
@@ -311,7 +329,18 @@ export class UnconfirmedTransactionService {
   }
 
   private getUnconfirmedDeposit(zp: ZeroPoolNetwork, tx: ZpTransaction): Observable<PayNote | undefined> {
-    return fromPromise(zp.getUncompleteDeposits()).pipe(
+    // if (tx.ethTxHash) {
+    return fromPromise(
+      zp.ZeroPool.web3Ethereum.getTransaction(tx.ethTxHash)
+    ).pipe(
+      tap((transaction: Transaction) => {
+        if (transaction) {
+          depositProgress.next({ step: StepList.UNCONFIRMED_DEPOSIT_START, extraData: tx.ethTxHash });
+        }
+      }),
+      mergeMap(() => {
+        return fromPromise(zp.getUncompleteDeposits());
+      }),
       map((payNoteList: PayNote[]) => {
         const unconfirmedDeposit = payNoteList.filter((note) => {
           return note.txHash === tx.txHash;
@@ -320,23 +349,17 @@ export class UnconfirmedTransactionService {
       }),
       take(2)
     );
-  }
+    // }
 
-  private getDepositTransaction(): ZpTransaction | undefined {
-    return this.get<ZpTransaction>('deposit');
-  }
-
-  private getGasDepositTransaction(): ZpTransaction | undefined {
-    return this.get<ZpTransaction>('gas-deposit');
-  }
-
-  private get<T>(key: string): T | undefined {
-    const item = localStorage.getItem(key);
-    try {
-      return JSON.parse(item) as T;
-    } catch (e) {
-      return undefined;
-    }
+    // return fromPromise(zp.getUncompleteDeposits()).pipe(
+    //   map((payNoteList: PayNote[]) => {
+    //     const unconfirmedDeposit = payNoteList.filter((note) => {
+    //       return note.txHash === tx.txHash;
+    //     });
+    //     return unconfirmedDeposit && unconfirmedDeposit[0];
+    //   }),
+    //   take(2)
+    // );
   }
 
   private waitForTx(zp: ZeroPoolNetwork, txHash: string, takeWhileFunc?: () => boolean): Observable<string> {
