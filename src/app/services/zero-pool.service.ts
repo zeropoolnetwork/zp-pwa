@@ -168,10 +168,19 @@ export class ZeroPoolService {
       switchMap(
         (state: MyUtxoState<string>) => {
 
-          this.maxAmountToSend = state.utxoList
-            .sort(sortUtxo)
-            .slice(0, 2)
-            .reduce((acc, utxo) => acc + +utxo.amount, 0);
+          const sortedUtxo = state.utxoList.sort(sortUtxo);
+          const groupedUtxo = groupUtxoByToken(sortedUtxo);
+
+          for (const token in groupedUtxo) {
+            if (!groupedUtxo.hasOwnProperty(token)) {
+              continue;
+            }
+
+            this.maxAmountToSend[token] = groupedUtxo[token]
+              .slice(0, 2)
+              .reduce((acc, utxo) => acc + +utxo.amount, 0);
+
+          }
 
           return this.stateStorageService.saveUtxo(state);
         }
@@ -355,4 +364,12 @@ function sortUtxo(a: Utxo<string>, b: Utxo<string>): number {
   } else {
     return 0;
   }
+}
+
+function groupUtxoByToken(utxoList: Utxo<string>[]): { [key: string]: Utxo<string>[] } {
+  return utxoList.reduce((g, utxo) => {
+    g[utxo.token] = g[utxo.token] || [];
+    g[utxo.token].push(utxo);
+    return g;
+  }, {});
 }
