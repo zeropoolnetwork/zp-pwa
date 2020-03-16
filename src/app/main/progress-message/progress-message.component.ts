@@ -28,7 +28,7 @@ export class ProgressMessageComponent implements OnInit {
     this.title = messages.title || '';
     this.progressMessageLineOne = messages.lineOne || '';
     this.progressMessageLineTwo = messages.lineTwo || '';
-    this.imageSrc = messages.image ? messages.image : this.imageSrc;
+    this.imageSrc = messages.image ? messages.image : '/assets/images/guy-fawkes-cross-fingers.png';
 
     this.href = link;
   }

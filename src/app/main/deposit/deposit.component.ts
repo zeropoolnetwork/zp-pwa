@@ -4,7 +4,7 @@ import { ZeroPoolService } from '../../services/zero-pool.service';
 import { tw } from 'zeropool-lib';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { of, Subscription } from 'rxjs';
-import { catchError, switchMap, tap } from 'rxjs/operators';
+import { catchError, filter, finalize, switchMap, tap } from 'rxjs/operators';
 import { AmountValidatorParams, CustomValidators } from '../gas-deposit/custom-validators';
 import { Web3ProviderService } from '../../services/web3.provider.service';
 import {
@@ -94,27 +94,27 @@ export class DepositComponent implements AfterViewInit, OnDestroy {
 
     setTimeout(() => {
       // Handling case when subscription is already in progress
-      if (UnconfirmedTransactionService.hasOngoingDepositTransaction()) {
-
-        if (depositProgress.value) {
-          this.depositInProgress = true;
-          this.setProgressState(depositProgress.value.step, depositProgress.value.extraData);
-        }
-
-        const progress = depositProgress$.subscribe(
-          (progressStep: UnconfirmedTxProgressNotification) => {
-            progressStep && this.setProgressState(progressStep.step, progressStep.extraData);
-          },
-          () => {
-          },
-          () => {
-            this.depositInProgress = false;
-            this.isFinished = true;
-          }
-        );
-
-        this.subscription.add(progress);
+      if (!UnconfirmedTransactionService.hasOngoingDepositTransaction()) {
+        return;
       }
+
+      if (depositProgress.value) {
+        this.depositInProgress = true;
+        this.setProgressState(depositProgress.value.step, depositProgress.value.extraData);
+      }
+
+      const progressSubscription = depositProgress$.pipe(
+        filter((progressStep) => !!progressStep),
+        tap((progressStep: UnconfirmedTxProgressNotification) => {
+          this.setProgressState(progressStep.step, progressStep.extraData);
+        }),
+        finalize(() => {
+          this.depositInProgress = false;
+          this.isFinished = true;
+        })
+      ).subscribe();
+
+      this.subscription.add(progressSubscription);
     });
 
   }

@@ -35,9 +35,11 @@
 
 
   <ng-container *ngIf="isDone">
-    <h3>Successful Withdrawal</h3>
-    <img src="/assets/images/guy-fawkes-thanks.png" width="240px">
-    <div class="actions">
+    <h2 class="title" style="margin-bottom: 25px">Successful Withdrawal</h2>
+    <div>
+      <img src="/assets/images/guy-fawkes-thanks.png" width="240px">
+    </div>
+    <div class="actions" style="margin-top: 25px">
       <button mat-stroked-button routerLink="/main">Back</button>
     </div>
   </ng-container>

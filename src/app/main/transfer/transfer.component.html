@@ -7,16 +7,27 @@
       <p class="ng-star-inserted">This transfer will happen within ZeroPool<br> and will be truly private</p>
 
       <div class="mt-10">
-
         <mat-form-field appearance="outline" class="field">
           <mat-label>Enter ZeroPool Address of receiver</mat-label>
           <input matInput formControlName="toAddress" autocomplete="off">
+          <mat-error *ngIf="toAddress.hasError('badLength')">
+            Recipient address length is invalid
+          </mat-error>
+          <mat-error *ngIf="toAddress.hasError('badSymbol')">
+            Recipient address is invalid
+          </mat-error>
         </mat-form-field>
 
+        <br>
         <mat-form-field appearance="outline" class="field">
           <mat-label>Enter amount of zpETH</mat-label>
           <input matInput formControlName="toAmount" autocomplete="off" type="number">
-          <mat-hint *ngIf="myZpBalance" align="end">Available {{myZpBalance}} zpETH</mat-hint>
+          <mat-hint *ngIf="myZpBalance" align="end">
+            Available:
+            <span style="text-decoration: underline; cursor: pointer" (click)="fillMax(myZpBalance);">
+              {{myZpBalance}} zpETH
+            </span>
+          </mat-hint>
 
           <mat-error *ngIf="toAmount.hasError('min')">
             Min amount is {{minAmount}} zpETH
@@ -34,26 +45,17 @@
       </div>
     </ng-container>
 
-    <ng-container>
-      <app-progress-message
-        [hidden]="!transferIsInProgress"
-        #progressDialog></app-progress-message>
-
-      <!--<h3>Waiting for transaction confirmation <br>-->
-      <!--It will take several minutes</h3>-->
-      <!--<div class="actions">-->
-      <!--&lt;!&ndash;        <button mat-stroked-button routerLink="./transfer" routerLink="/main">Back</button>&ndash;&gt;-->
-      <!--<button mat-stroked-button routerLink="/main">Back</button>-->
-      <!--</div>-->
-    </ng-container>
+    <app-progress-message #progressDialog [hidden]="!transferIsInProgress"></app-progress-message>
 
   </ng-container>
 
 
   <ng-container *ngIf="isDone">
-    <h3>Send Successful</h3>
-    <div class="actions">
-      <!--  <button mat-stroked-button routerLink="./transfer" routerLink="/main">Back</button>-->
+    <h2 class="title" style="margin-bottom: 25px">Send Successful</h2>
+    <div>
+      <img src="/assets/images/guy-fawkes-you-are-right.png" width="240px">
+    </div>
+    <div class="actions" style="margin-top: 25px">
       <button mat-stroked-button routerLink="/main">Back</button>
     </div>
   </ng-container>
@@ -61,7 +63,6 @@
   <ng-container *ngIf="isDoneWithError">
     <h2 class="title">Oops!<br>something went wrong</h2>
     <div>
-      <!--      <img src="/assets/images/guy-fawkes-oh-no.png" width="240px">-->
       <img src="/assets/images/guy-fawkes-dont-know.png" width="240px">
     </div>
     <h3 class="title"></h3>

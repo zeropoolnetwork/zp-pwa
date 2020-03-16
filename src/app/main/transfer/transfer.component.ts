@@ -38,17 +38,15 @@ export class TransferComponent implements OnInit {
     return this.form.get('toAmount');
   }
 
-  get toAddress(): string {
-    return this.form.get('toAddress').value;
+  get toAddress(): AbstractControl {
+    return this.form.get('toAddress');
   }
 
   constructor(
     private fb: FormBuilder,
     private txService: TransactionService,
-    private zpService: ZeroPoolService
+    private zpService: ZeroPoolService,
   ) {
-
-
   }
 
   ngOnInit(): void {
@@ -79,17 +77,16 @@ export class TransferComponent implements OnInit {
 
     this.setProgressState(StepList.GENERATE_TRANSACTION);
 
+    const address = this.toAddress.value;
     const amount = tw(this.toAmount.value).toNumber();
-    const progressCallback = (progressStep: StepList, txHash?: string) => {
-      this.setProgressState(progressStep, txHash);
-    };
+    const progressCallback = (progressStep: StepList, txHash?: string) => this.setProgressState(progressStep, txHash);
 
-    this.txService.transfer(environment.ethToken, this.toAddress, amount, environment.relayerFee, progressCallback).pipe(
+    this.txService.transfer(environment.ethToken, address, amount, environment.relayerFee, progressCallback).pipe(
       tap((txHash: any) => {
         this.transferIsInProgress = false;
         this.isDone = true;
         console.log({
-          transfer: txHash
+          transfer:  txHash
         });
       }),
       catchError((e) => {
@@ -101,4 +98,7 @@ export class TransferComponent implements OnInit {
     ).subscribe();
   }
 
+  fillMax(max: number) {
+    this.toAmount.setValue(max);
+  }
 }
