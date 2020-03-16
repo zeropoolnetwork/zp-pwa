@@ -7,6 +7,7 @@ import { BehaviorSubject, combineLatest, merge, Observable, of } from 'rxjs';
 import { TransactionService } from '../../services/transaction.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { StepList } from '../progress-message/transaction-progress';
+import { Router } from '@angular/router';
 
 interface IWrappedPayNote {
   payNote: PayNote;
@@ -22,6 +23,7 @@ export class WithdrawalsListComponent {
 
   expiresBlockNumber = this.zpService.challengeExpiresBlocks;
 
+  refreshPageAfterWithdrawal = false;
   isAvailableNewWithdraw = false;
 
   withdrawals$: Observable<IWrappedPayNote[]>;
@@ -30,7 +32,8 @@ export class WithdrawalsListComponent {
 
   constructor(
     private zpService: ZeroPoolService,
-    private txService: TransactionService
+    private txService: TransactionService,
+    private router: Router
   ) {
 
     this.checkZpEthBalance();
@@ -54,6 +57,7 @@ export class WithdrawalsListComponent {
     const activeWithdrawalsUpdate$ = zpService.zpUpdates$.pipe(
       map(() => {
         this.checkZpEthBalance();
+        this.refreshPageAfterWithdrawal = this.zpService.lostDeposits.length <= 1;
         return wrapPayNoteList(this.zpService.activeWithdrawals || []);
       }),
       exhaustMap((w: IWrappedPayNote[]) => {
@@ -100,9 +104,6 @@ export class WithdrawalsListComponent {
 
     return this.zpService.isReady$.pipe(
       filter((isReady: boolean) => isReady),
-      tap((tx: boolean) => {
-        console.log(tx);
-      }),
       take(1),
       mergeMap(() => {
         return combineLatest([
@@ -111,14 +112,10 @@ export class WithdrawalsListComponent {
         ]);
       }),
       map(([tx, receipt]) => {
-        console.log(receipt);
         if (receipt && tx.blockNumber && !receipt.status) {
           return false;
         }
         return !!tx;
-      }),
-      tap((tx: boolean) => {
-        console.log(tx);
       })
     );
   }
@@ -140,6 +137,17 @@ export class WithdrawalsListComponent {
         console.log({
           withdraw: txHash
         });
+
+        const updatedButtons = this.buttonsSubject.value.filter((id) => id !== w.txHash);
+        this.buttonsSubject.next(updatedButtons);
+
+        this.zpService.activeWithdrawals =
+          this.zpService.activeWithdrawals.filter((x) => x.txHash !== w.txHash);
+
+        if (this.refreshPageAfterWithdrawal) {
+          this.router.navigate(['main']);
+        }
+
       }),
       catchError((e) => {
         localStorage.removeItem(w.txHash);
