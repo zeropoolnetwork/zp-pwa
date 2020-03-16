@@ -134,6 +134,7 @@ export class WithdrawalsListComponent {
       ]);
     }).pipe(
       tap((txHash: any) => {
+        localStorage.removeItem(w.txHash);
         console.log({
           withdraw: txHash
         });
