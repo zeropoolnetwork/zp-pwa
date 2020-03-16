@@ -5,11 +5,12 @@
   <div class="lost-deposit-list">
 
     <div *ngFor="let w of withdrawals$ | async">
-      <div class="lost-deposit-row"  *ngIf="{isReady: isReadyToFinalize(w.payNote.blockNumber) | async} as finalize">
+      <div class="lost-deposit-row" *ngIf="{isReady: isReadyToFinalize(w.payNote.blockNumber) | async} as finalize">
 
         <div>
           <p *ngIf="!finalize.isReady">
-            Pending {{ getRemainingBlockNumber(w.payNote.blockNumber) | async }} / {{ expiresBlockNumber | async }} blocks
+            Pending {{ getRemainingBlockNumber(w.payNote.blockNumber) | async }} / {{ expiresBlockNumber | async }}
+            blocks
           </p>
 
           <p *ngIf="finalize.isReady">Verified</p>
