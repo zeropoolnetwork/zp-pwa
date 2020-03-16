@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { fw, PayNote } from 'zeropool-lib';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { environment } from '../../../environments/environment';
-import { catchError, distinctUntilChanged, exhaustMap, filter, map, mergeMap, switchMap, take, tap } from 'rxjs/operators';
-import { BehaviorSubject, combineLatest, interval, merge, Observable, of } from 'rxjs';
+import { catchError, exhaustMap, filter, map, mergeMap, take, tap } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, merge, Observable, of } from 'rxjs';
 import { TransactionService } from '../../services/transaction.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { Router } from '@angular/router';
@@ -22,7 +22,7 @@ export class DepositCancelComponent {
 
   expiresBlockNumber = this.zpService.depositExpiresBlocks;
 
-  isAvailableNewDeposit = true;
+  refreshPageAfterCancelDeposit = false;
   withdrawals$: Observable<IWrappedPayNote[]>;
 
   private buttonsSubject: BehaviorSubject<string[]> = new BehaviorSubject([]);
@@ -51,6 +51,7 @@ export class DepositCancelComponent {
 
     const activeWithdrawalsUpdate$ = zpService.zpUpdates$.pipe(
       map(() => {
+        this.refreshPageAfterCancelDeposit = this.zpService.lostDeposits.length <= 1;
         return wrapPayNoteList(this.zpService.lostDeposits || []);
       }),
       exhaustMap((w: IWrappedPayNote[]) => {
@@ -75,7 +76,7 @@ export class DepositCancelComponent {
           if (s.indexOf(wrappedPayNote.payNote.txHash) !== -1) {
             wrappedPayNote.isFinalizingNow = true;
           }
-
+          console.log('123');
           return wrappedPayNote;
         });
       })
@@ -135,7 +136,10 @@ export class DepositCancelComponent {
         const updatedButtons = this.buttonsSubject.value.filter((id) => id !== w.txHash);
         this.buttonsSubject.next(updatedButtons);
 
-        if (this.buttonsSubject.value.length === 0) {
+        this.zpService.lostDeposits =
+          this.zpService.lostDeposits.filter((x) => x.txHash !== w.txHash);
+
+        if (this.refreshPageAfterCancelDeposit) {
           this.router.navigate(['main']);
         }
 
