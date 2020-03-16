@@ -329,15 +329,23 @@ export class UnconfirmedTransactionService {
   }
 
   private getUnconfirmedDeposit(zp: ZeroPoolNetwork, tx: ZpTransaction): Observable<PayNote | undefined> {
-    // if (tx.ethTxHash) {
-    return fromPromise(
-      zp.ZeroPool.web3Ethereum.getTransaction(tx.ethTxHash)
-    ).pipe(
-      tap((transaction: Transaction) => {
-        if (transaction) {
-          depositProgress.next({ step: StepList.UNCONFIRMED_DEPOSIT_START, extraData: tx.ethTxHash });
-        }
-      }),
+
+    let x$ = of('');
+
+    if (tx.ethTxHash) {
+
+      x$ = fromPromise(zp.ZeroPool.web3Ethereum.getTransaction(tx.ethTxHash)).pipe(
+        map((transaction: Transaction) => {
+          if (transaction) {
+            depositProgress.next({ step: StepList.UNCONFIRMED_DEPOSIT_START, extraData: tx.ethTxHash });
+          }
+          return '';
+        }),
+      );
+
+    }
+
+    return x$.pipe(
       mergeMap(() => {
         return fromPromise(zp.getUncompleteDeposits());
       }),
@@ -349,17 +357,7 @@ export class UnconfirmedTransactionService {
       }),
       take(2)
     );
-    // }
 
-    // return fromPromise(zp.getUncompleteDeposits()).pipe(
-    //   map((payNoteList: PayNote[]) => {
-    //     const unconfirmedDeposit = payNoteList.filter((note) => {
-    //       return note.txHash === tx.txHash;
-    //     });
-    //     return unconfirmedDeposit && unconfirmedDeposit[0];
-    //   }),
-    //   take(2)
-    // );
   }
 
   private waitForTx(zp: ZeroPoolNetwork, txHash: string, takeWhileFunc?: () => boolean): Observable<string> {
