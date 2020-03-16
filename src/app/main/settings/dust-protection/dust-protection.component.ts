@@ -12,8 +12,8 @@ export class DustProtectionComponent implements OnInit {
   enable: boolean;
 
   public form: FormGroup = this.fb.group({
-    maxGasFee: [32000, [Validators.required]],
-    minUtxoSize: [320, [Validators.required]],
+    maxGasFee: [320, [Validators.required]],
+    minUtxoSize: [32000, [Validators.required]],
     activate: [true, [Validators.requiredTrue]],
   });
 
