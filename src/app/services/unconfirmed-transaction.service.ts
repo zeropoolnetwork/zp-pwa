@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { PayNote, toHex, Tx, ZeroPoolNetwork } from 'zeropool-lib';
 import { ZeroPoolService } from './zero-pool.service';
-import { delay, exhaustMap, filter, map, mergeMap, repeatWhen, take, takeWhile, tap } from 'rxjs/operators';
+import { catchError, delay, exhaustMap, filter, map, mergeMap, repeatWhen, take, takeWhile, tap } from 'rxjs/operators';
 import { BehaviorSubject, combineLatest, defer, Observable, of, timer } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { environment } from '../../environments/environment';
@@ -31,6 +31,9 @@ const dateExpiresInMinutes = 10;
   providedIn: 'root'
 })
 export class UnconfirmedTransactionService {
+
+  public startDepositSearch$: Observable<any> = this.tryDeposit();
+  public startGasDepositSearch$: Observable<any> = this.tryGasDeposit();
 
   static saveDepositTransaction(tx: ZpTransaction): void {
     this.save('deposit', {
@@ -92,14 +95,12 @@ export class UnconfirmedTransactionService {
 
 
   constructor(private zpService: ZeroPoolService, private relayerApi: RelayerApiService) {
-    this.tryDeposit();
-    this.tryGasDeposit();
   }
 
-  private tryGasDeposit(): void {
+  private tryGasDeposit(): Observable<any> {
     const depositZpTx = UnconfirmedTransactionService.getGasDepositTransaction();
     if (!depositZpTx) {
-      return;
+      return of('');
     }
 
     const txHash$ = this.zpService.isReady$.pipe(
@@ -144,21 +145,22 @@ export class UnconfirmedTransactionService {
       UnconfirmedTransactionService.deleteGasDepositTransaction();
       depositProgress.next({ step: StepList.FAILED });
       console.log('unconfirmed transaction failed: ', e.message || e);
+      return of('');
     };
 
-
-    this.tryCompleteTransaction(
+    return this.tryCompleteTransaction(
       mainNetDonationTx$,
       depositTakeWhileFunc,
-      onDepositError
+    ).pipe(
+      catchError(onDepositError)
     );
 
   }
 
-  private tryDeposit(): void {
+  private tryDeposit(): Observable<any> {
     const depositZpTx = UnconfirmedTransactionService.getDepositTransaction();
     if (!depositZpTx) {
-      return;
+      return of('');
     }
 
     const unconfirmedDeposit$ = this.zpService.isReady$.pipe(
@@ -215,13 +217,15 @@ export class UnconfirmedTransactionService {
       UnconfirmedTransactionService.deleteDepositTransaction();
       depositProgress.next({ step: StepList.FAILED });
       console.log('unconfirmed transaction failed: ', e.message || e);
+      return of('');
     };
 
 
-    this.tryCompleteTransaction(
+    return this.tryCompleteTransaction(
       tryDeposit$,
       depositTakeWhileFunc,
-      onDepositError
+    ).pipe(
+      catchError(onDepositError)
     );
 
   }
@@ -229,8 +233,7 @@ export class UnconfirmedTransactionService {
   private tryCompleteTransaction(
     executeTx$: Observable<any>,
     takeWhileFunc: () => boolean,
-    onError: (err: any) => void
-  ): void {
+  ): Observable<any> {
 
     const scheduledTxFunc = () => {
       return TransactionSynchronizer.execute({
@@ -240,13 +243,9 @@ export class UnconfirmedTransactionService {
 
     const tryEachMillisecond = 3000;
 
-    defer(scheduledTxFunc).pipe(
+    return defer(scheduledTxFunc).pipe(
       repeatWhen(completed => completed.pipe(delay(tryEachMillisecond))),
       takeWhile(takeWhileFunc),
-    ).subscribe(
-      () => {
-      },
-      onError
     );
 
   }

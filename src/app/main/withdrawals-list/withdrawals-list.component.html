@@ -2,22 +2,27 @@
   <h2>Your withdrawals</h2>
   <div class="withdrawals-list">
     <div *ngFor="let w of withdrawals$ | async">
-      <div class="withdrawals-row">
-        <div>
-          <p *ngIf="!isReadyToFinalize(w.payNote.blockNumber)">
-            Pending {{ getRemainingBlockNumber(w.payNote.blockNumber) }} / {{ expiresBlockNumber }} blocks
-          </p>
-          <p *ngIf="isReadyToFinalize(w.payNote.blockNumber)">Verified</p>
-          <h3>{{ getAmount(w.payNote.utxo.amount) }} {{ getAssetName(w.payNote.utxo.token) }}</h3>
+      <div *ngIf="{isReady: isReadyToFinalize(w.payNote.blockNumber) | async} as finalize">
+
+        <div class="withdrawals-row">
+          <div>
+            <p *ngIf="!finalize.isReady">
+              Pending {{ getRemainingBlockNumber(w.payNote.blockNumber) | async }} / {{ expiresBlockNumber | async }}
+              blocks
+            </p>
+            <p *ngIf="finalize.isReady">Verified</p>
+            <h3>{{ getAmount(w.payNote.utxo.amount) }} {{ getAssetName(w.payNote.utxo.token) }}</h3>
+          </div>
+
+          <loaders-css *ngIf="w.isFinalizingNow" loader="ball-beat" [color]="'rgba(100, 100, 100, 0.5)'"
+                       [scale]="1"></loaders-css>
+
+
+          <button *ngIf="!w.isFinalizingNow" [disabled]="!finalize.isReady" (click)="withdraw(w.payNote)"
+                  mat-stroked-button>Finalize
+          </button>
+
         </div>
-
-        <ng-container *ngIf="w.isFinalizingNow">
-          <loaders-css loader="ball-beat" [color]="'rgba(100, 100, 100, 0.5)'" [scale]="1"></loaders-css>
-        </ng-container>
-
-        <ng-container *ngIf="!w.isFinalizingNow">
-          <button [disabled]="!isReadyToFinalize(w.payNote.blockNumber)" (click)="withdraw(w.payNote)" mat-stroked-button>Finalize</button>
-        </ng-container>
 
       </div>
     </div>
@@ -25,6 +30,8 @@
   </div>
   <div class="actions mt-20">
     <button mat-stroked-button routerLink="/main">Back</button>
-    <button [disabled]="!isAvailableNewWithdraw" mat-flat-button routerLink="/main/withdraw" color="accent">New withdraw</button>
+    <button [disabled]="!isAvailableNewWithdraw" mat-flat-button routerLink="/main/withdraw" color="accent">New
+      withdraw
+    </button>
   </div>
 </div>

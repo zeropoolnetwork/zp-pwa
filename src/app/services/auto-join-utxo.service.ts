@@ -24,6 +24,8 @@ export interface AutoJoinSettings {
 })
 export class AutoJoinUtxoService {
 
+  public start$: Observable<any>;
+
   private isReady$ = this.zpService.isReady$.pipe(
     filter((isReady: boolean) => isReady),
     take(1),
@@ -44,7 +46,7 @@ export class AutoJoinUtxoService {
 
     const account$ = this.accountService.account$;
 
-    combineLatest([account$, this.isReady$]).pipe(
+    this.start$ = combineLatest([account$, this.isReady$]).pipe(
       mergeMap(
         (x: any) => {
 
@@ -62,7 +64,7 @@ export class AutoJoinUtxoService {
 
         }
       )
-    ).subscribe();
+    );
 
   }
 

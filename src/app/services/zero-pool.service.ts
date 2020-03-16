@@ -100,7 +100,7 @@ export class ZeroPoolService {
           environment.contractAddress,
           this.web3ProviderService.web3Provider,
           account.zeropoolMnemonic,
-          this.circomService.circomeTxJson,
+          this.circomService.circomTxJson,
           this.circomService.proverKey,
           utxoState,
           historyState
@@ -112,7 +112,7 @@ export class ZeroPoolService {
           environment.sideChainAddress,
           gasWeb3Provider,
           account.zeropoolMnemonic,
-          this.circomService.circomeTxJson,
+          this.circomService.circomTxJson,
           this.circomService.proverKey,
           gasUtxoState,
         );

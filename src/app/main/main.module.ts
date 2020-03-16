@@ -35,6 +35,7 @@ import { UnconfirmedTransactionService } from '../services/unconfirmed-transacti
 import { ProgressMessageComponent } from './progress-message/progress-message.component';
 import { TransactionBlockerService } from '../services/transaction-blocker.service';
 import { DepositCancelComponent } from './deposit-cancel/deposit-cancel.component';
+import { BackgroundService } from '../services/background.service';
 
 @NgModule({
   declarations: [
@@ -79,7 +80,8 @@ import { DepositCancelComponent } from './deposit-cancel/deposit-cancel.componen
     TransactionService,
     AutoJoinUtxoService,
     UnconfirmedTransactionService,
-    TransactionBlockerService
+    TransactionBlockerService,
+    BackgroundService
   ]
 })
 export class MainModule {

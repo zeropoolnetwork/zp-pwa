@@ -9,7 +9,7 @@ import { catchError, map } from 'rxjs/operators';
 export class CircomLoaderService {
 
   proverKey: ArrayBuffer;
-  circomeTxJson: any;
+  circomTxJson: any;
   isReady$: Observable<boolean>;
 
   // tslint:disable-next-line:variable-name
@@ -31,7 +31,7 @@ export class CircomLoaderService {
         return transactionJson.json();
       })
       .then( (txJson: any) => {
-        this.circomeTxJson = txJson;
+        this.circomTxJson = txJson;
       });
 
     this.isReady$ = fromPromise(Promise.all([p1$, p2$]))

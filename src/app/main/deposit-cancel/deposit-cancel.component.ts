@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { fw, PayNote } from 'zeropool-lib';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { environment } from '../../../environments/environment';
-import { catchError, exhaustMap, filter, map, mergeMap, take, tap } from 'rxjs/operators';
+import { catchError, exhaustMap, filter, map, mergeMap, shareReplay, take, tap } from 'rxjs/operators';
 import { BehaviorSubject, combineLatest, merge, Observable, of } from 'rxjs';
 import { TransactionService } from '../../services/transaction.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { Router } from '@angular/router';
+import { BackgroundService } from '../../services/background.service';
 
 interface IWrappedPayNote {
   payNote: PayNote;
@@ -20,7 +21,13 @@ interface IWrappedPayNote {
 })
 export class DepositCancelComponent {
 
-  expiresBlockNumber = this.zpService.depositExpiresBlocks;
+  expiresBlockNumber = this.zpService.isReady$.pipe(
+    filter(x => x),
+    map(() => {
+      return this.zpService.depositExpiresBlocks;
+    }),
+    shareReplay(1)
+  );
 
   refreshPageAfterCancelDeposit = false;
   withdrawals$: Observable<IWrappedPayNote[]>;
@@ -30,6 +37,7 @@ export class DepositCancelComponent {
   constructor(
     private zpService: ZeroPoolService,
     private txService: TransactionService,
+    private backgroundService: BackgroundService,
     private router: Router
   ) {
 
@@ -76,7 +84,6 @@ export class DepositCancelComponent {
           if (s.indexOf(wrappedPayNote.payNote.txHash) !== -1) {
             wrappedPayNote.isFinalizingNow = true;
           }
-          console.log('123');
           return wrappedPayNote;
         });
       })
@@ -152,22 +159,33 @@ export class DepositCancelComponent {
     ).subscribe();
   }
 
-  isReadyToFinalize(withdrawBlockNumber: number): boolean {
-    const remainingBlockNum = this.zpService.currentBlockNumber - withdrawBlockNumber;
-    return remainingBlockNum > this.expiresBlockNumber;
+  isReadyToFinalize(withdrawBlockNumber: number): Observable<boolean> {
+
+    return this.expiresBlockNumber.pipe(
+      map((expiresBlockNumber) => {
+        const remainingBlockNum = this.zpService.currentBlockNumber - withdrawBlockNumber;
+        return remainingBlockNum > expiresBlockNumber;
+      })
+    );
+
   }
 
-  getRemainingBlockNumber(withdrawBlockNumber: number): number | string {
+  getRemainingBlockNumber(withdrawBlockNumber: number): Observable<number | string> {
 
-    if (typeof this.expiresBlockNumber !== 'number') {
-      return '?';
-    }
+    return this.expiresBlockNumber.pipe(
+      map((expiresBlockNumber) => {
+        if (typeof expiresBlockNumber !== 'number') {
+          return '?';
+        }
 
-    const remainingBlockNum = this.zpService.currentBlockNumber - withdrawBlockNumber;
-    if (remainingBlockNum > this.expiresBlockNumber) {
-      return this.expiresBlockNumber;
-    }
-    return remainingBlockNum;
+        const remainingBlockNum = this.zpService.currentBlockNumber - withdrawBlockNumber;
+        if (remainingBlockNum > expiresBlockNumber) {
+          return expiresBlockNumber;
+        }
+        return remainingBlockNum;
+      })
+    );
+
   }
 
 }

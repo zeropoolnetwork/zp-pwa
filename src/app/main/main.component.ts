@@ -11,6 +11,7 @@ import { AutoJoinUtxoService } from '../services/auto-join-utxo.service';
 import { Router } from '@angular/router';
 import { depositProgress$, UnconfirmedTransactionService } from '../services/unconfirmed-transaction.service';
 import { environment } from '../../environments/environment';
+import { BackgroundService } from '../services/background.service';
 
 @Component({
   selector: 'app-main',
@@ -51,13 +52,10 @@ export class MainComponent implements OnInit {
     private zpService: ZeroPoolService,
     private web3Service: Web3ProviderService,
     private clipboard: Clipboard,
-    private autoJoin: AutoJoinUtxoService, // background script
-    private unconfirmedTx: UnconfirmedTransactionService, // background script
-    private router: Router
+    private backgroundService: BackgroundService
   ) {
 
     this.account$ = this.accountSvc.account$;
-    this.zpService.start$.subscribe(); // Unsubscribe ?? - Обсудить с Кириллом
 
     this.subscription = this.zpService.zpUpdates$.subscribe(() => {
       this.accountSvc.deleteNewAccountFlag();

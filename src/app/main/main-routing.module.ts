@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 
 import { MainComponent } from './main.component';
 import { DepositComponent } from './deposit/deposit.component';
@@ -16,17 +16,17 @@ import { ResetAccountComponent } from './settings/reset-account/reset-account.co
 import { DepositCancelComponent } from './deposit-cancel/deposit-cancel.component';
 
 const routes: Routes = [
-  {path: '', component: MainComponent},
-  {path: 'gas-is-needed', component: GasIsNeededComponent},
-  {path: 'gas-deposit', component: GasDepositComponent},
-  {path: 'cancel-deposit', component: DepositCancelComponent},
-  {path: 'deposit', component: DepositComponent, canActivate: [GasGuard]},
-  {path: 'transfer', component: TransferComponent, canActivate: [GasGuard]},
-  {path: 'withdraw', component: WithdrawComponent, canActivate: [GasGuard]},
-  {path: 'withdrawals-list', component: WithdrawalsListComponent, canActivate: [GasGuard]},
-  {path: 'settings', component: SettingsComponent},
-  {path: 'settings/reset', component: ResetAccountComponent},
-  {path: 'settings/dust-protection', component: DustProtectionComponent}
+  { path: '', component: MainComponent },
+  { path: 'gas-is-needed', component: GasIsNeededComponent },
+  { path: 'gas-deposit', component: GasDepositComponent },
+  { path: 'cancel-deposit', component: DepositCancelComponent },
+  { path: 'deposit', component: DepositComponent, canActivate: [GasGuard] },
+  { path: 'transfer', component: TransferComponent, canActivate: [GasGuard] },
+  { path: 'withdraw', component: WithdrawComponent, canActivate: [GasGuard] },
+  { path: 'withdrawals-list', component: WithdrawalsListComponent },
+  { path: 'settings', component: SettingsComponent },
+  { path: 'settings/reset', component: ResetAccountComponent },
+  { path: 'settings/dust-protection', component: DustProtectionComponent }
 ];
 
 @NgModule({
