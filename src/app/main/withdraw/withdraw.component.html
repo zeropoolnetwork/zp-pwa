@@ -5,15 +5,18 @@
     <app-progress-message [hidden]="!withdrawIsInProgress" #progressDialog></app-progress-message>
 
     <ng-container *ngIf="!withdrawIsInProgress">
-      <h2>Place withdraw request</h2>
+      <!--      <h2>Place withdraw request</h2>-->
+      <h2>Withdrawal</h2>
 
-      <p>Published withdraw requests will be available for the challenge during the next {{challengeExpiresBlocks}}
-        blocks.<br> You will be
-        able to transfer funds to your account once that period is expired.</p>
+      <p>First, you request will be published and become available for the challenge during the
+        next {{challengeExpiresBlocks}} blocks.</p>
+      <p> You will be able to transfer funds to your account once that period is expired.</p>
 
       <mat-form-field appearance="outline" class="field">
-        <mat-label>Enter amount of ETH</mat-label>
-        <input matInput formControlName="toAmount" autocomplete="off">
+        <mat-label>Enter amount of zpETH</mat-label>
+        <input matInput formControlName="toAmount" autocomplete="off" type="number">
+
+        <mat-hint *ngIf="myZpBalance" align="end">Available {{myZpBalance}} zpETH</mat-hint>
 
         <mat-error *ngIf="toAmount.hasError('min')">
           Min amount is {{minAmount}} zpETH
@@ -23,11 +26,7 @@
         </mat-error>
       </mat-form-field>
 
-      <ng-container *ngIf="myZpBalance">
-        <div class="available-eth" style="margin-top: 1px;">Available {{myZpBalance}} zpETH</div>
-      </ng-container>
-
-      <div class="actions">
+      <div class="actions" style="margin-top: 20px">
         <button mat-stroked-button routerLink="/main">Back</button>
         <button mat-flat-button color="accent" [disabled]="!transferForm.valid" (click)="onSendClick()">Send</button>
       </div>
@@ -38,7 +37,7 @@
 
   <ng-container *ngIf="isDone">
     <h3>Successful Withdrawal</h3>
-    <img src="/assets/images/guy-faswkes-thanks.png" width="240px">
+    <img src="/assets/images/guy-fawkes-thanks.png" width="240px">
     <div class="actions">
       <button mat-stroked-button routerLink="/main">Back</button>
     </div>

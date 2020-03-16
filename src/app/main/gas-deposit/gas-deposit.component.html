@@ -9,11 +9,9 @@
     <mat-form-field appearance="outline" class="field">
       <mat-label>Enter amount of ETH</mat-label>
       <input matInput formControlName="amount" autocomplete="off" type="number">
-
       <!--
         <mat-error *ngFor="let errorText of objectValues(amount.errors || {})">{{errorText}}</mat-error>
       -->
-
       <mat-error *ngIf="amount.hasError('min')">
         Min amount of gas donation {{minEth}}
       </mat-error>

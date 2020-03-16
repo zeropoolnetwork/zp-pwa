@@ -7,27 +7,23 @@
 
       <h2>Deposit</h2>
       <p>ETH from your account will be deposited to your ZeroPool address via relayer</p>
-      <ng-container *ngIf="availableEthAmount">
-        <div class="title titleWithOutPadding available-eth">Available {{availableEthAmount}} ETH</div>
-      </ng-container>
 
-      <ng-container>
+      <mat-form-field appearance="outline" class="field">
 
-        <mat-form-field appearance="outline" class="field">
-          <mat-label>Enter amount of ETH</mat-label>
-          <input matInput formControlName="amount" autocomplete="off" type="number">
-          <mat-error *ngIf="amount.hasError('min')">
-            Min amount of deposit {{minEth}}
-          </mat-error>
-          <mat-error *ngIf="amount.hasError('max')">
-            Maximum amount of deposit in BETA is: {{maxEth}} ETH
-          </mat-error>
-          <mat-error *ngIf="amount.hasError('notEnough')">
-            Don't have enough funds
-          </mat-error>
-        </mat-form-field>
+        <mat-label>Enter amount of ETH</mat-label>
+        <input matInput formControlName="amount" autocomplete="off" type="number">
+        <mat-hint *ngIf="availableEthAmount" align="end">Available {{availableEthAmount}} ETH</mat-hint>
 
-      </ng-container>
+        <mat-error *ngIf="amount.hasError('min')">
+          Min amount of deposit {{minEth}}
+        </mat-error>
+        <mat-error *ngIf="amount.hasError('max')">
+          Maximum amount of deposit in BETA is: {{maxEth}} ETH
+        </mat-error>
+        <mat-error *ngIf="amount.hasError('notEnough')">
+          Don't have enough funds
+        </mat-error>
+      </mat-form-field>
 
       <div class="actions mt-20">
         <button mat-stroked-button routerLink="/main">Back</button>
