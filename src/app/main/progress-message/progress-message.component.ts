@@ -23,6 +23,11 @@ export class ProgressMessageComponent implements OnInit {
   }
 
   showMessage(action: ActionList, step: StepList, link?: string) {
+    console.log('----');
+    console.log(JSON.stringify(action));
+    console.log(JSON.stringify(step));
+    console.log('----');
+
     const messages = resolveProgressMessage(action, step);
 
     this.title = messages.title || '';
