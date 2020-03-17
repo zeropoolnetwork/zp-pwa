@@ -16,8 +16,7 @@
         <input matInput formControlName="toAmount" autocomplete="off" type="number">
 
         <mat-hint *ngIf="myZpBalance" align="end">
-          Available {{myZpBalance}} zpETH
-          <span class="fill-value-hint" (click)="fillMax(myZpBalance);">{{myZpBalance}} zpETH</span>
+          Available <span class="fill-value-hint" (click)="fillMax(myZpBalance);">{{myZpBalance}} zpETH</span>
         </mat-hint>
 
         <mat-error *ngIf="toAmount.hasError('min')">

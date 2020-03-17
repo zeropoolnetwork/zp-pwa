@@ -40,7 +40,7 @@ export class ZeroPoolService {
   public zp: ZeroPoolNetwork;
   public zpGas: ZeroPoolNetwork;
 
-  public maxAmountToSend: number;
+  public maxAmountToSend: ZpBalance = {};
 
   public ethBalance: number;
   public zpBalance: ZpBalance;
