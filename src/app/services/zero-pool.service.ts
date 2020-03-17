@@ -168,7 +168,7 @@ export class ZeroPoolService {
       switchMap(
         (state: MyUtxoState<string>) => {
 
-          const sortedUtxo = state.utxoList.sort(sortUtxo);
+          const sortedUtxo = [...state.utxoList].sort(sortUtxo);
           const groupedUtxo = groupUtxoByToken(sortedUtxo);
 
           for (const token in groupedUtxo) {
