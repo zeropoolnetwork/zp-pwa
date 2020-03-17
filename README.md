@@ -4,7 +4,7 @@ Angular based progressive web app to perform a truly private transaction on the 
 ZeroPool itself is a Rollup for publishing encrypted transactions.
 
 You can try out it live:
-- http://app.zeropool.network/
+- https://app.zeropool.network/
 - https://testnet.app.zeropool.network/
 
 The app communicates with relayer and smart contracts deployed on two ethereum networks:
@@ -17,6 +17,7 @@ At the moment, the following features are implemented:
 - [x] Deposits/withdrawals to/from the main chain
 - [x] Private transfers of ETH between ZeroPool accounts
 - [x] Private gas deposits on the gas chain as payment for relay for block publishing
+- [x] UTXO auto-join in backgorund
 - [x] Integration with desktop Metamask
 
 ## Changeset for the upcoming release:
@@ -26,11 +27,17 @@ At the moment, the following features are implemented:
 - [ ] Settings / About page with a link to smart contract and relayer
 - [ ] Withdraw to any address, not only to currently selected on metamask
 - [ ] More details in the transaction history, links to etherscan
+- [ ] Bug fixes
 
 ## Technical debt:
 - [ ] Introduce proper state management, think on Akita at the moment
 - [ ] OnPush change detection strategy for history and some other places
 - [ ] Update from Angular 9.0.3 -> 9.0.6
+
+## Further plans:
+- [ ] Swaps support
+- [ ] Improve support of mobile browsers
+- [ ] To be continued... 
 
 ## Development server
 
