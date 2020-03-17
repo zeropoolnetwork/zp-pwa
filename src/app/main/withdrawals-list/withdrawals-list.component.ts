@@ -35,8 +35,6 @@ export class WithdrawalsListComponent {
 
   withdrawals$: Observable<IWrappedPayNote[]>;
 
-  checkingMetaMask: { [key: string]: boolean } = {};
-
   // Buttons(paynote txHash) that we should replace with spinner
   private buttonsSubject: BehaviorSubject<string[]> = new BehaviorSubject([]);
 
@@ -72,7 +70,7 @@ export class WithdrawalsListComponent {
     const activeWithdrawalsUpdate$ = zpService.zpUpdates$.pipe(
       map(() => {
         this.checkZpEthBalance();
-        this.refreshPageAfterWithdrawal = this.zpService.lostDeposits.length <= 1;
+        this.refreshPageAfterWithdrawal = this.zpService.activeWithdrawals.length <= 1;
         return wrapPayNoteList(this.zpService.activeWithdrawals || []);
       }),
       exhaustMap((w: IWrappedPayNote[]) => {
@@ -127,23 +125,24 @@ export class WithdrawalsListComponent {
       filter((isReady: boolean) => isReady),
       take(1),
       mergeMap(() => {
-        return combineLatest([
-          fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransaction(ethTxHash)),
-          fromPromise(this.zpService.zp.ZeroPool.web3Ethereum.getTransactionReceipt(ethTxHash))
+        const w3eth = this.zpService.zp.ZeroPool.web3Ethereum;
+        const all$ = Promise.all([
+          w3eth.getTransaction(ethTxHash),
+          w3eth.getTransactionReceipt(ethTxHash)
         ]);
+        return fromPromise(all$);
       }),
       map(([tx, receipt]) => {
-        if (receipt && tx.blockNumber && !receipt.status) {
-          return false;
-        }
-        return !!tx;
+        const hasFailedEthTx = receipt && tx.blockNumber && !receipt.status;
+        const isTransactionPublished = () => !!tx;
+        //
+        return hasFailedEthTx ? false : isTransactionPublished();
       })
     );
   }
 
   withdraw(w: PayNote): void {
 
-    this.checkingMetaMask[w.txHash] = true;
     // Step 1
     this.metamaskSubject.next([
       ...this.metamaskSubject.value,
@@ -207,7 +206,7 @@ export class WithdrawalsListComponent {
 
     return this.expiresBlockNumber.pipe(
       map((challengeExpiresBlocks: number) => {
-        if (typeof this.zpService.challengeExpiresBlocks !== 'number') {
+        if (typeof challengeExpiresBlocks !== 'number') {
           return '?';
         }
 

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { fw, PayNote } from 'zeropool-lib';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { environment } from '../../../environments/environment';
-import { catchError, exhaustMap, filter, flatMap, map, mergeMap, shareReplay, take, tap } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, exhaustMap, filter, flatMap, map, shareReplay, take, tap } from 'rxjs/operators';
 import { BehaviorSubject, combineLatest, merge, Observable, of } from 'rxjs';
 import { TransactionService } from '../../services/transaction.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
@@ -12,6 +12,7 @@ import { BackgroundService } from '../../services/background.service';
 interface IWrappedPayNote {
   payNote: PayNote;
   isFinalizingNow: boolean;
+  isAwaitingForMetamaskSign: boolean;
 }
 
 @Component({
@@ -32,7 +33,11 @@ export class DepositCancelComponent {
   refreshPageAfterCancelDeposit = false;
   withdrawals$: Observable<IWrappedPayNote[]>;
 
+  // Buttons(paynote txHash) that we should replace with spinner
   private buttonsSubject: BehaviorSubject<string[]> = new BehaviorSubject([]);
+
+  // Button(paynote txHash) that we should replace with check metamask message
+  private metamaskSubject: BehaviorSubject<string[]> = new BehaviorSubject([]);
 
   constructor(
     private zpService: ZeroPoolService,
@@ -51,7 +56,8 @@ export class DepositCancelComponent {
         map((isFinalizingNow: boolean) => {
           return {
             payNote: w.payNote,
-            isFinalizingNow
+            isFinalizingNow,
+            isAwaitingForMetamaskSign: false
           };
         })
       );
@@ -76,14 +82,21 @@ export class DepositCancelComponent {
 
     this.withdrawals$ = combineLatest([
       w$,
-      this.buttonsSubject.asObservable()
+      this.buttonsSubject.asObservable().pipe(distinctUntilChanged()),
+      this.metamaskSubject.asObservable().pipe(distinctUntilChanged()),
     ]).pipe(
       map((x) => {
-        const [w, s]: [IWrappedPayNote[], string[]] = x;
+        const [w, b, m]: [IWrappedPayNote[], string[], string[]] = x;
+
         return w.map((wrappedPayNote: IWrappedPayNote) => {
-          if (s.indexOf(wrappedPayNote.payNote.txHash) !== -1) {
+          const txHash = wrappedPayNote.payNote.txHash;
+          if (b.indexOf(txHash) !== -1) {
             wrappedPayNote.isFinalizingNow = true;
           }
+          if (m.indexOf(txHash) !== -1) {
+            wrappedPayNote.isAwaitingForMetamaskSign = true;
+          }
+
           return wrappedPayNote;
         });
       })
@@ -125,7 +138,19 @@ export class DepositCancelComponent {
   }
 
   withdraw(w: PayNote): void {
+
+    // Step 1
+    this.metamaskSubject.next([
+      ...this.metamaskSubject.value,
+      w.txHash
+    ]);
+
     this.txService.depositCancel(w, (error: any, txHash: string | undefined) => {
+
+      // Step 2: Reset metamask
+      const updatedButtons = this.metamaskSubject.value.filter((id) => id !== w.txHash);
+      this.metamaskSubject.next(updatedButtons);
+
       if (error) {
         return;
       }
@@ -197,7 +222,8 @@ function wrapPayNoteList(withdrawals: PayNote[]): IWrappedPayNote[] {
     (payNote: PayNote) => {
       return {
         payNote,
-        isFinalizingNow: !!localStorage.getItem(payNote.txHash)
+        isFinalizingNow: !!localStorage.getItem(payNote.txHash),
+        isAwaitingForMetamaskSign: false
       };
     }
   );

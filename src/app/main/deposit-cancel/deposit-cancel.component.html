@@ -3,7 +3,6 @@
   <p>It seems that your deposit transaction wasn't published in ZeroPool block in time.</p>
   <p>You can get your funds back</p>
   <div class="lost-deposit-list">
-
     <div *ngFor="let w of withdrawals$ | async">
       <div class="lost-deposit-row" *ngIf="{isReady: isReadyToFinalize(w.payNote.blockNumber) | async} as finalize">
 
@@ -17,14 +16,17 @@
           <h3>{{ getAmount(w.payNote.utxo.amount) }} {{ getAssetName(w.payNote.utxo.token) }}</h3>
         </div>
 
-        <ng-container *ngIf="w.isFinalizingNow">
-          <loaders-css loader="ball-beat" [color]="'rgba(100, 100, 100, 0.5)'" [scale]="1"></loaders-css>
-        </ng-container>
+        <div>
+          <loaders-css *ngIf="w.isFinalizingNow && !w.isAwaitingForMetamaskSign"
+                       loader="ball-beat" [color]="'rgba(100, 100, 100, 0.5)'" [scale]="1"></loaders-css>
 
-
-        <ng-container *ngIf="!w.isFinalizingNow">
-          <button [disabled]="!finalize.isReady" (click)="withdraw(w.payNote)" mat-stroked-button>Withdraw</button>
-        </ng-container>
+          <button *ngIf="!w.isFinalizingNow && !w.isAwaitingForMetamaskSign"
+                  [disabled]="!finalize.isReady" (click)="withdraw(w.payNote)" mat-stroked-button>Withdraw
+          </button>
+          <p *ngIf="w.isAwaitingForMetamaskSign"
+             style="font-size: small"><b>check metamask</b>
+          </p>
+        </div>
 
       </div>
     </div>
