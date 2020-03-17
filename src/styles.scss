@@ -212,6 +212,11 @@ button.arrow-back {
   }
 }
 
+.fill-value-hint {
+  text-decoration: underline;
+  cursor: pointer
+}
+
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {

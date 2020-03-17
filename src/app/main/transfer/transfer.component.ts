@@ -60,11 +60,11 @@ export class TransferComponent implements OnInit {
       Validators.max(this.myZpBalance)
     ]);
 
-    // this.zpService.zpUpdates$.pipe(
-    //   tap(() => {
-    //     this.zpService.maxAmountToSend
-    //   })
-    // );
+    this.zpService.zpUpdates$.pipe(
+      tap(() => {
+        this.myZpBalance = fw(this.zpService.maxAmountToSend[ethAssetId]) || 0;
+      })
+    );
 
     this.form.get('toAmount').updateValueAndValidity();
 
