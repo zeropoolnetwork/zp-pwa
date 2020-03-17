@@ -1,9 +1,9 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
-export type AmountValidatorParams = {
-  availableAmount?: Number;
-  maxAmount?: Number;
-  minAmount?: Number;
+export interface AmountValidatorParams {
+  availableAmount?: number;
+  maxAmount?: number;
+  minAmount?: number;
 }
 
 export class CustomValidators {
@@ -14,15 +14,15 @@ export class CustomValidators {
       const num = control.value;
 
       if (num < minAmount) {
-        return {'min': true};
+        return {min: true};
       }
 
       if (num > maxAmount) {
-        return {'max': true};
+        return {max: true};
       }
 
       if (num > availableAmount) {
-        return {'notEnough': true};
+        return {notEnough: true};
       }
 
       return null;

@@ -5,7 +5,7 @@ import { tw } from 'zeropool-lib';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { of, Subscription } from 'rxjs';
 import { catchError, filter, finalize, switchMap, tap } from 'rxjs/operators';
-import { AmountValidatorParams, CustomValidators } from '../gas-deposit/custom-validators';
+import { AmountValidatorParams, CustomValidators } from '../custom-validators';
 import { Web3ProviderService } from '../../services/web3.provider.service';
 import {
   depositProgress,

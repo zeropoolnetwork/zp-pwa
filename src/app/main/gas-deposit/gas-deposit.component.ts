@@ -5,7 +5,7 @@ import { catchError, switchMap, take, tap } from 'rxjs/operators';
 import { TransactionService } from '../../services/transaction.service';
 import { of } from 'rxjs';
 import { ZeroPoolService } from '../../services/zero-pool.service';
-import { AmountValidatorParams, CustomValidators } from './custom-validators';
+import { AmountValidatorParams, CustomValidators } from '../custom-validators';
 import { Web3ProviderService } from '../../services/web3.provider.service';
 import { ProgressMessageComponent } from '../progress-message/progress-message.component';
 import { UnconfirmedTransactionService } from '../../services/unconfirmed-transaction.service';
@@ -26,7 +26,13 @@ export class GasDepositComponent implements OnInit {
   @ViewChild('progressDialog')
   progressDialog: ProgressMessageComponent;
 
-  // objectValues = Object.values;
+  //
+  form: FormGroup = this.fb.group({
+    amount: ['', [
+      Validators.required,
+      CustomValidators.amount(this.amountValidatorParams)]
+    ]
+  });
 
   get maxEth(): number {
     return 0.05;
@@ -46,13 +52,6 @@ export class GasDepositComponent implements OnInit {
       minAmount: this.minEth,
     };
   }
-
-  form: FormGroup = this.fb.group({
-    amount: ['', [
-      Validators.required,
-      CustomValidators.amount(this.amountValidatorParams)]
-    ]
-  });
 
   get amount(): AbstractControl {
     return this.form.get('amount');

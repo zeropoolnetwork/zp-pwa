@@ -9,6 +9,7 @@ import { ZeroPoolService } from '../../services/zero-pool.service';
 import { ValidateAddress } from '../../common/validateAddress';
 import { ProgressMessageComponent } from '../progress-message/progress-message.component';
 import { ActionList, StepList } from '../progress-message/transaction-progress';
+import { CustomValidators } from '../custom-validators';
 
 @Component({
   selector: 'app-transfer',
@@ -20,6 +21,8 @@ export class TransferComponent implements OnInit {
   transactionHash: string;
 
   myZpBalance: number;
+  myAvailableZpBalance: number;
+
   minAmount = 1e-18;
 
   isDone = false;
@@ -52,22 +55,36 @@ export class TransferComponent implements OnInit {
   ngOnInit(): void {
     const ethAssetId = environment.ethToken;
     this.myZpBalance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
+    this.myAvailableZpBalance = fw(this.zpService.maxAmountToSend[ethAssetId]) || 0;
 
     // Adjust max value to validates
     this.form.get('toAmount').setValidators([
       Validators.required,
-      Validators.min(this.minAmount),
-      Validators.max(this.myZpBalance)
+      CustomValidators.amount({
+        minAmount: this.minAmount,
+        maxAmount: this.myZpBalance,
+      })
     ]);
+    this.form.get('toAmount').updateValueAndValidity();
+    //
 
     this.zpService.zpUpdates$.pipe(
       tap(() => {
-        this.myZpBalance = fw(this.zpService.maxAmountToSend[ethAssetId]) || 0;
+        //
+        this.myAvailableZpBalance = fw(this.zpService.maxAmountToSend[ethAssetId]) || 0;
+        //
+        this.form.get('toAmount').setValidators([
+          Validators.required,
+          CustomValidators.amount({
+            minAmount: this.minAmount,
+            maxAmount: this.myZpBalance,
+            availableAmount: fw(this.zpService.maxAmountToSend[ethAssetId])
+          })
+        ]);
+        this.form.get('toAmount').updateValueAndValidity();
+        //
       })
     );
-
-    this.form.get('toAmount').updateValueAndValidity();
-
   }
 
   private setProgressState(progressStep: StepList, txHash?: string) {
@@ -93,7 +110,7 @@ export class TransferComponent implements OnInit {
         this.transferIsInProgress = false;
         this.isDone = true;
         console.log({
-          transfer:  txHash
+          transfer: txHash
         });
       }),
       catchError((e) => {

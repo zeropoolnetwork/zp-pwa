@@ -25,13 +25,20 @@
           <span class="fill-value-hint" (click)="fillMax(myZpBalance);">{{myZpBalance}} zpETH</span>
         </mat-hint>
 
+
         <mat-error *ngIf="toAmount.hasError('min')">
           Min amount is {{minAmount}} zpETH
         </mat-error>
         <mat-error *ngIf="toAmount.hasError('max')">
           You have only {{myZpBalance}} zpETH
         </mat-error>
+        <mat-error *ngIf="toAmount.hasError('notEnough')">
+          <span>UTXO join in progress</span><br>
+          <span>{{myAvailableZpBalance}} / {{myZpBalance}} zpETH is available now</span>
+        </mat-error>
       </mat-form-field>
+
+<!--      {{toAmount.errors | json}}-->
 
       <div class="actions mt-20">
         <button mat-stroked-button routerLink="/main">Back</button>
