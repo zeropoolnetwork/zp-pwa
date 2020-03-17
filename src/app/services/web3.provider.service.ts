@@ -95,7 +95,6 @@ export class Web3ProviderService {
   }
 
   connectWeb3(): boolean {
-    debugger;
 
     if (typeof ethereum !== 'undefined') {
       this.enableWeb3(ethereum);
