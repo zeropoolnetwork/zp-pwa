@@ -12,6 +12,7 @@ import { BackgroundService } from '../../services/background.service';
 interface IWrappedPayNote {
   payNote: PayNote;
   isFinalizingNow: boolean;
+  isAwaitingForMetamaskSign: boolean;
 }
 
 @Component({
@@ -34,7 +35,13 @@ export class WithdrawalsListComponent {
 
   withdrawals$: Observable<IWrappedPayNote[]>;
 
+  checkingMetaMask: { [key: string]: boolean } = {};
+
+  // Buttons(paynote txHash) that we should replace with spinner
   private buttonsSubject: BehaviorSubject<string[]> = new BehaviorSubject([]);
+
+  // Button(paynote txHash) that we should replace with check metamask message
+  private metamaskSubject: BehaviorSubject<string[]> = new BehaviorSubject([]);
 
   constructor(
     private zpService: ZeroPoolService,
@@ -55,7 +62,8 @@ export class WithdrawalsListComponent {
         map((isFinalizingNow: boolean) => {
           return {
             payNote: w.payNote,
-            isFinalizingNow
+            isFinalizingNow,
+            isAwaitingForMetamaskSign: false
           };
         })
       );
@@ -81,13 +89,19 @@ export class WithdrawalsListComponent {
 
     this.withdrawals$ = combineLatest([
       w$,
-      this.buttonsSubject.asObservable().pipe(distinctUntilChanged())
+      this.buttonsSubject.asObservable().pipe(distinctUntilChanged()),
+      this.metamaskSubject.asObservable().pipe(distinctUntilChanged()),
     ]).pipe(
       map((x) => {
-        const [w, s]: [IWrappedPayNote[], string[]] = x;
+        const [w, b, m]: [IWrappedPayNote[], string[], string[]] = x;
+
         return w.map((wrappedPayNote: IWrappedPayNote) => {
-          if (s.indexOf(wrappedPayNote.payNote.txHash) !== -1) {
+          const txHash = wrappedPayNote.payNote.txHash;
+          if (b.indexOf(txHash) !== -1) {
             wrappedPayNote.isFinalizingNow = true;
+          }
+          if (m.indexOf(txHash) !== -1) {
+            wrappedPayNote.isAwaitingForMetamaskSign = true;
           }
 
           return wrappedPayNote;
@@ -128,7 +142,20 @@ export class WithdrawalsListComponent {
   }
 
   withdraw(w: PayNote): void {
+
+    this.checkingMetaMask[w.txHash] = true;
+    // Step 1
+    this.metamaskSubject.next([
+      ...this.metamaskSubject.value,
+      w.txHash
+    ]);
+
     this.txService.withdraw(w, (error: any, txHash: string | undefined) => {
+
+      // Step 2: Reset metamask
+      const updatedButtons = this.metamaskSubject.value.filter((id) => id !== w.txHash);
+      this.metamaskSubject.next(updatedButtons);
+
       if (error) {
         return;
       }
@@ -209,7 +236,8 @@ function wrapPayNoteList(withdrawals: PayNote[]): IWrappedPayNote[] {
     (payNote: PayNote) => {
       return {
         payNote,
-        isFinalizingNow: !!localStorage.getItem(payNote.txHash)
+        isFinalizingNow: !!localStorage.getItem(payNote.txHash),
+        isAwaitingForMetamaskSign: false
       };
     }
   );

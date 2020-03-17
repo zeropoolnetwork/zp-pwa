@@ -1,8 +1,8 @@
 <div class="fixed-center widget-box">
   <h2>Your withdrawals</h2>
   <div class="withdrawals-list">
-    <div *ngFor="let w of withdrawals$ | async">
-      <div *ngIf="{isReady: isReadyToFinalize(w.payNote.blockNumber) | async} as finalize">
+    <ng-container *ngFor="let w of withdrawals$ | async">
+      <ng-container *ngIf="{isReady: isReadyToFinalize(w.payNote.blockNumber) | async} as finalize">
 
         <div class="withdrawals-row">
           <div>
@@ -14,18 +14,22 @@
             <h3>{{ getAmount(w.payNote.utxo.amount) }} {{ getAssetName(w.payNote.utxo.token) }}</h3>
           </div>
 
-          <loaders-css *ngIf="w.isFinalizingNow" loader="ball-beat" [color]="'rgba(100, 100, 100, 0.5)'"
-                       [scale]="1"></loaders-css>
+          <div>
+            <loaders-css *ngIf="w.isFinalizingNow && !w.isAwaitingForMetamaskSign"
+                         loader="ball-beat" [color]="'rgba(100, 100, 100, 0.5)'" [scale]="1"></loaders-css>
 
-
-          <button *ngIf="!w.isFinalizingNow" [disabled]="!finalize.isReady" (click)="withdraw(w.payNote)"
-                  mat-stroked-button>Finalize
-          </button>
+            <button *ngIf="!w.isFinalizingNow && !w.isAwaitingForMetamaskSign"
+                    [disabled]="!finalize.isReady" (click)="withdraw(w.payNote)" mat-stroked-button>Finalize
+            </button>
+            <p *ngIf="w.isAwaitingForMetamaskSign"
+               style="font-size: small"><b>check metamask</b>
+            </p>
+          </div>
 
         </div>
 
-      </div>
-    </div>
+      </ng-container>
+    </ng-container>
 
   </div>
   <div class="actions mt-20">
