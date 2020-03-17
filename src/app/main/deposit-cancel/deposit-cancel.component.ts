@@ -24,6 +24,7 @@ export class DepositCancelComponent {
 
   expiresBlockNumber = this.zpService.isReady$.pipe(
     filter(x => x),
+    take(1),
     map(() => {
       return this.zpService.depositExpiresBlocks;
     }),
@@ -103,14 +104,6 @@ export class DepositCancelComponent {
     );
   }
 
-  getAmount(val: number): number {
-    return fw(val);
-  }
-
-  getAssetName(assetAddress: string) {
-    return assetAddress === environment.ethToken ? 'ETH' : '';
-  }
-
   isFinalizingNow(w: PayNote): Observable<boolean> {
     const ethTxHash = localStorage.getItem(w.txHash);
     if (!ethTxHash) {
@@ -140,16 +133,12 @@ export class DepositCancelComponent {
   withdraw(w: PayNote): void {
 
     // Step 1
-    this.metamaskSubject.next([
-      ...this.metamaskSubject.value,
-      w.txHash
-    ]);
+    this.openCheckMetamask(w.txHash);
 
     this.txService.depositCancel(w, (error: any, txHash: string | undefined) => {
 
       // Step 2: Reset metamask
-      const updatedButtons = this.metamaskSubject.value.filter((id) => id !== w.txHash);
-      this.metamaskSubject.next(updatedButtons);
+      this.closeCheckMetamask(w.txHash);
 
       if (error) {
         return;
@@ -157,18 +146,15 @@ export class DepositCancelComponent {
 
       // map: zpTx => ethTx
       localStorage.setItem(w.txHash, txHash);
-      this.buttonsSubject.next([
-        ...this.buttonsSubject.value,
-        w.txHash
-      ]);
+      this.openButtonLoader(w.txHash);
     }).pipe(
       tap((txHash: any) => {
         localStorage.removeItem(w.txHash);
         console.log({
           depositCancel: txHash
         });
-        const updatedButtons = this.buttonsSubject.value.filter((id) => id !== w.txHash);
-        this.buttonsSubject.next(updatedButtons);
+
+        this.closeButtonLoader(w.txHash);
 
         this.zpService.lostDeposits =
           this.zpService.lostDeposits.filter((x) => x.txHash !== w.txHash);
@@ -213,6 +199,38 @@ export class DepositCancelComponent {
       })
     );
 
+  }
+
+  getAmount(val: number): number {
+    return fw(val);
+  }
+
+  getAssetName(assetAddress: string) {
+    return assetAddress === environment.ethToken ? 'ETH' : '';
+  }
+
+  private closeButtonLoader(txHash: string): void {
+    const updatedButtons = this.buttonsSubject.value.filter((id) => id !== txHash);
+    this.buttonsSubject.next(updatedButtons);
+  }
+
+  private openButtonLoader(txHash: string): void {
+    this.buttonsSubject.next([
+      ...this.buttonsSubject.value,
+      txHash
+    ]);
+  }
+
+  private closeCheckMetamask(txHash: string): void {
+    const updatedButtons = this.metamaskSubject.value.filter((id) => id !== txHash);
+    this.metamaskSubject.next(updatedButtons);
+  }
+
+  private openCheckMetamask(txHash: string): void {
+    this.metamaskSubject.next([
+      ...this.metamaskSubject.value,
+      txHash
+    ]);
   }
 
 }

@@ -24,6 +24,7 @@ export class WithdrawalsListComponent {
 
   expiresBlockNumber = this.zpService.isReady$.pipe(
     filter(x => x),
+    take(1),
     map(() => {
       return this.zpService.challengeExpiresBlocks;
     }),
@@ -144,27 +145,20 @@ export class WithdrawalsListComponent {
   withdraw(w: PayNote): void {
 
     // Step 1
-    this.metamaskSubject.next([
-      ...this.metamaskSubject.value,
-      w.txHash
-    ]);
+    this.openCheckMetamask(w.txHash);
 
     this.txService.withdraw(w, (error: any, txHash: string | undefined) => {
 
       // Step 2: Reset metamask
-      const updatedButtons = this.metamaskSubject.value.filter((id) => id !== w.txHash);
-      this.metamaskSubject.next(updatedButtons);
-
+      this.closeCheckMetamask(w.txHash);
+      console.log('closed')
       if (error) {
         return;
       }
 
       // map: zpTx => ethTx
       localStorage.setItem(w.txHash, txHash);
-      this.buttonsSubject.next([
-        ...this.buttonsSubject.value,
-        w.txHash
-      ]);
+      this.openButtonLoader(w.txHash);
     }).pipe(
       tap((txHash: any) => {
         localStorage.removeItem(w.txHash);
@@ -172,8 +166,7 @@ export class WithdrawalsListComponent {
           withdraw: txHash
         });
 
-        const updatedButtons = this.buttonsSubject.value.filter((id) => id !== w.txHash);
-        this.buttonsSubject.next(updatedButtons);
+        this.closeButtonLoader(w.txHash);
 
         this.zpService.activeWithdrawals =
           this.zpService.activeWithdrawals.filter((x) => x.txHash !== w.txHash);
@@ -226,6 +219,30 @@ export class WithdrawalsListComponent {
 
   getAssetName(assetAddress: string) {
     return assetAddress === environment.ethToken ? 'ETH' : '';
+  }
+
+  private closeButtonLoader(txHash: string): void {
+    const updatedButtons = this.buttonsSubject.value.filter((id) => id !== txHash);
+    this.buttonsSubject.next(updatedButtons);
+  }
+
+  private openButtonLoader(txHash: string): void {
+    this.buttonsSubject.next([
+      ...this.buttonsSubject.value,
+      txHash
+    ]);
+  }
+
+  private closeCheckMetamask(txHash: string): void {
+    const updatedButtons = this.metamaskSubject.value.filter((id) => id !== txHash);
+    this.metamaskSubject.next(updatedButtons);
+  }
+
+  private openCheckMetamask(txHash: string): void {
+    this.metamaskSubject.next([
+      ...this.metamaskSubject.value,
+      txHash
+    ]);
   }
 
 }
