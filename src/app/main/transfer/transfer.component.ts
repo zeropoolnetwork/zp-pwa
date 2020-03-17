@@ -54,8 +54,14 @@ export class TransferComponent implements OnInit {
 
   ngOnInit(): void {
     const ethAssetId = environment.ethToken;
+
     this.myZpBalance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
     this.myAvailableZpBalance = fw(this.zpService.maxAmountToSend[ethAssetId]) || 0;
+
+    // console.table([
+    //   {name: 'this.myZpBalance', b: this.myZpBalance},
+    //   {name: 'zpService.maxAmountToSend=', b: this.myAvailableZpBalance}
+    // ]);
 
     // Adjust max value to validates
     this.form.get('toAmount').setValidators([
@@ -63,6 +69,7 @@ export class TransferComponent implements OnInit {
       CustomValidators.amount({
         minAmount: this.minAmount,
         maxAmount: this.myZpBalance,
+        availableAmount: this.myAvailableZpBalance,
       })
     ]);
     this.form.get('toAmount').updateValueAndValidity();
@@ -70,15 +77,21 @@ export class TransferComponent implements OnInit {
 
     this.zpService.zpUpdates$.pipe(
       tap(() => {
-        //
+        this.myZpBalance = fw(this.zpService.zpBalance[ethAssetId]) || 0;
         this.myAvailableZpBalance = fw(this.zpService.maxAmountToSend[ethAssetId]) || 0;
         //
+
+        // console.table([
+        //   {name: 'this.myZpBalance', b: this.myZpBalance},
+        //   {name: 'zpService.maxAmountToSend=', b: this.myAvailableZpBalance}
+        // ]);
+
         this.form.get('toAmount').setValidators([
           Validators.required,
           CustomValidators.amount({
             minAmount: this.minAmount,
             maxAmount: this.myZpBalance,
-            availableAmount: fw(this.zpService.maxAmountToSend[ethAssetId])
+            availableAmount: this.myAvailableZpBalance
           })
         ]);
         this.form.get('toAmount').updateValueAndValidity();
