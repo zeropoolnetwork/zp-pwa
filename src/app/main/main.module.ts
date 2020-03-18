@@ -36,6 +36,8 @@ import { ProgressMessageComponent } from './progress-message/progress-message.co
 import { TransactionBlockerService } from '../services/transaction-blocker.service';
 import { DepositCancelComponent } from './deposit-cancel/deposit-cancel.component';
 import { BackgroundService } from '../services/background.service';
+import { ExportMnemonicComponent } from './settings/export-mnemonic/export-mnemonic.component';
+import { CopyTooltipComponent } from '../common/copy-tooltip/copy-tooltip.component';
 
 @NgModule({
   declarations: [
@@ -52,6 +54,8 @@ import { BackgroundService } from '../services/background.service';
     DustProtectionComponent,
     StringifyHistoryPipe,
     ProgressMessageComponent,
+    ExportMnemonicComponent,
+    CopyTooltipComponent
   ],
   imports: [
     CommonModule,

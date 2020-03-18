@@ -1,0 +1,27 @@
+<div class="fixed-center widget-box">
+  <div class="widget-box-center settings-content" *ngIf="mnemonic | async as mnemonic">
+
+    <!--<section class="settings-delete">-->
+    <!--<h1>Export Mnemonic</h1>-->
+    <h1></h1>
+    <div style="margin-top: 2em">
+      <app-copy-tooltip [dataToCopy]="mnemonic" class="mnemonic">
+        <div style="color: black;">
+          {{mnemonic}}
+        </div>
+        <div style="margin: 0; padding: 0; bottom:0">
+          <p style="font-size: 13px !important; margin-top: 1em; padding: 0;">
+            <mat-icon style="font-size: 12px !important;">file_copy</mat-icon>
+            Click to copy
+          </p>
+        </div>
+      </app-copy-tooltip>
+      <br>
+    </div>
+
+    <!--</section>-->
+    <div class="actions mt-10">
+      <button mat-stroked-button routerLink="/main/settings">Back</button>
+    </div>
+  </div>
+</div>
