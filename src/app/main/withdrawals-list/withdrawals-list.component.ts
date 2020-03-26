@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { fw, PayNote } from 'zeropool-lib';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { environment } from '../../../environments/environment';
 import { catchError, distinctUntilChanged, exhaustMap, filter, map, mergeMap, shareReplay, take, tap } from 'rxjs/operators';
-import { BehaviorSubject, combineLatest, merge, Observable, of } from 'rxjs';
+import { BehaviorSubject, combineLatest, merge, Observable, of, Subscription } from 'rxjs';
 import { TransactionService } from '../../services/transaction.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { Router } from '@angular/router';
@@ -20,10 +20,12 @@ interface IWrappedPayNote {
   templateUrl: './withdrawals-list.component.html',
   styleUrls: ['./withdrawals-list.component.scss']
 })
-export class WithdrawalsListComponent {
+export class WithdrawalsListComponent implements OnDestroy {
+
+  private subscriptions: Subscription = new Subscription();
 
   expiresBlockNumber = this.zpService.isReady$.pipe(
-    filter(x => x),
+    filter((x) => x),
     take(1),
     map(() => {
       return this.zpService.challengeExpiresBlocks;
@@ -110,6 +112,10 @@ export class WithdrawalsListComponent {
 
   }
 
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
+  }
+
   checkZpEthBalance() {
     if (this.zpService.zpBalance) {
       this.isAvailableNewWithdraw = !!this.zpService.zpBalance[environment.ethToken];
@@ -147,11 +153,11 @@ export class WithdrawalsListComponent {
     // Step 1
     this.openCheckMetamask(w.txHash);
 
-    this.txService.withdraw(w, (error: any, txHash: string | undefined) => {
+    const withdraw$ = this.txService.withdraw(w, (error: any, txHash: string | undefined) => {
 
       // Step 2: Reset metamask
       this.closeCheckMetamask(w.txHash);
-      console.log('closed')
+      console.log('closed');
       if (error) {
         return;
       }
@@ -181,7 +187,9 @@ export class WithdrawalsListComponent {
         console.log(e);
         return of('');
       })
-    ).subscribe();
+    );
+
+    this.subscriptions.add(withdraw$.subscribe());
   }
 
   isReadyToFinalize(withdrawBlockNumber: number): Observable<boolean> {

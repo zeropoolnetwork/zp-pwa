@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { fw, PayNote } from 'zeropool-lib';
 import { ZeroPoolService } from '../../services/zero-pool.service';
 import { environment } from '../../../environments/environment';
 import { catchError, distinctUntilChanged, exhaustMap, filter, flatMap, map, shareReplay, take, tap } from 'rxjs/operators';
-import { BehaviorSubject, combineLatest, merge, Observable, of } from 'rxjs';
+import { BehaviorSubject, combineLatest, merge, Observable, of, Subscription } from 'rxjs';
 import { TransactionService } from '../../services/transaction.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { Router } from '@angular/router';
@@ -20,10 +20,12 @@ interface IWrappedPayNote {
   templateUrl: './deposit-cancel.component.html',
   styleUrls: ['./deposit-cancel.component.scss']
 })
-export class DepositCancelComponent {
+export class DepositCancelComponent implements OnDestroy {
+
+  private subscriptions: Subscription = new Subscription();
 
   expiresBlockNumber = this.zpService.isReady$.pipe(
-    filter(x => x),
+    filter((x) => x),
     take(1),
     map(() => {
       return this.zpService.depositExpiresBlocks;
@@ -67,6 +69,7 @@ export class DepositCancelComponent {
     const activeWithdrawalsUpdate$ = zpService.zpUpdates$.pipe(
       map(() => {
         this.refreshPageAfterCancelDeposit = this.zpService.lostDeposits.length <= 1;
+
         return wrapPayNoteList(this.zpService.lostDeposits || []);
       }),
       exhaustMap((w: IWrappedPayNote[]) => {
@@ -104,6 +107,10 @@ export class DepositCancelComponent {
     );
   }
 
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
+  }
+
   isFinalizingNow(w: PayNote): Observable<boolean> {
     const ethTxHash = localStorage.getItem(w.txHash);
     if (!ethTxHash) {
@@ -135,7 +142,7 @@ export class DepositCancelComponent {
     // Step 1
     this.openCheckMetamask(w.txHash);
 
-    this.txService.depositCancel(w, (error: any, txHash: string | undefined) => {
+    const cancelDeposit$ = this.txService.depositCancel(w, (error: any, txHash: string | undefined) => {
 
       // Step 2: Reset metamask
       this.closeCheckMetamask(w.txHash);
@@ -169,7 +176,9 @@ export class DepositCancelComponent {
         console.log(e);
         return of('');
       })
-    ).subscribe();
+    );
+
+    this.subscriptions.add(cancelDeposit$.subscribe());
   }
 
   isReadyToFinalize(withdrawBlockNumber: number): Observable<boolean> {
