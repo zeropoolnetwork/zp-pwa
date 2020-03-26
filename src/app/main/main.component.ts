@@ -124,27 +124,4 @@ export class MainComponent implements OnInit {
     }
   }
 
-  // TODO: move to separate component or directive
-  onAddressClick(tooltip: MatTooltip, account: IAccount) {
-
-    tooltip.hide();
-    this.clipboard.copy(account.zeropoolAddress);
-
-    timer(250).pipe(
-      tap(() => {
-        this.tooltipMessage = 'Copied!';
-        tooltip.show();
-      }),
-      delay(1000),
-      tap(() => {
-        tooltip.hide();
-      }),
-      delay(50),
-      tap(() => {
-        this.tooltipMessage = 'Copy to clipboard';
-      }),
-    ).subscribe(() => {
-      console.log('!');
-    });
-  }
 }

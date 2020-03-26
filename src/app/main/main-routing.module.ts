@@ -14,6 +14,7 @@ import { GasDepositComponent } from './gas-deposit/gas-deposit.component';
 import { DustProtectionComponent } from './settings/dust-protection/dust-protection.component';
 import { ResetAccountComponent } from './settings/reset-account/reset-account.component';
 import { DepositCancelComponent } from './deposit-cancel/deposit-cancel.component';
+import { ExportMnemonicComponent } from './settings/export-mnemonic/export-mnemonic.component';
 
 const routes: Routes = [
   { path: '', component: MainComponent },
@@ -26,7 +27,8 @@ const routes: Routes = [
   { path: 'withdrawals-list', component: WithdrawalsListComponent },
   { path: 'settings', component: SettingsComponent },
   { path: 'settings/reset', component: ResetAccountComponent },
-  { path: 'settings/dust-protection', component: DustProtectionComponent }
+  { path: 'settings/dust-protection', component: DustProtectionComponent },
+  { path: 'settings/mnemonic', component: ExportMnemonicComponent },
 ];
 
 @NgModule({
