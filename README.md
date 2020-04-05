@@ -23,7 +23,7 @@ At the moment, the following features are implemented:
 ## Changeset for the upcoming release:
 - [ ] ERC20 Support on UI
 - [ ] Build/Version info in the footer
-- [ ] Settings / export mnemonic
+- [x] Settings / export mnemonic
 - [ ] Settings / About page with a link to smart contract and relayer
 - [ ] Withdraw to any address, not only to currently selected on metamask
 - [ ] More details in the transaction history, links to etherscan
@@ -46,3 +46,15 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app w
 ## Build
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+
+## Docker
+Nginx server
+```bash
+docker build zp .
+docker run -d -p 80:80 zp
+```
+
+To test already built application run `./dev.sh`.   
+Nginx + Volume to the dist folder
+
+
